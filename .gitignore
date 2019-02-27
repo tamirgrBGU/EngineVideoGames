@@ -1,0 +1,9 @@
+# Directories
+.vs/
+bin/
+bin-int/
+display/
+engine3D/
+
+# Files
+*.user
