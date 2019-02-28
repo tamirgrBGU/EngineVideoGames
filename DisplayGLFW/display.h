@@ -1,7 +1,7 @@
 #ifndef DISPLAY_INCLUDED_H
 #define DISPLAY_INCLUDED_H
 
-#include <GLFW/glfw3.h>
+#include <GLFW\glfw3.h>
 #include <string>
 
 class Display
@@ -12,6 +12,7 @@ public:
 
 	void Clear(float r, float g, float b, float a);
 	void SwapBuffers();
+	void PollEvents();
 	bool IsFullscreen(  );
 	void* getScene();
 	void addKeyCallBack(void(*func)(GLFWwindow *,int,int,int,int));

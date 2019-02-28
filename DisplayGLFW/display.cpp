@@ -101,3 +101,8 @@ void Display::SwapBuffers()
 {
 	glfwSwapBuffers(m_window);
 }
+
+void Display::PollEvents()
+{
+	glfwPollEvents();
+}
