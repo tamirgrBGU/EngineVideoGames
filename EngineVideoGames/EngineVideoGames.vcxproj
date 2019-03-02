@@ -75,7 +75,7 @@
     <ClCompile Include="EulerAngles.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Log.cpp" />
-    <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="MeshConstructor.cpp" />
     <ClCompile Include="MovableGLM.cpp" />
     <ClCompile Include="obj_loader.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -91,7 +91,7 @@
     <ClInclude Include="EulerAngles.h" />
     <ClInclude Include="IndexBuffer.hpp" />
     <ClInclude Include="Log.hpp" />
-    <ClInclude Include="mesh.h" />
+    <ClInclude Include="MeshConstructor.h" />
     <ClInclude Include="MovableGLM.h" />
     <ClInclude Include="obj_loader.h" />
     <ClInclude Include="scene.h" />

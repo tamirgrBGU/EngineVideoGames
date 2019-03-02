@@ -3,10 +3,10 @@
 //varying vec3 color0;
 
 uniform sampler2D sampler;
-uniform vec3 lightDirection;
-uniform vec3 lightColor;
+uniform vec4 lightDirection;
+uniform vec4 lightColor;
 
 void main()
 {
-	gl_FragColor = vec4(lightColor,1);
+	gl_FragColor = lightColor;
 }

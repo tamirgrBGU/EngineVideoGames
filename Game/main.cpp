@@ -14,10 +14,10 @@ int main(int argc,char *argv[])
 	Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, "OpenGL");
 	init(display);
 	Game scn(glm::vec3(0.0f, 5.0f, -20.0f), CAM_ANGLE, relation, zNear,zFar);
-	scn.init();
+	scn.Init();
 	
 	scn.addShader("../res/shaders/basicShader");
-	scn.addShader("../res/shaders/newPickingShader");	
+	scn.addShader("../res/shaders/pickingShader");	
 
 	display.setScene(&scn);
 	while(!display.closeWindow())

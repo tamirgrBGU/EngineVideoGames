@@ -1,96 +1,45 @@
 #include "shape.h"
+#include "Log.hpp"
+#include "MeshConstructor.h"
 
 Shape::Shape(const Shape& shape)
 {
 	if(shape.mesh)
 		mesh = shape.mesh;
-	if(shape.lineMesh)
-		lineMesh = shape.lineMesh;
+	verticesNum = shape.verticesNum;
 	tex = shape.tex;
 	isCopy = true;
-	vao = new VertexArray();
-}
-Shape::Shape(const std::string& fileName,VertexArray *_vao){
-	mesh = new Mesh(fileName,_vao);
-	tex = 0;
-	isCopy = false;
-	vao = _vao;
 }
 
-Shape::Shape(const std::string& fileName,const std::string& textureFileName,VertexArray *_vao){
-	mesh = new Mesh(fileName,_vao); 
-	tex = new Texture(textureFileName);
+Shape::Shape(const std::string& fileName){
+	mesh = new VertexArray();
 	isCopy = false;
-	vao = _vao;
 }
 
-Shape::Shape(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices,VertexArray *_vao)
+Shape::Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution)
 {
-	mesh = new Mesh(vertices,numVertices,indices,numIndices,_vao);
-	tex = 0; 
+	mesh = new VertexArray();
+	mesh->Bind();
+	verticesNum = MeshConstructor(SimpleShapeType,*mesh).GetCount();
+	mesh->Unbind();
 	isCopy = false;
-	vao = _vao;
 }
 
-Shape::Shape(LineVertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices,VertexArray *_vao)
+void Shape::AddTexture(const std::string& textureFileName)
 {
-
-	lineMesh = new LineMesh(vertices,numVertices,indices,numIndices);
-	tex = 0; 
-	isCopy = false;
-	vao = _vao;
-}
-
-
-Shape::Shape(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices,const std::string& textureFileName,VertexArray *_vao)
-{
-	mesh = new Mesh(vertices,numVertices,indices,numIndices,_vao);
-	tex = new Texture(textureFileName);
-	isCopy = false;
-	vao = _vao;
-}
-
-	Shape::Shape(int CylParts,int linkPosition,VertexArray *_vao)
-	{
-		mesh = new Mesh(CylParts,linkPosition,_vao);
-		tex = 0; 
-		isCopy = false;
-		vao = _vao;
-	}
-
-	Shape::Shape(int CylParts,int linkPosition,const std::string& textureFileName,VertexArray *_vao)
-	{
-		mesh = new Mesh(CylParts,linkPosition,_vao);
-		tex = new Texture(textureFileName); 
-		isCopy = false;
-		vao = _vao;
-	}
-
-void Shape::addMesh(Vertex* vertices, unsigned int numVertices,unsigned int* indices, unsigned int numIndices, const std::string& textureFileName)
-{
-	mesh = new Mesh(vertices,numVertices,indices,numIndices,vao);
 	tex = new Texture(textureFileName);
 }
 
-void Shape::addMesh(Vertex* vertices, unsigned int numVertices,unsigned int* indices, unsigned int numIndices)
-{
-	mesh = new Mesh(vertices,numVertices,indices,numIndices,vao);
-}
 
-void Shape::addLineMesh(LineVertex* vertices, unsigned int numVertices,unsigned int* indices, unsigned int numIndices)
+void Shape::Draw(int mode, const Shader& shader)
 {
-	lineMesh = new LineMesh(vertices,numVertices,indices,numIndices);
-}
-
-void Shape::draw(int mode)
-{
-	//transformations
 	if(tex)
 		tex->Bind();
-	if(mesh)
-		mesh->Draw(mode);
-	if(lineMesh)
-		lineMesh->Draw();
+
+	shader.Bind();
+	mesh->Bind();
+	GLCall(glDrawElements(mode,verticesNum, GL_UNSIGNED_INT, nullptr));
+	mesh->Unbind();
 }
 
 Shape::~Shape(void)
@@ -99,12 +48,9 @@ Shape::~Shape(void)
 	{
 		if(mesh)
  			delete mesh;
-		if(lineMesh)
-			delete lineMesh;
+		
 		if(tex)
 			delete tex;
 	}
-	else
-		if(vao)
-			delete vao;
 }
+

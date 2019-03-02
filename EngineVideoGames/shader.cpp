@@ -3,7 +3,7 @@
 #include <GL\glew.h>
 #include <iostream>
 #include <fstream>
-#include "Renderer.hpp"
+#include "Log.hpp"
 
 static void printMat(glm::mat4 phi)
 {
@@ -26,20 +26,16 @@ Shader::Shader(const std::string& fileName)
 	for(unsigned int i = 0; i < NUM_SHADERS; i++)
 		glAttachShader(m_program, m_shaders[i]);
 
-	GLCall(glBindAttribLocation(m_program, 0, "position"));
-	GLCall(glBindAttribLocation(m_program, 1, "texCoords"));
-	GLCall(glBindAttribLocation(m_program, 2, "normal"));
-	GLCall(glBindAttribLocation(m_program, 3, "color"));
-	GLCall(glBindAttribLocation(m_program, 4, "weights"));
-	GLCall(glBindAttribLocation(m_program, 5, "jointIndices"));
+	GLCall(glBindAttribLocation(m_program, POSITION_VB, "position"));
+	GLCall(glBindAttribLocation(m_program, TEXCOORD_VB, "texCoords"));
+	GLCall(glBindAttribLocation(m_program, NORMAL_VB, "normal"));
+	GLCall(glBindAttribLocation(m_program, COLOR_VB, "color"));
+	GLCall(glBindAttribLocation(m_program, WEIGHT_VB, "weights"));
+	GLCall(glBindAttribLocation(m_program, JOINT_INDEX_VB, "jointIndices"));
 
 	GLCall(glLinkProgram(m_program));
-	//CheckShaderError(m_program, GL_LINK_STATUS, true, "Error linking shader program");
-
-	GLCall(glValidateProgram(m_program));
-	//CheckShaderError(m_program, GL_LINK_STATUS, true, "Invalid shader program");
-
 	
+	GLCall(glValidateProgram(m_program));	
 }
 
 Shader::~Shader()
@@ -85,26 +81,6 @@ std::string Shader::LoadShader(const std::string& fileName)
     return output;
 }
 
-//void Shader::CheckShaderError(unsigned int shader, unsigned int flag, bool isProgram, const std::string& errorMessage)
-//{
-//    GLint success = 0;
-//    GLchar error[1024] = { 0 };
-//
-//    if(isProgram)
-//        glGetProgramiv(shader, flag, &success);
-//    else
-//        glGetShaderiv(shader, flag, &success);
-//
-//    if(success == GL_FALSE)
-//    {
-//        if(isProgram)
-//            glGetProgramInfoLog(shader, sizeof(error), NULL, error);
-//        else
-//            glGetShaderInfoLog(shader, sizeof(error), NULL, error);
-//
-//        std::cerr << errorMessage << ": '" << error << "'" << std::endl;
-//    }
-//}
 
 unsigned int Shader::CreateShader(const std::string& text, unsigned int type)
 {
@@ -121,8 +97,6 @@ unsigned int Shader::CreateShader(const std::string& text, unsigned int type)
 
     GLCall(glShaderSource(shader, 1, p, lengths));
     GLCall(glCompileShader(shader));
-
-  //  CheckShaderError(shader, GL_COMPILE_STATUS, false, "Error compiling shader!");
 
     return shader;
 }

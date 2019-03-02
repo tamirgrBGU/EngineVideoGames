@@ -4,81 +4,10 @@
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
 
-int Mesh::shpsNum = 0;
+
 using namespace std;
 using namespace glm;
 
-	LineVertex axisVertices[] = 
-	{
-		LineVertex(glm::vec3(1,0,0),glm::vec3(1,0,0)),
-		LineVertex(glm::vec3(-1,0,0),glm::vec3(1,0,0)),
-		LineVertex(glm::vec3(0,1,0),glm::vec3(0,1,0)),
-		LineVertex(glm::vec3(0,-1,0),glm::vec3(0,1,0)),
-		LineVertex(glm::vec3(0,0,1),glm::vec3(0,0,1)),
-		LineVertex(glm::vec3(0,0,-1),glm::vec3(0,0,1)),
-	};
-
-
-	 unsigned int axisIndices[] = 
-	{
-		0,1,
-		2,3,
-		4,5
-	};
-
-	Vertex vertices[] =
-	{
-		Vertex(glm::vec3(-1, -1, -1), glm::vec2(1, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-		Vertex(glm::vec3(1, -1, -1), glm::vec2(1, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-
-		Vertex(glm::vec3(-1, -1, 1), glm::vec2(1, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-		Vertex(glm::vec3(-1, 1, 1), glm::vec2(0, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-		Vertex(glm::vec3(1, 1, 1), glm::vec2(0, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-		Vertex(glm::vec3(1, -1, 1), glm::vec2(1, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-
-		Vertex(glm::vec3(-1, -1, -1), glm::vec2(0, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-		Vertex(glm::vec3(-1, -1, 1), glm::vec2(1, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-		Vertex(glm::vec3(1, -1, 1), glm::vec2(1, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-		Vertex(glm::vec3(1, -1, -1), glm::vec2(0, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-
-		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-		Vertex(glm::vec3(-1, 1, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-		Vertex(glm::vec3(1, 1, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-
-		Vertex(glm::vec3(-1, -1, -1), glm::vec2(1, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-		Vertex(glm::vec3(-1, -1, 1), glm::vec2(1, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-		Vertex(glm::vec3(-1, 1, 1), glm::vec2(0, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-
-		Vertex(glm::vec3(1, -1, -1), glm::vec2(1, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
-		Vertex(glm::vec3(1, -1, 1), glm::vec2(1, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
-		Vertex(glm::vec3(1, 1, 1), glm::vec2(0, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
-		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1))
-	};
-
-
-
-	unsigned int indices[] =	{0, 1, 2,
-							  0, 2, 3,
-
-							  6, 5, 4,
-							  7, 6, 4,
-
-							  10, 9, 8,
-							  11, 10, 8,
-
-							  12, 13, 14,
-							  12, 14, 15,
-
-							  16, 17, 18,
-							  16, 18, 19,
-
-							  22, 21, 20,
-							  23, 22, 20
-	                          };
 
 
 	static void printMat(const mat4 mat)
@@ -123,113 +52,33 @@ using namespace glm;
 		isActive = false;
 	}
 
-	void Scene::addBox(const std::string& fileName, int parent)
+	void Scene::addCube(const std::string& texFileName, int parent)
 	{
-		unsigned int numVertices = sizeof(vertices)/sizeof(vertices[0]);
+		chainParents.push_back(parent);
+		shapes.push_back(new Shape(1,1,1));
+		if(texFileName!="")
+			shapes.back()->AddTexture(texFileName);
 		
-		unsigned int numIndices = sizeof(indices)/sizeof(indices[0]) ; 
-		chainParents.push_back(-1);
-		vaos.push_back(new VertexArray());
-		//vaos.back()->Bind();
-		if(fileName=="")
-			shapes.push_back(new Shape((Vertex*)vertices,numVertices,indices,numIndices,vaos.back()));
-		else
-			shapes.push_back(new Shape((Vertex*)vertices,numVertices,indices,numIndices,fileName,vaos.back()));
 	}
-	void Scene::addAxis(){}
-
-	void Scene::addShape(int Cylparts,int linkPosition,int parent)
+	void Scene::addAxis()
 	{
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			
-		}
-		vaos.back()->Bind();
 		chainParents.push_back(-1);
-		shapes.push_back(new Shape(Cylparts,linkPosition,vaos.back()));
-	}
-	void Scene::addShape(int CylParts,int linkPosition,const std::string& textureFileName,int parent)
-	{
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			
-		}
-		//vaos.back()->Bind();
-		chainParents.push_back(-1);
-		shapes.push_back(new Shape(CylParts,linkPosition,textureFileName,vaos.back()));
-	}
-	void Scene::addShape(int type,int parent)
-	{
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			
-		}
-		vaos.back()->Bind();
-			chainParents.push_back(-1);
-		shapes.push_back(new Shape(*shapes[type]));
+		shapes.push_back(new Shape(0,1,1));
 	}
 
-	void Scene::addShape(const std::string& fileName,int parent)
+	void Scene::addShape(const std::string& fileName,const std::string& texFileName,int parent)
 	{
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			
-		}
-		vaos.back()->Bind();
-		chainParents.push_back(-1);
-		shapes.push_back(new Shape(fileName,vaos.back()));
+		chainParents.push_back(parent);
+		shapes.push_back(new Shape(fileName));
+		if(texFileName!="")
+			shapes.back()->AddTexture(texFileName);	
 	}
 
-	void Scene::addShape(const std::string& fileName,const std::string& textureFileName,int parent)
-	{
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			
-		}
-		vaos.back()->Bind();
-		chainParents.push_back(-1);
-		shapes.push_back(new Shape(fileName,textureFileName,vaos.back()));
-	}
-
-	void Scene::addShape(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices,int parent)
-	{
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			
-		}
-		vaos.back()->Bind();
-		chainParents.push_back(-1);
-		shapes.push_back(new Shape(vertices,numVertices,indices,numIndices,vaos.back()));
-	}
-	
-	void Scene::addShape(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices, const std::string &textureFlieName,int parent)
-	{
-
-		if(parent<0)
-		{
-			vaos.push_back(new VertexArray());
-			vaos.back()->Bind();
-		}
-		chainParents.push_back(-1);
-		shapes.push_back(new Shape(vertices,numVertices,indices,numIndices,textureFlieName,vaos.back()));
-	}
 
 	void Scene::addShader(const std::string& fileName)
 	{
 		shaders.push_back(new Shader(fileName));
-		if(!axisMesh)
-		{
-			vaos.back()->Bind();
-			axisMesh = new Shape(axisVertices,sizeof(axisVertices)/sizeof(axisVertices[0]),axisIndices, sizeof(axisIndices)/sizeof(axisIndices[0]),vaos.back());
-			axisMesh->myScale(vec3(2.0*scaleFactor,2.0*scaleFactor,2.0*scaleFactor));
-			axisMesh->myTranslate(vec3(0,0,0.5),1);
-		}
+		
 	}
 
 	mat4 Scene::GetViewProjection(int indx) const
@@ -266,7 +115,7 @@ using namespace glm;
 		//	Normals[i] = Normals[0]; 
 		//}
 		int vaoIndx = -1;
-		shaders[shaderIndx]->Bind();
+		//shaders[shaderIndx]->Bind();
 		Normals[0] = global*shapes[0]->makeTransScale();
 		for (int i=1; i<shapes.size();i++)
 		{
@@ -293,14 +142,11 @@ using namespace glm;
 				Update(MVP,&Normals[firstCell],counter,shaderIndx);
 				for (int k = 0; k < counter; k++)
 				{				
-					if(shaderIndx==0 && drawAxis && chainParents[firstCell + k]>=0)
-					{
-						axisMesh->draw(GL_LINES);
-					}
+
 					if(shaderIndx == 1)
-						shapes[firstCell + k]->draw(GL_TRIANGLES);
+						shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
 					else 
-						shapes[firstCell + k]->draw(GL_TRIANGLES);
+						shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
 				}
 				counter = 1;
 				firstCell = i;
@@ -344,12 +190,12 @@ using namespace glm;
 		Update(MVP,&Normals[firstCell],counter,shaderIndx);
 				if(shaderIndx==0 && drawAxis && chainParents[firstCell]>=0)
 				{
-					axisMesh->draw(GL_LINES);
+					axisMesh->Draw(GL_LINES,*shaders[shaderIndx]);
 				}
 				if(shaderIndx == 1)
-					shapes[firstCell]->draw(GL_TRIANGLES);
+					shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
 				else 
-					shapes[firstCell]->draw(GL_TRIANGLES);
+					shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
 		//for (int i = 0; i < shapes.size(); i++)
 		//{
 
@@ -669,7 +515,6 @@ using namespace glm;
 		xold = xpos;
 		yold = ypos;
 	}
-
 	Scene::~Scene(void)
 {
 	for (Shape* shp : shapes)
@@ -689,4 +534,5 @@ using namespace glm;
 			delete vao;
 		}
 	delete axisMesh;
+
 }

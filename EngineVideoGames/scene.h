@@ -33,19 +33,13 @@ public:
 		xLocalRotate,yLocalRotate,zLocalRotate,xGlobalRotate,yGlobalRotate,zGlobalRotate,xScale,yScale,zScale,xCameraTranslate,yCameraTranslate,zCameraTranslate};
 	Scene();
 	Scene(glm::vec3 position,float angle,float hwRelation,float near, float far);
-	void addShape(int type,int parent);
 	void addShape(const std::string& fileName,int parent);
 	void addShape(const std::string& fileName,const std::string& textureFileName,int parent);
-	void addShape(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices,int parent);
-	void addShape(Vertex* vertices, unsigned int numVertices, unsigned int* indices, unsigned int numIndices,const std::string& textureFileName,int parent);
-	void addShape(int Cyparts,int linkPosition,int parent);
-	void addShape(int CylParts,int linkPosition,const std::string& textureFileName,int parent);
 	
 	void addShader(const std::string& fileName);
-	void addBox(const std::string& fileName, int parent);
+	void addCube(const std::string& fileName, int parent);
 	void addAxis();
 
-	//void Update( int const shaderIndx);
 	virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
 
 	glm::mat4 GetViewProjection(int indx) const;
@@ -84,14 +78,6 @@ public:
 	void mouseProccessing(int button);
 	bool inline IsActive() const { return isActive;} 
 	virtual ~Scene(void);
-
-	//static LineVertex axisVertices[6];
-
-	//static unsigned int axisIndices[6];
-
-	//static Vertex vertices[24] ;
-	//
-	//static unsigned int indices[24] ;
 
 };
 
