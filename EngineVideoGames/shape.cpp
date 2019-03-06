@@ -20,7 +20,8 @@ Shape::Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yR
 {
 	mesh = new VertexArray();
 	mesh->Bind();
-	verticesNum = MeshConstructor(SimpleShapeType,*mesh).GetCount();
+	verticesNum = 36;
+	MeshConstructor(SimpleShapeType,*mesh,renderID);
 	mesh->Unbind();
 	isCopy = false;
 }
@@ -38,6 +39,7 @@ void Shape::Draw(int mode, const Shader& shader)
 
 	shader.Bind();
 	mesh->Bind();
+		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderID));
 	GLCall(glDrawElements(mode,verticesNum, GL_UNSIGNED_INT, nullptr));
 	mesh->Unbind();
 }

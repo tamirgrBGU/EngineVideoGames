@@ -1,14 +1,14 @@
-#version 120
+#version 130
 
 attribute vec3 position;
-attribute vec2 texCoord;
-attribute vec3 normal;
 attribute vec3 color;
+attribute vec3 normal;
+attribute vec2 texCoord;
 
 uniform mat4 MVP;
 uniform mat4 Normal;
 
-//varying vec3 color0;
+//out vec3 color0;
 
 void main()
 {

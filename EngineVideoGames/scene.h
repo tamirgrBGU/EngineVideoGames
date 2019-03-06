@@ -44,7 +44,7 @@ public:
 
 	glm::mat4 GetViewProjection(int indx) const;
 	glm::mat4 GetShapeTransformation() const;
-	void draw(int shaderIndx,int cameraIndx,bool drawAxis);
+	void Draw(int shaderIndx,int cameraIndx,bool debugMode);
 	void shapeTransformation(int type,float amt);
 	void shapeRotation(glm::vec3 v, float ang,int indx);
 	//void inline setPicked(int pickID){pickedShape = pickID;}

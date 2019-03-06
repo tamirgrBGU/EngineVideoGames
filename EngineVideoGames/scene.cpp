@@ -102,7 +102,7 @@ using namespace glm;
 		//shaders[shaderIndx]->SetUniform1i("linksNum",Mesh::shpsNum); 
 	}
 
-	void Scene::draw(int shaderIndx,int cameraIndx,bool drawAxis)
+	void Scene::Draw(int shaderIndx,int cameraIndx,bool debugMode)
 	{
 		const int length = 40;
 		glm::mat4 Normals[length];
@@ -186,16 +186,17 @@ using namespace glm;
 		}
 //		Update(MVP,&Normals[firstCell],counter,shaderIndx);
 		//vaos[0]->Bind();
-			
+		std::cout<<"MVP"<<std::endl;	
+		printMat(MVP);
+		std::cout<<"normal"<<std::endl;
+		printMat(*Normals);
+
 		Update(MVP,&Normals[firstCell],counter,shaderIndx);
-				if(shaderIndx==0 && drawAxis && chainParents[firstCell]>=0)
-				{
-					axisMesh->Draw(GL_LINES,*shaders[shaderIndx]);
-				}
-				if(shaderIndx == 1)
-					shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-				else 
-					shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
+				
+		if(shaderIndx == 1)
+			shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
+		else 
+			shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
 		//for (int i = 0; i < shapes.size(); i++)
 		//{
 
@@ -399,7 +400,7 @@ using namespace glm;
 		//float depth;
 		glClearColor(0.0,0.0,0.0,0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		draw(1,0,false); 
+		Draw(1,0,false); 
 						
 		GLint viewport[4];  
 		unsigned char data[4];
@@ -536,3 +537,4 @@ using namespace glm;
 	delete axisMesh;
 
 }
+	 

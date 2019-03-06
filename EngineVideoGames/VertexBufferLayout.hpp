@@ -24,6 +24,9 @@ struct VertexBufferElement{
 	}
 	static unsigned int GetSizeOfType(unsigned int type){
 		switch(type){
+			case GL_FLOAT_VEC2:		return 8;
+			case GL_FLOAT_VEC3:		return 12;
+			case GL_FLOAT_VEC4:		return 16;
 			case GL_FLOAT: 			return 4;
 			case GL_UNSIGNED_INT: 	return 4;
 			case GL_UNSIGNED_BYTE: 	return 1;
@@ -69,6 +72,24 @@ public:
 	template<> inline void VertexBufferLayout::Push<unsigned char>(unsigned int count){
 		m_Elements.push_back(VertexBufferElement( GL_UNSIGNED_BYTE, count, GL_TRUE ));
 		m_Stride+=count *VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
+
+	}
+
+	template<> inline void VertexBufferLayout::Push<glm::vec2>(unsigned int count){
+		m_Elements.push_back(VertexBufferElement( GL_FLOAT_VEC2, count, GL_FALSE ));
+		m_Stride+=count *VertexBufferElement::GetSizeOfType(GL_FLOAT_VEC2);
+
+	}
+
+	template<> inline void VertexBufferLayout::Push<glm::vec3>(unsigned int count){
+		m_Elements.push_back(VertexBufferElement( GL_FLOAT_VEC3, count, GL_FALSE ));
+		m_Stride+=count *VertexBufferElement::GetSizeOfType(GL_FLOAT_VEC3);
+
+	}
+
+	template<> inline void VertexBufferLayout::Push<glm::vec4>(unsigned int count){
+		m_Elements.push_back(VertexBufferElement( GL_FLOAT_VEC3, count, GL_FALSE ));
+		m_Stride+=count *VertexBufferElement::GetSizeOfType(GL_FLOAT_VEC4);
 
 	}
 

@@ -16,6 +16,7 @@ private:
 	Texture *tex;
 
 	bool isCopy;
+	unsigned int renderID;
 public:
 
 	Shape(const Shape& shape);

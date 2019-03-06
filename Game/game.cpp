@@ -10,7 +10,8 @@ Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far
 
 void Game::Init()
 {
-	addAxis();
+	addCube("",-1);
+	//addAxis();
 
 }
 void Game::Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx)

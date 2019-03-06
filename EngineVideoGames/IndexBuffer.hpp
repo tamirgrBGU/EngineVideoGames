@@ -19,8 +19,12 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	inline unsigned int GetCount() const {
+	inline unsigned int GetCount()  {
 		return m_Count;
+	}
+
+	inline unsigned int GetRender()  {
+		return m_RendererID;
 	}
 
 

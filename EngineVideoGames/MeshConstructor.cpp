@@ -75,20 +75,21 @@
 							  23, 22, 20
 	                          };
 
-MeshConstructor::MeshConstructor(const int type,VertexArray &vao)
+MeshConstructor::MeshConstructor(const int type,VertexArray &vao,unsigned int &ib)
 {
 	
 	switch (type)
 	{
 	case Axis:
-		initLine(6,6,vao);
+		ib = initLine(6,6,vao);
 		break;
 	case Cube:
-		initMesh(24, 36,vao);
+		ib = initMesh(24, 36,vao);
 		break;
 	default:
 		break;
 	}
+	
 }
 
 
@@ -96,7 +97,7 @@ MeshConstructor::~MeshConstructor(void)
 {
 }
 
-void MeshConstructor::initLine(int verticesNum, int indicesNum,VertexArray &vao ){
+unsigned int MeshConstructor::initLine(int verticesNum, int indicesNum,VertexArray &vao ){
 	IndexedModel model;
 	VertexBuffer vbs(axisVertices,sizeof(LineVertex)*6);
 	//for(unsigned int i = 0; i < verticesNum; i++)
@@ -112,11 +113,12 @@ void MeshConstructor::initLine(int verticesNum, int indicesNum,VertexArray &vao 
 	
 	//for(unsigned int i = 0; i < indicesNum; i++)
     //    model.indices.push_back(axisIndices[i]);
-	
-	ib = new IndexBuffer(indices,indicesNum);
+	IndexBuffer *ib = new IndexBuffer(indices,indicesNum);
+	//ib = new IndexBuffer(axisIndices,indicesNum);
+	return ib->GetRender();
 }
 
-void MeshConstructor::initMesh(int verticesNum, int indicesNum,VertexArray &vao){
+unsigned int MeshConstructor::initMesh(int verticesNum, int indicesNum,VertexArray &vao){
     IndexedModel model;
 	std::vector<VertexBuffer> vbs;
 	for(unsigned int i = 0; i < verticesNum; i++)
@@ -140,6 +142,6 @@ void MeshConstructor::initMesh(int verticesNum, int indicesNum,VertexArray &vao)
 	for(unsigned int i = 0; i < indicesNum; i++)
         model.indices.push_back(indices[i]);
 	
-	ib = new IndexBuffer(indices,indicesNum);
-
+	IndexBuffer *ib = new IndexBuffer(indices,indicesNum);
+	return ib->GetRender();
 }

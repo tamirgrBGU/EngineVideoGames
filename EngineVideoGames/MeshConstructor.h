@@ -70,11 +70,11 @@ class MeshConstructor
 		Octahedron,
 		Tethrahedron
 	};
-	void initLine(int verticesNum, int indicesNum, VertexArray &vao);
-	void initMesh(int verticesNum, int indicesNum, VertexArray &vao);
+	unsigned int initLine(int verticesNum, int indicesNum, VertexArray &vao);
+	unsigned int initMesh(int verticesNum, int indicesNum, VertexArray &vao);
 public:
 	
-	MeshConstructor(const int type, VertexArray &vao);
+	MeshConstructor(const int type, VertexArray &vao,unsigned int &ib);
 	inline int GetCount(){return ib->GetCount();}
 	~MeshConstructor(void);
 };

@@ -16,7 +16,6 @@ Display::Display(int width, int height, const std::string& title)
 		error = -1;
 	}
 	glfwMakeContextCurrent(m_window);
-	//m_glContext = SDL_GL_CreateContext(m_window);
 
 	GLenum res = glewInit();
     if(res != GLEW_OK)
@@ -26,8 +25,8 @@ Display::Display(int width, int height, const std::string& title)
 	isFullScreen = false;
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_SMOOTH);
-	//glEnable(GL_CULL_FACE);
-	//glCullFace(GL_FRONT_AND_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT_AND_BACK);
 }
 
 void Display::addKeyCallBack(void(*keyCallback)(GLFWwindow *,int,int,int,int))
