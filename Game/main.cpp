@@ -8,11 +8,11 @@ int main(int argc,char *argv[])
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;
 	const float relation = (float)DISPLAY_WIDTH/(float)DISPLAY_HEIGHT;
+	Game scn(glm::vec3(0.0f, 0.0f, -5.0f), CAM_ANGLE, relation, zNear,zFar);
 	
 	Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, "OpenGL");
 	init(display);
 	
-	Game scn(glm::vec3(0.0f, 5.0f, -20.0f), CAM_ANGLE, relation, zNear,zFar);
 	scn.Init();
 	
 	scn.addShader("../res/shaders/basicShader");

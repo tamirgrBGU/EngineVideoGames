@@ -1,0 +1,19 @@
+#pragma once
+#include "Bezier1D.h"
+class Bezier2D
+{
+	int circularSubdivision; //usualy 4 how many subdivision in circular direction
+	Bezier1D b;
+
+public:
+	Bezier2D(void);
+	Bezier2D(Bezier1D b,glm::vec3 axis,int circularSubdivision); 
+	IndexedModel GetSurface(int resT,int resS);
+	Vertex GetVertex(int segmentT,int segmentS,int t,int s);
+	glm::vec3 GetNormal(int segmentT,int segmentS,int t,int s);
+
+	void MoveControlPoint(int segmentT,int segmentS, int indx,bool preserveC1);
+
+	~Bezier2D(void);
+};
+

@@ -1,3 +1,5 @@
+#define GLEW_STATIC
+#include <GL\glew.h>
 #include "shape.h"
 #include "Log.hpp"
 #include "MeshConstructor.h"
@@ -19,10 +21,10 @@ Shape::Shape(const std::string& fileName){
 Shape::Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution)
 {
 	mesh = new VertexArray();
-	mesh->Bind();
+	//mesh->Bind();
 	verticesNum = 36;
 	MeshConstructor(SimpleShapeType,*mesh,renderID);
-	mesh->Unbind();
+//	mesh->Unbind();
 	isCopy = false;
 }
 
@@ -37,10 +39,10 @@ void Shape::Draw(int mode, const Shader& shader)
 	if(tex)
 		tex->Bind();
 
-	shader.Bind();
+	shader.Bind(); 
 	mesh->Bind();
-		GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderID));
-	GLCall(glDrawElements(mode,verticesNum, GL_UNSIGNED_INT, nullptr));
+	//	GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderID));
+	GLCall(glDrawElements(mode,verticesNum, GL_UNSIGNED_INT, 0));
 	mesh->Unbind();
 }
 

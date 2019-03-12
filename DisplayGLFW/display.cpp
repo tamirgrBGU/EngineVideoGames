@@ -1,5 +1,5 @@
 #define GLEW_STATIC
-#include <GL/glew.h>
+#include <GL\glew.h>
 #include <iostream>
 #include "display.h"
 
@@ -25,8 +25,8 @@ Display::Display(int width, int height, const std::string& title)
 	isFullScreen = false;
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_SMOOTH);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT_AND_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT_AND_BACK);
 }
 
 void Display::addKeyCallBack(void(*keyCallback)(GLFWwindow *,int,int,int,int))

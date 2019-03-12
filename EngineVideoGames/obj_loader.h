@@ -1,8 +1,7 @@
 #ifndef OBJ_LOADER_H_INCLUDED
 #define OBJ_LOADER_H_INCLUDED
 
-#include <glm/glm.hpp>
-#include <vector>
+#include "Mesh.h"
 #include <string>
 
 struct OBJIndex
@@ -14,19 +13,6 @@ struct OBJIndex
     bool operator<(const OBJIndex& r) const { return vertexIndex < r.vertexIndex; }
 };
 
-class IndexedModel
-{
-public:
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec2> texCoords;
-    std::vector<glm::vec3> normals;
-	std::vector<glm::vec3> colors;
-	std::vector<glm::vec3> weights;
-	std::vector<glm::ivec3> joint_indices;
-    std::vector<unsigned int> indices;
-    
-    void CalcNormals();
-};
 
 class OBJModel
 {

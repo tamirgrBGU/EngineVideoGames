@@ -20,8 +20,6 @@ vec3 MovableGLM::findAxis(vec3 vec) const
 	return vec3(transpose( rotateMat*makeRot())*vec4(vec,1));
 }
 
-
-
 MovableGLM::MovableGLM()
 {
 	translateMat[0] = mat4(1);  //translation to general point

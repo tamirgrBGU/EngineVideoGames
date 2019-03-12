@@ -4,6 +4,8 @@
  *  Created on: 13 de dez de 2017
  *      Author: Casa
  */
+#define GLEW_STATIC
+#include <GL\glew.h>
 #include "IndexBuffer.hpp"
 #include "Log.hpp"
 

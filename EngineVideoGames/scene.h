@@ -40,7 +40,9 @@ public:
 	void addCube(const std::string& fileName, int parent);
 	void addAxis();
 
-	virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
+	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//
+
+	virtual void Update( glm::mat4 MVP ,glm::mat4 Normals,Shader* s);
 
 	glm::mat4 GetViewProjection(int indx) const;
 	glm::mat4 GetShapeTransformation() const;

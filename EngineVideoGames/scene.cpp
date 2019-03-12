@@ -91,9 +91,9 @@ using namespace glm;
 		return shapes[pickedShape]->makeTrans();
 	}
 
-	void Scene::Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx)
+	void Scene::Update( glm::mat4 MVP ,glm::mat4 Normals,Shader*  s)
 	{
-
+		
 		//shaders[shaderIndx]->SetUniformMat4f("MVP", MVP);
 		//shaders[shaderIndx]->SetUniformMat4fv("jointTransforms", jointTransforms);
 		//shaders[shaderIndx]->SetUniform4f("lightDirection", 0.0f, 0.0f, 1.0f,0.0f);
@@ -114,49 +114,50 @@ using namespace glm;
 		//{
 		//	Normals[i] = Normals[0]; 
 		//}
-		int vaoIndx = -1;
+		
 		//shaders[shaderIndx]->Bind();
 		Normals[0] = global*shapes[0]->makeTransScale();
-		for (int i=1; i<shapes.size();i++)
-		{
-			//int j = i;
-//			int counter = 0;
-			
-			glm::mat4 Normal1 = shapes[i]->makeTransScale();
-			/*if(chainParents[i] == -1)
-			{
-				vaoIndx++;
-				vaos[vaoIndx]->Bind();
-			}*/
-			//vaos[i]->Bind();
-			for (int j = i; chainParents[j] > -1; j = chainParents[j])
-			{
-				
-				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
-			}
-			
+	//	MVP = MVP*Normals[0];
+		//		for (int i=1; i<shapes.size();i++)
+//		{
+//			//int j = i;
+////			int counter = 0;
+//			
+//			glm::mat4 Normal1 = shapes[i]->makeTransScale();
+//			/*if(chainParents[i] == -1)
+//			{
+//				vaoIndx++;
+//				vaos[vaoIndx]->Bind();
+//			}*/
+//			//vaos[i]->Bind();
+//			for (int j = i; chainParents[j] > -1; j = chainParents[j])
+//			{
+//				
+//				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
+//			}
+//			
 			//mat4 MVP1 = MVP * Normal1; 
-			Normals[i] = global * Normal1;
-			if(chainParents[i] < 0)
-			{
-				Update(MVP,&Normals[firstCell],counter,shaderIndx);
-				for (int k = 0; k < counter; k++)
-				{				
+	//		Normals[i] = global * Normal1;
+	//		if(chainParents[i] < 0)
+	//		{
+	//			Update(MVP,&Normals[firstCell],counter,shaderIndx);
+	//			for (int k = 0; k < counter; k++)
+	//			{				
 
-					if(shaderIndx == 1)
-						shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-					else 
-						shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-				}
-				counter = 1;
-				firstCell = i;
-				
-			}
-			else
-				counter++;
-	//		glm::quat q1 = glm::quat_cast(Normals[i]);
-	
-			
+	//				if(shaderIndx == 1)
+	//					shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
+	//				else 
+	//					shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
+	//			}
+	//			counter = 1;
+	//			firstCell = i;
+	//			
+	//		}
+	//		else
+	//			counter++;
+	////		glm::quat q1 = glm::quat_cast(Normals[i]);
+	//
+	//		
 			//glm::vec4 qd = Normals[i][3];
 			//
 			//for (int j = 0; j < 4; j++)
@@ -183,20 +184,21 @@ using namespace glm;
 			//	shapes[i]->draw(GL_TRIANGLES);
 			//else 
 			//	shapes[i]->draw(GL_TRIANGLES);
-		}
+		//}
 //		Update(MVP,&Normals[firstCell],counter,shaderIndx);
-		//vaos[0]->Bind();
-		std::cout<<"MVP"<<std::endl;	
-		printMat(MVP);
-		std::cout<<"normal"<<std::endl;
-		printMat(*Normals);
-
-		Update(MVP,&Normals[firstCell],counter,shaderIndx);
+		//mesh->Bind();
+		MVP = MVP*Normals[firstCell];
+		//std::cout<<"MVP"<<std::endl;	
+		//printMat(MVP);
+		//std::cout<<"normal"<<std::endl;
+		//printMat(*Normals);
+		
+		Update(MVP,Normals[0],shaders[shaderIndx]);
 				
-		if(shaderIndx == 1)
-			shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-		else 
-			shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
+		//if(shaderIndx == 1)
+		//	shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
+		//else 
+			shapes[0]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
 		//for (int i = 0; i < shapes.size(); i++)
 		//{
 

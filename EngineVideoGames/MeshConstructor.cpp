@@ -1,3 +1,5 @@
+#define GLEW_STATIC
+#include <GL\glew.h>
 #include "MeshConstructor.h"
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
@@ -75,16 +77,17 @@
 							  23, 22, 20
 	                          };
 
-MeshConstructor::MeshConstructor(const int type,VertexArray &vao,unsigned int &ib)
+MeshConstructor::MeshConstructor(const int type,VertexArray &vao,unsigned int &ibNum)
 {
 	
 	switch (type)
 	{
 	case Axis:
-		ib = initLine(6,6,vao);
+		ibNum = initLine(6,6,vao);
 		break;
 	case Cube:
-		ib = initMesh(24, 36,vao);
+		initMesh(24, 36,vao);
+		ibNum = ib->GetRender(); 
 		break;
 	default:
 		break;
@@ -95,10 +98,14 @@ MeshConstructor::MeshConstructor(const int type,VertexArray &vao,unsigned int &i
 
 MeshConstructor::~MeshConstructor(void)
 {
+	if(ib)
+		delete ib;
 }
 
 unsigned int MeshConstructor::initLine(int verticesNum, int indicesNum,VertexArray &vao ){
 	IndexedModel model;
+	
+	vao.Bind();
 	VertexBuffer vbs(axisVertices,sizeof(LineVertex)*6);
 	//for(unsigned int i = 0; i < verticesNum; i++)
 	//{
@@ -118,7 +125,7 @@ unsigned int MeshConstructor::initLine(int verticesNum, int indicesNum,VertexArr
 	return ib->GetRender();
 }
 
-unsigned int MeshConstructor::initMesh(int verticesNum, int indicesNum,VertexArray &vao){
+void MeshConstructor::initMesh(int verticesNum, int indicesNum,VertexArray &vao){
     IndexedModel model;
 	std::vector<VertexBuffer> vbs;
 	for(unsigned int i = 0; i < verticesNum; i++)
@@ -128,20 +135,24 @@ unsigned int MeshConstructor::initMesh(int verticesNum, int indicesNum,VertexArr
 		model.normals.push_back(*vertices[i].GetNormal());
 		model.texCoords.push_back(*vertices[i].GetTexCoord());
 	}
-	vbs.push_back(VertexBuffer(&model.positions[0],verticesNum*sizeof(model.positions[0])));
-	vbs.push_back(VertexBuffer(&model.colors[0],verticesNum*sizeof(model.colors[0])));
-	vbs.push_back(VertexBuffer(&model.normals[0],verticesNum*sizeof(model.normals[0])));
-	vbs.push_back(VertexBuffer(&model.texCoords[0],verticesNum*sizeof(model.texCoords[0])));
-	//VertexBufferLayout layout;
-	for (int i = 0; i < vbs.size()-1; i++)
-	{
-		//layout.Push<float>(3);
-		vao.AddBuffer(vbs[i],i,3,GL_FLOAT);
-	}
-	vao.AddBuffer(vbs.back(),vbs.size()-1,2,GL_FLOAT);
 	for(unsigned int i = 0; i < indicesNum; i++)
         model.indices.push_back(indices[i]);
 	
-	IndexBuffer *ib = new IndexBuffer(indices,indicesNum);
-	return ib->GetRender();
+	vao.Bind();
+	//vbs.push_back(VertexBuffer(&model.positions[0],verticesNum*sizeof(model.positions[0])));
+	//vbs.push_back(VertexBuffer(&model.colors[0],verticesNum*sizeof(model.colors[0])));
+	//vbs.push_back(VertexBuffer(&model.normals[0],verticesNum*sizeof(model.normals[0])));
+	//vbs.push_back(VertexBuffer(&model.texCoords[0],verticesNum*sizeof(model.texCoords[0])));
+	//VertexBufferLayout layout;
+	for (int i = 0; i < 3; i++)
+	{
+		vbs.push_back(VertexBuffer(model.GetData(i),verticesNum*sizeof(model.positions[0])));	
+		vao.AddBuffer(vbs[i],i,3,GL_FLOAT);
+	}
+	vbs.push_back(VertexBuffer(model.GetData(3),verticesNum*sizeof(model.texCoords[0])));
+	vao.AddBuffer(vbs.back(),vbs.size()-1,2,GL_FLOAT);
+	
+	ib = new IndexBuffer(indices,indicesNum);
+	
+	vao.Unbind();
 }
