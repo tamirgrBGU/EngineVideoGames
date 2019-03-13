@@ -24,3 +24,109 @@ void IndexedModel::CalcNormals()
 		colors[i] = (glm::vec3(1,1,1) + normals[i])/2.0f;
 	}
 }
+
+
+IndexedModel CubeTriangles()
+{
+	Vertex vertices[] =
+	{
+		Vertex(glm::vec3(-1, -1, -1), glm::vec2(1, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(glm::vec3(1, -1, -1), glm::vec2(1, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+
+		Vertex(glm::vec3(-1, -1, 1), glm::vec2(1, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+		Vertex(glm::vec3(-1, 1, 1), glm::vec2(0, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+		Vertex(glm::vec3(1, 1, 1), glm::vec2(0, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+		Vertex(glm::vec3(1, -1, 1), glm::vec2(1, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+
+		Vertex(glm::vec3(-1, -1, -1), glm::vec2(0, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+		Vertex(glm::vec3(-1, -1, 1), glm::vec2(1, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+		Vertex(glm::vec3(1, -1, 1), glm::vec2(1, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+		Vertex(glm::vec3(1, -1, -1), glm::vec2(0, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+
+		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+		Vertex(glm::vec3(-1, 1, 1), glm::vec2(1, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+		Vertex(glm::vec3(1, 1, 1), glm::vec2(1, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+
+		Vertex(glm::vec3(-1, -1, -1), glm::vec2(1, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+		Vertex(glm::vec3(-1, -1, 1), glm::vec2(1, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+		Vertex(glm::vec3(-1, 1, 1), glm::vec2(0, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+
+		Vertex(glm::vec3(1, -1, -1), glm::vec2(1, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
+		Vertex(glm::vec3(1, -1, 1), glm::vec2(1, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
+		Vertex(glm::vec3(1, 1, 1), glm::vec2(0, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
+		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1))
+	};
+
+
+
+	unsigned int indices[] =	{0, 1, 2,
+							  0, 2, 3,
+
+							  6, 5, 4,
+							  7, 6, 4,
+
+							  10, 9, 8,
+							  11, 10, 8,
+
+							  12, 13, 14,
+							  12, 14, 15,
+
+							  16, 17, 18,
+							  16, 18, 19,
+
+							  22, 21, 20,
+							  23, 22, 20
+	                          };
+
+	    IndexedModel model;
+	
+	for(unsigned int i = 0; i < 24; i++)
+	{
+		model.positions.push_back(*vertices[i].GetPos());
+		model.colors.push_back(*vertices[i].GetColor());
+		model.normals.push_back(*vertices[i].GetNormal());
+		model.texCoords.push_back(*vertices[i].GetTexCoord());
+	}
+	for(unsigned int i = 0; i < 36; i++)
+        model.indices.push_back(indices[i]);
+	
+	return model;
+}
+
+IndexedModel AxisGenerator()
+{
+	IndexedModel model;
+
+	LineVertex axisVertices[] = 
+	{
+		LineVertex(glm::vec3(1,0,0),glm::vec3(1,0,0)),
+		LineVertex(glm::vec3(-1,0,0),glm::vec3(1,0,0)),
+		LineVertex(glm::vec3(0,1,0),glm::vec3(0,1,0)),
+		LineVertex(glm::vec3(0,-1,0),glm::vec3(0,1,0)),
+		LineVertex(glm::vec3(0,0,1),glm::vec3(0,0,1)),
+		LineVertex(glm::vec3(0,0,-1),glm::vec3(0,0,1)),
+	};
+
+
+	 unsigned int axisIndices[] = 
+	{
+		0,1,
+		2,3,
+		4,5
+	};
+
+	 for(unsigned int i = 0; i < 6; i++)
+	{
+		model.positions.push_back(*axisVertices[i].GetPos());
+		model.colors.push_back(*axisVertices[i].GetColor());
+
+	}
+	for(unsigned int i = 0; i < 6; i++)
+        model.indices.push_back(axisIndices[i]);
+	
+	return model;
+}

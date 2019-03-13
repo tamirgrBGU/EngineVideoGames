@@ -41,7 +41,7 @@ using namespace glm;
 		//verticesSize = sizeof(vertices)/sizeof(vertices[0]);
 		//
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
-		glLineWidth(3);
+		glLineWidth(6);
 		cameras.push_back(new Camera(position,angle,hwRelation,near,far));
 	//	axisMesh = new Shape(axisVertices,sizeof(axisVertices)/sizeof(axisVertices[0]),axisIndices, sizeof(axisIndices)/sizeof(axisIndices[0]));
 		pickedShape = -1;
@@ -91,131 +91,38 @@ using namespace glm;
 		return shapes[pickedShape]->makeTrans();
 	}
 
-	void Scene::Update( glm::mat4 MVP ,glm::mat4 Normals,Shader*  s)
-	{
-		
-		//shaders[shaderIndx]->SetUniformMat4f("MVP", MVP);
-		//shaders[shaderIndx]->SetUniformMat4fv("jointTransforms", jointTransforms);
-		//shaders[shaderIndx]->SetUniform4f("lightDirection", 0.0f, 0.0f, 1.0f,0.0f);
-		////glUniform3f(m_uniforms[3], r/255.0f, g/255.0f, b/255.0f);
-		//shaders[shaderIndx]->SetUniform4f("lightColor", 0.9f, 0.8f, 0.7f,1.0f);
-		//shaders[shaderIndx]->SetUniform1i("linksNum",Mesh::shpsNum); 
-	}
-
 	void Scene::Draw(int shaderIndx,int cameraIndx,bool debugMode)
 	{
-		const int length = 40;
-		glm::mat4 Normals[length];
-		glm::mat4 MVP = cameras[cameraIndx]->GetViewProjection();
-		glm::mat4 global =  makeTrans();
-		int counter = 1,firstCell = 0 ;
-		//Normals[0] = makeTrans();
-		//for (int i = 1; i < length; i++)
-		//{
-		//	Normals[i] = Normals[0]; 
-		//}
-		
-		//shaders[shaderIndx]->Bind();
-		Normals[0] = global*shapes[0]->makeTransScale();
-	//	MVP = MVP*Normals[0];
-		//		for (int i=1; i<shapes.size();i++)
-//		{
-//			//int j = i;
-////			int counter = 0;
-//			
-//			glm::mat4 Normal1 = shapes[i]->makeTransScale();
-//			/*if(chainParents[i] == -1)
-//			{
-//				vaoIndx++;
-//				vaos[vaoIndx]->Bind();
-//			}*/
-//			//vaos[i]->Bind();
-//			for (int j = i; chainParents[j] > -1; j = chainParents[j])
-//			{
-//				
-//				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
-//			}
-//			
-			//mat4 MVP1 = MVP * Normal1; 
-	//		Normals[i] = global * Normal1;
-	//		if(chainParents[i] < 0)
-	//		{
-	//			Update(MVP,&Normals[firstCell],counter,shaderIndx);
-	//			for (int k = 0; k < counter; k++)
-	//			{				
+		glm::mat4 Normal = makeTrans();
+		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
+		int p = pickedShape;
+		shaders[shaderIndx]->Bind();
+		for (int i=0; i<shapes.size();i++)
+		{
 
-	//				if(shaderIndx == 1)
-	//					shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-	//				else 
-	//					shapes[firstCell + k]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-	//			}
-	//			counter = 1;
-	//			firstCell = i;
-	//			
-	//		}
-	//		else
-	//			counter++;
-	////		glm::quat q1 = glm::quat_cast(Normals[i]);
-	//
-	//		
-			//glm::vec4 qd = Normals[i][3];
-			//
-			//for (int j = 0; j < 4; j++)
-			//{
-			//	printf("%f ", qd[j]);
-			//	Normals[i][j][0] = q1[j];
-			//	Normals[i][j][1] = qd[j];
-			//	//Normals[i][0][j] = q1[j];
-			//	//	Normals[i][1][1] = qd[j];
-			//}
-			//	printf("\n");
-		
-			//if(shaderIndx==0 && drawAxis && chainParents[i]>=0)
-			//{
-			//	shaders[shaderIndx]->Update(axisMesh->makeTransScale(MVP),Normals,0);
-			//	axisMesh->draw(GL_LINES);
-			//}
+			mat4 Normal1 = mat4(1);
+			pickedShape =i;
+			for (int j = i; chainParents[j] > -1; j = chainParents[j])
+			{
+				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
+			}
+			
 
-			//MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
-			//Normals[i] = Normal1 * shapes[i]->makeTrans();
-			//
-			//
-			//if(shaderIndx == 1)
-			//	shapes[i]->draw(GL_TRIANGLES);
-			//else 
-			//	shapes[i]->draw(GL_TRIANGLES);
-		//}
-//		Update(MVP,&Normals[firstCell],counter,shaderIndx);
-		//mesh->Bind();
-		MVP = MVP*Normals[firstCell];
-		//std::cout<<"MVP"<<std::endl;	
-		//printMat(MVP);
-		//std::cout<<"normal"<<std::endl;
-		//printMat(*Normals);
-		
-		Update(MVP,Normals[0],shaders[shaderIndx]);
-				
-		//if(shaderIndx == 1)
-		//	shapes[firstCell]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-		//else 
-			shapes[0]->Draw(GL_TRIANGLES,*shaders[shaderIndx]);
-		//for (int i = 0; i < shapes.size(); i++)
-		//{
+			mat4 MVP1 = MVP * Normal1; 
+			Normal1 = Normal * Normal1;
 
-		//vaos[0]->Unbind();
+			MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
+			Normal1 = Normal1 * shapes[i]->makeTrans();
+			
+			Update(MVP1,Normal1,shaders[shaderIndx]);
 
-		//	
-		//	if(shaderIndx == 1)
-		//		shapes[i]->draw(GL_TRIANGLES);
-		//	else 
-		//		shapes[i]->draw(GL_TRIANGLES);
-		//}
-		//if(shaderIndx==0 )
-		//{
-		//	shaders[shaderIndx]->Bind();
-		//	//shaders[shaderIndx]->Update(cameras[0]->GetViewProjection()*scale(vec3(10,10,10)),Normals);
-		//	axisMesh->draw(GL_LINES);
-		//}
+			if(shaderIndx == 1)
+				shapes[i]->Draw(*shaders[shaderIndx]);
+			else 
+				shapes[i]->Draw(*shaders[shaderIndx]);
+
+		}
+		pickedShape = p;
 	}
 
 	 void Scene::shapeRotation(vec3 v, float ang,int indx)
@@ -500,7 +407,7 @@ using namespace glm;
 				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
 				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
 
-				shapeTransformation(xCameraTranslate,transX);
+				shapeTransformation(xCameraTranslate,-transX);
 				shapeTransformation(yCameraTranslate,transY);
 				//changeDistPos();
 			}
@@ -518,6 +425,7 @@ using namespace glm;
 		xold = xpos;
 		yold = ypos;
 	}
+	
 	Scene::~Scene(void)
 {
 	for (Shape* shp : shapes)

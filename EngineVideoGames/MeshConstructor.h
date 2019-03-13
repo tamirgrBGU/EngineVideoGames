@@ -16,12 +16,13 @@ class MeshConstructor
 		Octahedron,
 		Tethrahedron
 	};
-	unsigned int initLine(int verticesNum, int indicesNum, VertexArray &vao);
-	void initMesh(int verticesNum, int indicesNum, VertexArray &vao);
+	int initLine(IndexedModel &model,VertexArray &vao);
+	int initMesh(IndexedModel &model,VertexArray &vao);
 public:
 	
-	MeshConstructor(const int type, VertexArray &vao,unsigned int &ibNum);
+	MeshConstructor(const int type, VertexArray &vao,int *indicesNum);
 	inline unsigned int GetCount(){return ib->GetCount();}
 	~MeshConstructor(void);
+
 };
 

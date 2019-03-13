@@ -1,9 +1,8 @@
-﻿Build started 07/03/2019 16:25:03.
+﻿Build started 13/03/2019 23:29:40.
      1>Project "C:\Dev\EngineVideoGames\DisplayGLFW\DisplayGLFW.vcxproj" on node 3 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IC:\Dev\EngineVideoGames\DisplayGLFW /IC:\Dev\EngineVideoGames\res/includes /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt display.cpp
          display.cpp
-     1>c:\dev\enginevideogames\displayglfw\display.cpp(72): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
        Lib:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"C:\Dev\EngineVideoGames\Debug\DisplayGLFW.lib" /NOLOGO Debug\display.obj
          DisplayGLFW.vcxproj -> C:\Dev\EngineVideoGames\Debug\DisplayGLFW.lib
@@ -11,4 +10,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.24
+Time Elapsed 00:00:01.36

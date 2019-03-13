@@ -2,21 +2,21 @@
 #include "MovableGLM.h"
 #include "VertexArray.hpp"
 #include "shader.h"
-#include "IndexBuffer.hpp"
 #include "MeshConstructor.h"
-#include "obj_loader.h"
+
 #include "texture.h"
 
 class Shape : public MovableGLM
 {
 private:
 
-	VertexArray *mesh;
-	int verticesNum;
+	MeshConstructor *mesh;
+	int indicesNum;
 	Texture *tex;
-
+	VertexArray vao;
 	bool isCopy;
 	unsigned int renderID;
+	int mode;
 public:
 
 	Shape(const Shape& shape);
@@ -27,7 +27,7 @@ public:
 
 	void AddTexture(const std::string& textureFileName);
 
-	void Draw(int mode, const Shader& shader);
+	void Draw( const Shader& shader);
 
 	virtual ~Shape(void);
 };

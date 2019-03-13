@@ -21,7 +21,7 @@ VertexArray::~VertexArray() {
 
 void VertexArray::AddBuffer(const VertexBuffer& vb,int attribNum,int count, int type)
 {
-		vb.Bind();
+		//vb.Bind();
 		GLCall(glEnableVertexAttribArray(attribNum));
 		GLCall(glVertexAttribPointer(attribNum,count,type,GL_FALSE, 0,0));
 }

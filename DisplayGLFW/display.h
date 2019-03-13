@@ -28,7 +28,7 @@ public:
 	//void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 	//static void window_size_callback(GLFWwindow* window, int width, int height);
 	void updatePosition(double xpos, double ypos);
-	bool closeWindow();
+	int closeWindow();
 	 ~Display();
 //protected:
 private:
