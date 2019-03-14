@@ -44,14 +44,13 @@
 	{
 		Game *scn = (Game*)glfwGetWindowUserPointer(window);
 
+		scn->updatePosition(xpos,ypos);
 		if(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 		{
-			scn->updatePosition(xpos,ypos);
 			scn->mouseProccessing(GLFW_MOUSE_BUTTON_RIGHT);
 		}
 		else if(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 		{
-			scn->updatePosition(xpos,ypos);
 			scn->mouseProccessing(GLFW_MOUSE_BUTTON_LEFT);
 		}
 	}

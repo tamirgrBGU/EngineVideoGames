@@ -52,28 +52,23 @@ using namespace glm;
 		isActive = false;
 	}
 
-	void Scene::addCube(const std::string& texFileName, int parent)
+	void Scene::addShapeFromFile(const std::string& fileName,int parent,unsigned int mode)
 	{
 		chainParents.push_back(parent);
-		shapes.push_back(new Shape(1,1,1));
-		if(texFileName!="")
-			shapes.back()->AddTexture(texFileName);
-		
-	}
-	void Scene::addAxis()
-	{
-		chainParents.push_back(-1);
-		shapes.push_back(new Shape(0,1,1));
+		shapes.push_back(new Shape(fileName,mode));
 	}
 
-	void Scene::addShape(const std::string& fileName,const std::string& texFileName,int parent)
+	void Scene::addShape(int type, int parent,unsigned int mode)
 	{
 		chainParents.push_back(parent);
-		shapes.push_back(new Shape(fileName));
-		if(texFileName!="")
-			shapes.back()->AddTexture(texFileName);	
+		shapes.push_back(new Shape(type,20,20,mode));
 	}
 
+	void Scene::addShapeCopy(int indx,int parent,unsigned int mode)
+	{
+		chainParents.push_back(parent);
+		shapes.push_back(new Shape(*shapes[indx],mode));
+	}
 
 	void Scene::addShader(const std::string& fileName)
 	{

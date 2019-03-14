@@ -101,9 +101,6 @@
     <ClInclude Include="VertexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexBufferLayout.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MeshConstructor.h">
       <Filter>Header Files</Filter>
     </ClInclude>

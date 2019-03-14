@@ -9,24 +9,25 @@ Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far
 
 void Game::Init()
 {
-	addCube("",-1);
+	addShape(0,-1,1);
+	addShape(1,-1,4);
+	addShape(1,-1,4);
+	
+	//translate all scene away from camera
+	myTranslate(glm::vec3(0,0,-20),0);
 
-	addCube("",-1);
-	//pickedShape = 0;
-	//shapeTransformation(xScale,30);
-	//shapeTransformation(yScale,30);
 	pickedShape = 0;
-	shapeTransformation(zGlobalTranslate,-30);
-	shapeTransformation(yGlobalRotate,45);
-	pickedShape = 1;
-	shapeTransformation(zGlobalTranslate,-30);
-	shapeTransformation(yGlobalTranslate,5);
-	addAxis();
-	pickedShape = 2;
-	shapeTransformation(zGlobalTranslate,-30);
+
 	shapeTransformation(yScale,10);
 	shapeTransformation(xScale,10);
 	shapeTransformation(zScale,10);
+
+	
+	pickedShape = 1;
+	shapeTransformation(yGlobalTranslate,5);
+
+	pickedShape = 2;
+	shapeTransformation(yGlobalRotate,45);	
 
 }
 
@@ -36,7 +37,7 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 	int g = ((pickedShape+1) & 0x0000FF00) >>  8;
 	int b = ((pickedShape+1) & 0x00FF0000) >> 16;
 	s->Bind();
-		s->SetUniformMat4f("MVP", MVP);
+	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
 	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);

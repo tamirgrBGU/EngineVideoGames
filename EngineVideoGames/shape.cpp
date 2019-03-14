@@ -4,32 +4,27 @@
 #include "Log.hpp"
 
 
-Shape::Shape(const Shape& shape)
+Shape::Shape(const Shape& shape,unsigned int mode)
 {
 	if(shape.mesh)
 		mesh = shape.mesh;
 	indicesNum = shape.indicesNum;
 	//tex = shape.tex;
 	isCopy = true;
-	mode = shape.mode;
+	this->mode = mode;
 }
 
-Shape::Shape(const std::string& fileName){
+Shape::Shape(const std::string& fileName, unsigned int mode){
 	mesh = new MeshConstructor(0,vao, &indicesNum);
 	isCopy = false;
-	mode = GL_TRIANGLES;
+	this->mode = mode;
 }
 
-Shape::Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution)
+Shape::Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution,unsigned int mode)
 {
 	mesh = new MeshConstructor(SimpleShapeType,vao,&indicesNum);
 	//mesh->Bind();
-	if(SimpleShapeType == 0)
-		mode = GL_LINES;
-	else
-		mode = GL_TRIANGLES;
-	//mesh=new Mesh();
-//	mesh->Unbind();
+	this->mode = mode;
 	isCopy = false;
 }
 

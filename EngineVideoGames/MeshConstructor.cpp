@@ -4,9 +4,6 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 
-	
-
-
 
 MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum)
 {
@@ -26,7 +23,6 @@ MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum
 	}
 	
 }
-
 
 MeshConstructor::~MeshConstructor(void)
 {

@@ -5,40 +5,24 @@
 #include "VertexArray.hpp"
 #include <vector>
 
+
 class Scene : public MovableGLM
 {
-	
-	std::vector<Shape*> shapes;
-	std::vector<Camera*> cameras; //light will have the properties of camera
-	std::vector<VertexArray*> vaos; 
-	
-	Shape *axisMesh;
-	int verticesSize;
-	int indicesSize;
 
-	float depth;
-	double xold, yold,xrel, yrel;
-	int cameraIndx;
-
-protected:
-		std::vector<Shader*> shaders;
-	std::vector<int> chainParents;
-	int pickedShape;
-	int direction;
-	static const int scaleFactor =3;
-	bool isActive;
 public:
 	enum axis{xAxis,yAxis,zAxis};
 	enum transformations{xLocalTranslate,yLocalTranslate,zLocalTranslate,xGlobalTranslate,yGlobalTranslate,zGlobalTranslate,
 		xLocalRotate,yLocalRotate,zLocalRotate,xGlobalRotate,yGlobalRotate,zGlobalRotate,xScale,yScale,zScale,xCameraTranslate,yCameraTranslate,zCameraTranslate};
+	
 	Scene();
 	Scene(glm::vec3 position,float angle,float hwRelation,float near, float far);
-	void addShape(const std::string& fileName,int parent);
-	void addShape(const std::string& fileName,const std::string& textureFileName,int parent);
+	
+	void addShapeFromFile(const std::string& fileName,int parent,unsigned int mode);
+	void addShape(int type,int parent,unsigned int mode);
+	void addShapeCopy(int indx,int parent,unsigned int mode);
 	
 	void addShader(const std::string& fileName);
-	void addCube(const std::string& fileName, int parent);
-	void addAxis();
+	
 
 	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//
 
@@ -80,6 +64,27 @@ public:
 	void mouseProccessing(int button);
 	bool inline IsActive() const { return isActive;} 
 	virtual ~Scene(void);
+
+private:	
+	std::vector<Shape*> shapes;
+	std::vector<Camera*> cameras; //light will have the properties of camera
+	std::vector<VertexArray*> vaos; 
+	
+	Shape *axisMesh;
+	int verticesSize;
+	int indicesSize;
+
+	float depth;
+	double xold, yold,xrel, yrel;
+	int cameraIndx;
+
+protected:
+		std::vector<Shader*> shaders;
+	std::vector<int> chainParents;
+	int pickedShape;
+	int direction;
+	static const int scaleFactor =3;
+	bool isActive;
 
 };
 

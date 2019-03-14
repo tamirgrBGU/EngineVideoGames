@@ -109,7 +109,6 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="VertexArray.hpp" />
     <ClInclude Include="VertexBuffer.hpp" />
-    <ClInclude Include="VertexBufferLayout.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="EngineVideoGames.rc" />

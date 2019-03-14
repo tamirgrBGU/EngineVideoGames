@@ -15,15 +15,15 @@ private:
 	Texture *tex;
 	VertexArray vao;
 	bool isCopy;
-	unsigned int renderID;
-	int mode;
+	unsigned int mode;
+	
 public:
 
-	Shape(const Shape& shape);
+	Shape(const Shape& shape,unsigned int mode);
 
-	Shape(const std::string& fileName);
+	Shape(const std::string& fileName,unsigned int mode);
 	
-	Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution);
+	Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution,unsigned int mode);
 
 	void AddTexture(const std::string& textureFileName);
 
