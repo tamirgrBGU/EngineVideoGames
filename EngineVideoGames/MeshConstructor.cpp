@@ -3,6 +3,7 @@
 #include "MeshConstructor.h"
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "bezier2D.h"
 
 
 MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum)
@@ -16,7 +17,14 @@ MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum
 		break;
 	case Cube:
 		*indicesNum = initMesh(CubeTriangles(),vao);
-		
+	case BezierLine:
+		//Bezier1D line();
+		//*indicesNum = initLine( line.GetLine(30,30),vao);
+		break;
+	case BezierSurface:
+		//Bezier1D line();
+		//Bezier2D surface(line,glm::vec3(0,0,1),4);
+		//*indicesNum = initMesh( surface.GetSurface(30,30),vao);
 		break;
 	default:
 		break;

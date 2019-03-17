@@ -9,9 +9,9 @@ Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far
 
 void Game::Init()
 {
-	addShape(0,-1,1);
-	addShape(1,-1,4);
-	addShape(1,-1,4);
+	addShape(Axis,-1,LINES);
+	addShape(Cube,-1,TRIANGLES);
+	addShape(Cube,-1,TRIANGLES);
 	
 	//translate all scene away from camera
 	myTranslate(glm::vec3(0,0,-20),0);

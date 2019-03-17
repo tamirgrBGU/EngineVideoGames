@@ -13,7 +13,16 @@ public:
 	enum axis{xAxis,yAxis,zAxis};
 	enum transformations{xLocalTranslate,yLocalTranslate,zLocalTranslate,xGlobalTranslate,yGlobalTranslate,zGlobalTranslate,
 		xLocalRotate,yLocalRotate,zLocalRotate,xGlobalRotate,yGlobalRotate,zGlobalRotate,xScale,yScale,zScale,xCameraTranslate,yCameraTranslate,zCameraTranslate};
-	
+	enum modes{POINTS,LINES,LINE_LOOP,LINE_STRIP,TRIANGLES,QUADS};
+	enum Shapes
+	{
+		Axis,
+		Cube,
+		Octahedron,
+		Tethrahedron,
+		BezierLine,
+		BezierSurface,
+	};
 	Scene();
 	Scene(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	
