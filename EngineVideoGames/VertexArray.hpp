@@ -4,8 +4,6 @@
 #include "IndexBuffer.hpp"
 #include "shader.h"
 
-class VertexBufferLayout;
-
 class VertexArray{
 private:
 	unsigned int m_RendererID;
@@ -14,7 +12,6 @@ public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
 	void AddBuffer(const VertexBuffer& vb,int attribNum,int count,int type);
 
 	void Bind() const;

@@ -10,7 +10,7 @@
 			Game *scn = (Game*)glfwGetWindowUserPointer(window);
 			double x2,y2;
 			glfwGetCursorPos(window,&x2,&y2);
-			scn->picking(x2,y2);
+			scn->picking((int)x2,(int)y2);
 		}
 	}
 	
@@ -44,7 +44,7 @@
 	{
 		Game *scn = (Game*)glfwGetWindowUserPointer(window);
 
-		scn->updatePosition(xpos,ypos);
+		scn->updatePosition((float)xpos,(float)ypos);
 		if(glfwGetMouseButton(window,GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 		{
 			scn->mouseProccessing(GLFW_MOUSE_BUTTON_RIGHT);

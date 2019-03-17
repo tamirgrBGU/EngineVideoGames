@@ -299,7 +299,7 @@ using namespace glm;
 		cameras[0]->setProjection((float)width/(float)height,cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar());
 	}
 
-	float Scene::picking(double x,double y)
+	float Scene::picking(int x,int y)
 	{
 		//float depth;
 		glClearColor(0.0,0.0,0.0,0.0);
@@ -413,7 +413,7 @@ using namespace glm;
 			}		
 	}
 
-	void Scene::updatePosition(double xpos, double ypos)
+	void Scene::updatePosition(float xpos, float ypos)
 	{
 		xrel = xold - xpos;
 		yrel = yold - ypos;

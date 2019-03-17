@@ -43,7 +43,7 @@ public:
 	void shapeTransformation(int type,float amt);
 	void shapeRotation(glm::vec3 v, float ang,int indx);
 	//void inline setPicked(int pickID){pickedShape = pickID;}
-	float picking(double x,double y);
+	float picking(int x,int y);
 	void resize(int width,int hight);
 	//void updateTipPosition(int indx);
 	glm::vec3 getTipPosition(int indx);
@@ -69,7 +69,7 @@ public:
 	}
 
 	//inline void SetMousePosition(double xpos, double ypos){xold =xpos; yold=ypos;}
-	void updatePosition(double xpos, double ypos);
+	void updatePosition(float xpos, float ypos);
 	void mouseProccessing(int button);
 	bool inline IsActive() const { return isActive;} 
 	virtual ~Scene(void);
@@ -84,7 +84,7 @@ private:
 	int indicesSize;
 
 	float depth;
-	double xold, yold,xrel, yrel;
+	float xold, yold,xrel, yrel;
 	int cameraIndx;
 
 protected:
