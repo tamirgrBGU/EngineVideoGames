@@ -8,7 +8,7 @@
 
 MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum)
 {
-	
+	Bezier2D *surface;
 	switch (type)
 	{
 	case Axis:
@@ -17,20 +17,26 @@ MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum
 		break;
 	case Cube:
 		*indicesNum = initMesh(CubeTriangles(),vao);
-	case BezierLine:
-		//Bezier1D line();
-		//*indicesNum = initLine( line.GetLine(30,30),vao);
-		break;
-	case BezierSurface:
-		//Bezier1D line();
-		//Bezier2D surface(line,glm::vec3(0,0,1),4);
-		//*indicesNum = initMesh( surface.GetSurface(30,30),vao);
-		break;
 	default:
 		break;
 	}
 	
 }
+
+MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS, VertexArray &vao,int *indicesNum)
+{
+	//if(isSurface)
+	//{
+	//	Bezier2D surface(*curve,glm::vec3(0,0,1),4);
+	//	*indicesNum = initMesh(surface.GetSurface(resT,resS),vao);		
+	//}
+	//else
+	//{
+	//	*indicesNum = initLine( curve->GetLine(resT),vao);
+	//}
+
+}
+
 
 MeshConstructor::~MeshConstructor(void)
 {

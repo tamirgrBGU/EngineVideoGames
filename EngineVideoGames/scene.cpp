@@ -61,7 +61,7 @@ using namespace glm;
 	void Scene::addShape(int type, int parent,unsigned int mode)
 	{
 		chainParents.push_back(parent);
-		shapes.push_back(new Shape(type,20,20,mode));
+		shapes.push_back(new Shape(type,mode));
 	}
 
 	void Scene::addShapeCopy(int indx,int parent,unsigned int mode)
@@ -404,12 +404,13 @@ using namespace glm;
 
 				shapeTransformation(xCameraTranslate,-transX);
 				shapeTransformation(yCameraTranslate,transY);
-				//changeDistPos();
+				WhenTranslate();
 			}
 			else
 			{
 				shapeTransformation(zGlobalRotate,xrel*.5);
 				shapeTransformation(xGlobalRotate,yrel*.5);
+				WhenRotate();
 			}		
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Bezier1D.h"
+
 class Bezier2D
 {
 	int circularSubdivision; //usualy 4 how many subdivision in circular direction

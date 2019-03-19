@@ -13,7 +13,7 @@ public:
 	
 	glm::vec3 GetVelosity(int segment,int t);			//returns the derivative of the curve in the requested segment for value of t
 
-	void MoveControlPoint(int segment, int indx,bool preserveC1); //change the positon of one control point. when preserveC1 is true it may affect other  control points 
+	void MoveControlPoint(int segment, int indx,bool preserveC1, glm::vec4 newPosition); //change the positon of one control point. when preserveC1 is true it may affect other  control points 
 	
 
 	~Bezier1D(void);

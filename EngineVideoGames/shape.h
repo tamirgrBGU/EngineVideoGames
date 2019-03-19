@@ -23,7 +23,9 @@ public:
 
 	Shape(const std::string& fileName,unsigned int mode);
 	
-	Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution,unsigned int mode);
+	Shape(const int SimpleShapeType,unsigned int mode);
+
+	Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,bool is2D,unsigned int mode);
 
 	void AddTexture(const std::string& textureFileName);
 

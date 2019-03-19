@@ -36,13 +36,12 @@ public:
 	void changeCenterOfRotation(glm::vec3 &Pvec);
 	void zeroTrans();
 	void zeroRot(bool generalRot);
-	void getTraslate(glm::vec4 &vec);
 	void copyTranslations(MovableGLM *mGLM);
 	void translateInSystem(const MovableGLM  &system,glm::vec3 &vec, int indx, bool toScale);
 	void mergeRot2Euler();
 	void printRot(bool generalRot);
 
-
+	glm::vec4 getTraslate();
 	glm::vec3 getPointInSystem(glm::mat4 &prevTransformations,glm::vec3 point);
 	glm::vec3 getVectorInSystem(glm::mat4 &prevTransformations,glm::vec3 vec);
 	glm::vec3 getCenterOfRotation(glm::mat4 &prevTransformations);

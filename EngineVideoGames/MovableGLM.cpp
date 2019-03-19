@@ -133,10 +133,10 @@ void MovableGLM::zeroRot(bool generalRot)
 		rotateMat = mat4(1);
 }
 
-void MovableGLM::getTraslate(vec4 & vec)
+glm::vec4 MovableGLM::getTraslate()
 {
 	mat4 mat = makeTrans();
-	vec = mat[3];
+	return mat[3];
 }
 
 void MovableGLM::mergeRot2Euler()

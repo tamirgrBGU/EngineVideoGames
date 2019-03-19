@@ -20,13 +20,21 @@ Shape::Shape(const std::string& fileName, unsigned int mode){
 	this->mode = mode;
 }
 
-Shape::Shape(const int SimpleShapeType, unsigned int xResolution,unsigned int yResolution,unsigned int mode)
+Shape::Shape(const int SimpleShapeType,unsigned int mode)
 {
 	mesh = new MeshConstructor(SimpleShapeType,vao,&indicesNum);
 	//mesh->Bind();
 	this->mode = mode;
 	isCopy = false;
 }
+
+Shape::Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,bool is2D,unsigned int mode)
+{
+	mesh = new MeshConstructor(curve,is2D,xResolution,yResolution,vao,&indicesNum);
+	this->mode = mode;
+	isCopy = false;
+}
+
 
 void Shape::AddTexture(const std::string& textureFileName)
 {

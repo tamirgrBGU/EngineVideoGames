@@ -53,6 +53,7 @@
 		{
 			scn->mouseProccessing(GLFW_MOUSE_BUTTON_LEFT);
 		}
+
 	}
 
 	void window_size_callback(GLFWwindow* window, int width, int height)
