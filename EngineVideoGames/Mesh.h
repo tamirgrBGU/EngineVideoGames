@@ -62,3 +62,5 @@ struct Vertex
 IndexedModel CubeTriangles();
 
 IndexedModel AxisGenerator();
+
+IndexedModel TethrahedronGenerator();

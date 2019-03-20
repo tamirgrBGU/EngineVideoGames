@@ -436,10 +436,7 @@ using namespace glm;
 		{
 			delete sdr;
 		}
-	for(VertexArray* vao: vaos)
-		{
-			delete vao;
-		}
+
 	delete axisMesh;
 
 }

@@ -8,11 +8,19 @@
 
 class MeshConstructor
 {
+	VertexArray vao;
 	IndexBuffer *ib;
-	IndexedModel model;
+//	IndexedModel model;
+	std::vector<VertexBuffer*> vbs;
+	bool is2D;
+	int unsigned indicesNum;
 	
-	int initLine(IndexedModel &model,VertexArray &vao);
-	int initMesh(IndexedModel &model,VertexArray &vao);
+	void InitLine(IndexedModel &model);
+	void InitMesh(IndexedModel &model);
+	void CopyMesh(const MeshConstructor &mesh);
+	void CopyLine(const MeshConstructor &mesh);
+	
+	
 public:
 	enum SimpleShapes
 	{
@@ -23,9 +31,14 @@ public:
 		BezierLine,
 		BezierSurface,
 	};
-	MeshConstructor(const int type, VertexArray &vao,int *indicesNum);
-	MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS,VertexArray &vao,int *indicesNums);
-	inline unsigned int GetCount(){return ib->GetCount();}
+	MeshConstructor(const int type);
+	MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS);
+	MeshConstructor(const MeshConstructor &mesh);
+	MeshConstructor::MeshConstructor(const std::string& fileName);
+
+	void Bind() {vao.Bind();}
+	void Unbind() {vao.Unbind();}
+	inline unsigned int GetIndicesNum(){return indicesNum;}
 	~MeshConstructor(void);
 
 };

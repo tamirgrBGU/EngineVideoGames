@@ -6,23 +6,22 @@
 
 Shape::Shape(const Shape& shape,unsigned int mode)
 {
-	if(shape.mesh)
-		mesh = shape.mesh;
-	indicesNum = shape.indicesNum;
+	
+	mesh = new MeshConstructor(*shape.mesh);
 	//tex = shape.tex;
 	isCopy = true;
 	this->mode = mode;
 }
 
 Shape::Shape(const std::string& fileName, unsigned int mode){
-	mesh = new MeshConstructor(0,vao, &indicesNum);
+	mesh = new MeshConstructor(fileName);
 	isCopy = false;
 	this->mode = mode;
 }
 
 Shape::Shape(const int SimpleShapeType,unsigned int mode)
 {
-	mesh = new MeshConstructor(SimpleShapeType,vao,&indicesNum);
+	mesh = new MeshConstructor(SimpleShapeType);
 	//mesh->Bind();
 	this->mode = mode;
 	isCopy = false;
@@ -30,7 +29,7 @@ Shape::Shape(const int SimpleShapeType,unsigned int mode)
 
 Shape::Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,bool is2D,unsigned int mode)
 {
-	mesh = new MeshConstructor(curve,is2D,xResolution,yResolution,vao,&indicesNum);
+	mesh = new MeshConstructor(curve,is2D,xResolution,yResolution);
 	this->mode = mode;
 	isCopy = false;
 }
@@ -48,10 +47,12 @@ void Shape::Draw( const Shader& shader)
 //		tex->Bind();
 
 	shader.Bind();
-	vao.Bind();
-
-	GLCall(glDrawElements(mode,indicesNum, GL_UNSIGNED_INT, 0));
-	vao.Unbind();
+	mesh->Bind();
+	/*if(isCopy)
+		glDrawArrays(GL_TRIANGLES, 0, indicesNum);
+	else*/
+	GLCall(glDrawElements(mode,mesh->GetIndicesNum(), GL_UNSIGNED_INT, 0));
+	mesh->Unbind();
 }
 
 Shape::~Shape(void)
@@ -59,8 +60,7 @@ Shape::~Shape(void)
 	if(!isCopy)
 	{
 		if(mesh)
- 			delete mesh;
-		
+			delete mesh;
 		if(tex)
 			delete tex;
 	}

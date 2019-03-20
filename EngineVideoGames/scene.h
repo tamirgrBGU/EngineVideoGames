@@ -22,6 +22,8 @@ public:
 		Tethrahedron,
 		BezierLine,
 		BezierSurface,
+		LineCopy,
+		MeshCopy,
 	};
 	Scene();
 	Scene(glm::vec3 position,float angle,float hwRelation,float near, float far);
@@ -79,7 +81,6 @@ public:
 private:	
 
 	std::vector<Camera*> cameras; //light will have the properties of camera
-	std::vector<VertexArray*> vaos; 
 	
 	Shape *axisMesh;
 	int verticesSize;

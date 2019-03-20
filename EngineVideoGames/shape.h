@@ -11,9 +11,8 @@ class Shape : public MovableGLM
 private:
 
 	MeshConstructor *mesh;
-	int indicesNum;
 	Texture *tex;
-	VertexArray vao;
+	
 	bool isCopy;
 	unsigned int mode;
 	
