@@ -17,6 +17,13 @@ MeshConstructor::MeshConstructor(const int type)
 		break;
 	case Cube:
 		 InitMesh(CubeTriangles());
+		 break;
+	case Octahedron:
+		 InitMesh(OctahedronGenerator());
+		 break;
+	case Tethrahedron:
+		 InitMesh(TethrahedronGenerator());
+		 break;
 	default:
 		break;
 	}
@@ -33,11 +40,11 @@ MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int res
 	//if(isSurface)
 	//{
 	//	Bezier2D surface(*curve,glm::vec3(0,0,1),4);
-	//	*indicesNum = InitMesh(surface.GetSurface(resT,resS),vao,ib);		
+	//	InitMesh(surface.GetSurface(resT,resS));		
 	//}
 	//else
 	//{
-	//	*indicesNum = InitLine( curve->GetLine(resT),vao);
+	//	InitLine( curve->GetLine(resT));
 	//}
 }
 

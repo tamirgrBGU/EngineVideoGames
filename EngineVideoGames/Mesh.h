@@ -64,3 +64,5 @@ IndexedModel CubeTriangles();
 IndexedModel AxisGenerator();
 
 IndexedModel TethrahedronGenerator();
+
+IndexedModel OctahedronGenerator();

@@ -36,9 +36,10 @@ void Game::addShape(int type,int parent,unsigned int mode)
 void Game::Init()
 {
 	addShape(Axis,-1,LINES);
-	addShape(Cube,-1,TRIANGLES);
-	addShapeCopy(1,-1,TRIANGLES);
-	addShapeFromFile("../res/objs/testBoxNoUV.obj",-1,TRIANGLES);
+	addShape(Octahedron,-1,TRIANGLES);
+	addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
+	addShapeCopy(2,-1,TRIANGLES);
+	
 	
 	//translate all scene away from camera
 	myTranslate(glm::vec3(0,0,-20),0);
@@ -56,6 +57,12 @@ void Game::Init()
 	pickedShape = 2;
 	shapeTransformation(yGlobalRotate,45);	
 
+	pickedShape = 3;
+
+	shapeTransformation(zGlobalTranslate,-40);
+	shapeTransformation(yScale,0.30);
+	shapeTransformation(xScale,0.30);
+	shapeTransformation(zScale,0.30);
 }
 
 void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
@@ -73,8 +80,8 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 
 void Game::WhenRotate()
 {
-	if(pickedShape>=0)
-		printMat(GetShapeTransformation());
+	//if(pickedShape>=0)
+	//	printMat(GetShapeTransformation());
 }
 
 void Game::WhenTranslate()

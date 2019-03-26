@@ -11,8 +11,8 @@ public:
 	Bezier2D(Bezier1D &b,glm::vec3 axis,int circularSubdivision);  
 
 	IndexedModel GetSurface(int resT,int resS);						//generates model for rendering using MeshConstructor::initMeshs
-	Vertex GetVertex(int segmentT,int segmentS,int t,int s);		//returns point on surface in the requested segments for value of t and s
-	glm::vec3 GetNormal(int segmentT,int segmentS,int t,int s);		//returns point on surface in the requested segments for value of t and s
+	Vertex GetVertex(int segmentT,int segmentS,float t,float s);		//returns point on surface in the requested segments for value of t and s
+	glm::vec3 GetNormal(int segmentT,int segmentS,float t,float s);		//returns point on surface in the requested segments for value of t and s
 
 	~Bezier2D(void);
 };

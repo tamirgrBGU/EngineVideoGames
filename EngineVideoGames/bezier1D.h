@@ -8,10 +8,10 @@ class Bezier1D
 public:
 	Bezier1D(void);
 	IndexedModel GetLine(int resT);						//generates model for rendering using MeshConstructor::initLin
-	LineVertex GetVertex(int segment,int t);			//returns point on curve in the requested segment for value of t
+	LineVertex GetVertex(int segment,float t);			//returns point on curve in the requested segment for value of t
 	LineVertex GetControlPoint(int segment,int indx);	//returns a control point in the requested segment. indx will be 0,1,2,3, for p0,p1,p2,p3
 	
-	glm::vec3 GetVelosity(int segment,int t);			//returns the derivative of the curve in the requested segment for value of t
+	glm::vec3 GetVelosity(int segment,float t);			//returns the derivative of the curve in the requested segment for value of t
 
 	void MoveControlPoint(int segment, int indx,bool preserveC1, glm::vec4 newPosition); //change the positon of one control point. when preserveC1 is true it may affect other  control points 
 	
