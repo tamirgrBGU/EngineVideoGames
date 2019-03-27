@@ -15,7 +15,8 @@ private:
 	
 	bool isCopy;
 	unsigned int mode;
-	
+	bool toRender;
+
 public:
 
 	Shape(const Shape& shape,unsigned int mode);
@@ -29,6 +30,12 @@ public:
 	void AddTexture(const std::string& textureFileName);
 
 	void Draw( const Shader& shader);
+
+	inline void Hide() {toRender = false;}
+
+	inline void Unhide() {toRender = true;}
+
+	inline bool Is2Render() {return toRender;}
 
 	virtual ~Shape(void);
 };

@@ -24,7 +24,7 @@ public:
 	//vec3 findAxis(vec4 &vec, int indx);
 	//vec3 findAxis2(vec4 &vec, int indx);
 	MovableGLM();
-	
+	virtual ~MovableGLM(){}
 	glm::mat4 makeTransScale(glm::mat4 &prevTransformations) const;
 	glm::mat4 makeTransScale() const;
 	glm::mat4 makeTrans(glm::mat4 &prevTransformations) const;

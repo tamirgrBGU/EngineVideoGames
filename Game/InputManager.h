@@ -32,7 +32,9 @@
 				case GLFW_KEY_ESCAPE:			
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
-				
+				case GLFW_KEY_SPACE:
+					scn->HideShape(0);
+				break;
 			default:
 				break;
 			}

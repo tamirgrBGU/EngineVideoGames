@@ -15,6 +15,7 @@ public:
 	void ControlPointUpdate();
 	void WhenRotate();
 	void WhenTranslate();
+	void Motion();
 	~Game(void);
 };
 

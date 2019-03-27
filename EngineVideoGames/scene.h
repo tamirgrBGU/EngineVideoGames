@@ -40,8 +40,9 @@ public:
 	virtual void Update( glm::mat4 MVP ,glm::mat4 Normals,Shader* s) = 0;
 	virtual void WhenTranslate(){};
 	virtual void WhenRotate(){};
+	virtual void Motion(){};
 
-	glm::mat4 GetViewProjection(int indx) const;
+	glm::mat4 GetViewProjection(int indx) const; 
 	glm::mat4 GetShapeTransformation() const;
 	void Draw(int shaderIndx,int cameraIndx,bool debugMode);
 	void shapeTransformation(int type,float amt);
@@ -66,12 +67,12 @@ public:
 	{
 		return cameras[cameraIndx]->GetWHRelation();
 	}
-
-	inline float GetAngle(int cameraIndx)
-	{
-		return cameras[cameraIndx]->GetAngle();
-	}
-
+	void ReadPixel();
+	
+	inline float GetAngle(int cameraIndx) {return cameras[cameraIndx]->GetAngle();}
+	inline void Activate() {isActive = true;}
+	inline void Deactivate() {isActive = false;}
+	void HideShape(int shpIndx);
 	//inline void SetMousePosition(double xpos, double ypos){xold =xpos; yold=ypos;}
 	void updatePosition(float xpos, float ypos);
 	void mouseProccessing(int button);

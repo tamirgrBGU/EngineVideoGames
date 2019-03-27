@@ -11,12 +11,14 @@ Shape::Shape(const Shape& shape,unsigned int mode)
 	//tex = shape.tex;
 	isCopy = true;
 	this->mode = mode;
+	toRender = true;
 }
 
 Shape::Shape(const std::string& fileName, unsigned int mode){
 	mesh = new MeshConstructor(fileName);
 	isCopy = false;
 	this->mode = mode;
+	toRender = true;
 }
 
 Shape::Shape(const int SimpleShapeType,unsigned int mode)
@@ -25,6 +27,7 @@ Shape::Shape(const int SimpleShapeType,unsigned int mode)
 	//mesh->Bind();
 	this->mode = mode;
 	isCopy = false;
+	toRender = true;
 }
 
 Shape::Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,bool is2D,unsigned int mode)
@@ -32,6 +35,7 @@ Shape::Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,
 	mesh = new MeshConstructor(curve,is2D,xResolution,yResolution);
 	this->mode = mode;
 	isCopy = false;
+	toRender = true;
 }
 
 

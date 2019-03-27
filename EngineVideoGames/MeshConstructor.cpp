@@ -9,7 +9,6 @@
 
 MeshConstructor::MeshConstructor(const int type)
 {
-	Bezier2D *surface;
 	switch (type)
 	{
 	case Axis:	

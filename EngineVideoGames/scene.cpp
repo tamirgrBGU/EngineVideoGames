@@ -94,28 +94,29 @@ using namespace glm;
 		shaders[shaderIndx]->Bind();
 		for (int i=0; i<shapes.size();i++)
 		{
-
-			mat4 Normal1 = mat4(1);
-			pickedShape =i;
-			for (int j = i; chainParents[j] > -1; j = chainParents[j])
+			if(shapes[i]->Is2Render())
 			{
-				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
+				mat4 Normal1 = mat4(1);
+				pickedShape =i;
+				for (int j = i; chainParents[j] > -1; j = chainParents[j])
+				{
+					Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
+				}
+			
+
+				mat4 MVP1 = MVP * Normal1; 
+				Normal1 = Normal * Normal1;
+
+				MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
+				Normal1 = Normal1 * shapes[i]->makeTrans();
+			
+				Update(MVP1,Normal1,shaders[shaderIndx]);
+
+				if(shaderIndx == 1)
+					shapes[i]->Draw(*shaders[shaderIndx]);
+				else 
+					shapes[i]->Draw(*shaders[shaderIndx]);
 			}
-			
-
-			mat4 MVP1 = MVP * Normal1; 
-			Normal1 = Normal * Normal1;
-
-			MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
-			Normal1 = Normal1 * shapes[i]->makeTrans();
-			
-			Update(MVP1,Normal1,shaders[shaderIndx]);
-
-			if(shaderIndx == 1)
-				shapes[i]->Draw(*shaders[shaderIndx]);
-			else 
-				shapes[i]->Draw(*shaders[shaderIndx]);
-
 		}
 		pickedShape = p;
 	}
@@ -210,9 +211,9 @@ using namespace glm;
 				break;
 			case zLocalRotate:
 				if(pickedShape ==-1)
-					myRotate(amt,vec3(0,0,1),zAxis12);
+					myRotate(amt,vec3(0,0,1),zAxis1);
 				else
-					shapes[pickedShape]->myRotate(amt,vec3(0,0,1),zAxis12);
+					shapes[pickedShape]->myRotate(amt,vec3(0,0,1),zAxis1);
 			break;
 			case xGlobalRotate:
 				if(pickedShape ==-1)
@@ -414,6 +415,12 @@ using namespace glm;
 			}		
 	}
 
+	void Scene::ReadPixel()
+	{
+		glReadPixels(1,1,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&depth);
+	}
+
+
 	void Scene::updatePosition(float xpos, float ypos)
 	{
 		xrel = xold - xpos;
@@ -421,9 +428,17 @@ using namespace glm;
 		xold = xpos;
 		yold = ypos;
 	}
-	
+
+	void Scene::HideShape(int shpIndx)
+	{
+		if(shapes[shpIndx]->Is2Render())
+			shapes[shpIndx]->Hide();
+		else 
+			shapes[shpIndx]->Unhide();
+	}
+
 	Scene::~Scene(void)
-{
+	{
 	for (Shape* shp : shapes)
 		{
 			delete shp;

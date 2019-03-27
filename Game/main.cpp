@@ -27,7 +27,7 @@ int main(int argc,char *argv[])
 	{
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 		scn->Draw(0,0,true);
-		
+		scn->Motion();
 		display.SwapBuffers();
 		display.PollEvents();
 	}

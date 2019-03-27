@@ -19,6 +19,7 @@ Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far
 { 
 	curve = new Bezier1D();
 }
+
 void Game::addShape(int type,int parent,unsigned int mode)
 {
 		chainParents.push_back(parent);
@@ -37,8 +38,8 @@ void Game::Init()
 {
 	addShape(Axis,-1,LINES);
 	addShape(Octahedron,-1,TRIANGLES);
-	addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
-	addShapeCopy(2,-1,TRIANGLES);
+	//addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
+	addShapeCopy(1,-1,TRIANGLES);
 	
 	
 	//translate all scene away from camera
@@ -51,18 +52,20 @@ void Game::Init()
 	shapeTransformation(zScale,10);
 
 	
-	pickedShape = 1;
-	shapeTransformation(yGlobalTranslate,5);
+	ReadPixel();
 	
 	pickedShape = 2;
-	shapeTransformation(yGlobalRotate,45);	
+	shapeTransformation(zLocalRotate,45);	
 
-	pickedShape = 3;
+	pickedShape = 1;
 
-	shapeTransformation(zGlobalTranslate,-40);
-	shapeTransformation(yScale,0.30);
-	shapeTransformation(xScale,0.30);
-	shapeTransformation(zScale,0.30);
+	shapeTransformation(zGlobalTranslate,-10);
+	shapeTransformation(yScale,3.30);
+	shapeTransformation(xScale,3.30);
+	shapeTransformation(zScale,3.30);
+
+	pickedShape = -1;
+	Activate();
 }
 
 void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
@@ -74,8 +77,7 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
-	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
-		
+	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);		
 }
 
 void Game::WhenRotate()
@@ -89,7 +91,18 @@ void Game::WhenTranslate()
 	if(pickedShape>=0)
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0,0,0,1);
-		std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
+	//	std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
+	}
+}
+
+void Game::Motion()
+{
+	if(isActive)
+	{
+		int p = pickedShape;
+		pickedShape = 2;
+		shapeTransformation(zLocalRotate,0.45);
+		pickedShape = p;
 	}
 }
 
