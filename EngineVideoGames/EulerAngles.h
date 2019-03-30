@@ -10,6 +10,7 @@ public:
 	EulerAngles();
 	EulerAngles(glm::mat4 &mat, int iterations);
 	EulerAngles(float phif, float thetaf,float psif);
+	virtual ~EulerAngles(){}
 protected:
 	void printAngles(int ang);
 	void buildAngMatrix(int XorZ, float c, float s);

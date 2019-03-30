@@ -32,7 +32,9 @@
 				case GLFW_KEY_ESCAPE:			
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
-				
+				case GLFW_KEY_SPACE:
+					scn->HideShape(0);
+				break;
 			default:
 				break;
 			}
@@ -53,6 +55,7 @@
 		{
 			scn->mouseProccessing(GLFW_MOUSE_BUTTON_LEFT);
 		}
+
 	}
 
 	void window_size_callback(GLFWwindow* window, int width, int height)

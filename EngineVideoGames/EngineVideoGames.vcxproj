@@ -78,6 +78,7 @@
     <ClCompile Include="bezier2D.cpp" />
     <ClCompile Include="EulerAngles.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="kdtree.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshConstructor.cpp" />
@@ -97,6 +98,7 @@
     <ClInclude Include="camera.h" />
     <ClInclude Include="EulerAngles.h" />
     <ClInclude Include="IndexBuffer.hpp" />
+    <ClInclude Include="kdtree.h" />
     <ClInclude Include="Log.hpp" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshConstructor.h" />

@@ -4,45 +4,74 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 #include "bezier2D.h"
+#include "obj_loader.h"
 
 
-MeshConstructor::MeshConstructor(const int type,VertexArray &vao,int *indicesNum)
+MeshConstructor::MeshConstructor(const int type)
 {
-	
 	switch (type)
 	{
-	case Axis:
-		
-		*indicesNum = initLine(AxisGenerator(),vao);
+	case Axis:	
+		InitLine(AxisGenerator());
 		break;
 	case Cube:
-		*indicesNum = initMesh(CubeTriangles(),vao);
-	case BezierLine:
-		//Bezier1D line();
-		//*indicesNum = initLine( line.GetLine(30,30),vao);
-		break;
-	case BezierSurface:
-		//Bezier1D line();
-		//Bezier2D surface(line,glm::vec3(0,0,1),4);
-		//*indicesNum = initMesh( surface.GetSurface(30,30),vao);
-		break;
+		 InitMesh(CubeTriangles());
+		 break;
+	case Octahedron:
+		 InitMesh(OctahedronGenerator());
+		 break;
+	case Tethrahedron:
+		 InitMesh(TethrahedronGenerator());
+		 break;
 	default:
 		break;
 	}
 	
 }
 
+MeshConstructor::MeshConstructor(const std::string& fileName)
+{
+	InitMesh(OBJModel(fileName).ToIndexedModel());
+}
+
+MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS)
+{
+	//if(isSurface)
+	//{
+	//	Bezier2D surface(*curve,glm::vec3(0,0,1),4);
+	//	InitMesh(surface.GetSurface(resT,resS));		
+	//}
+	//else
+	//{
+	//	InitLine( curve->GetLine(resT));
+	//}
+}
+
+MeshConstructor::MeshConstructor(const MeshConstructor &mesh)
+{
+	indicesNum = mesh.indicesNum;
+	if(is2D)
+		CopyMesh(mesh);
+	else
+		CopyLine(mesh);
+}
+
 MeshConstructor::~MeshConstructor(void)
 {
 	if(ib)
 		delete ib;
+	for (int i = 0; i < vbs.size(); i++)
+	{
+		if(vbs[i])
+			delete vbs[i];
+	}
 }
 
-int MeshConstructor::initLine(IndexedModel &model,VertexArray &vao){
+void MeshConstructor::InitLine(IndexedModel &model){
 	
 	int verticesNum = model.positions.size();
-	int indicesNum = model.indices.size();
-	std::vector<VertexBuffer*> vbs;
+	indicesNum = model.indices.size();
+	
 	vao.Bind();
 
 	for (int i = 0; i < 2; i++)
@@ -54,19 +83,15 @@ int MeshConstructor::initLine(IndexedModel &model,VertexArray &vao){
 	ib = new IndexBuffer((unsigned int*)model.GetData(4),indicesNum);
 	
 	vao.Unbind();
-
-	for (int i = 0; i < vbs.size(); i++)
-	{
-		delete vbs[i];
-	}
-	return indicesNum;
+	is2D = false;
+	
 }
 
-int MeshConstructor::initMesh( IndexedModel &model,VertexArray &vao){
+void MeshConstructor::InitMesh( IndexedModel &model){
 
 	int verticesNum = model.positions.size();
-	int indicesNum = model.indices.size();
-	std::vector<VertexBuffer*> vbs;
+	indicesNum = model.indices.size();
+	
 	vao.Bind();
 
 	for (int i = 0; i < 3; i++)
@@ -80,11 +105,43 @@ int MeshConstructor::initMesh( IndexedModel &model,VertexArray &vao){
 	ib = new IndexBuffer((unsigned int*)model.GetData(4),indicesNum);
 	
 	vao.Unbind();
-
-	for (int i = 0; i < vbs.size(); i++)
-	{
-		delete vbs[i];
-	}
-	return indicesNum;
+	is2D = true;
+	
 }
 
+void MeshConstructor::CopyLine(const MeshConstructor &mesh){
+	
+	vao.Bind();
+
+	for (int i = 0; i < 2; i++)
+	{
+		vbs.push_back(new VertexBuffer(*(mesh.vbs[i])));	
+		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
+	}
+	
+	ib = new IndexBuffer(*mesh.ib);
+	
+	vao.Unbind();
+
+	is2D = false;
+	
+}
+
+void MeshConstructor::CopyMesh(const MeshConstructor &mesh){
+
+	vao.Bind();
+
+	for (int i = 0; i < 4; i++)
+	{
+		vbs.push_back(new VertexBuffer(*(mesh.vbs[i])));	
+		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
+	}
+	
+	
+	ib = new IndexBuffer(*mesh.ib);
+	//ib = mesh.ib;
+	vao.Unbind();
+
+	is2D = true;
+	
+}
