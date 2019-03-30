@@ -36,10 +36,12 @@ void Game::addShape(int type,int parent,unsigned int mode)
 
 void Game::Init()
 {
+	
 	addShape(Axis,-1,LINES);
 	addShape(Octahedron,-1,TRIANGLES);
 	//addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
 	addShapeCopy(1,-1,TRIANGLES);
+	addShape(BezierLine,-1, LINES);
 	
 	
 	//translate all scene away from camera
@@ -51,11 +53,14 @@ void Game::Init()
 	shapeTransformation(xScale,10);
 	shapeTransformation(zScale,10);
 
+
 	
 	ReadPixel();
 	
 	pickedShape = 2;
 	shapeTransformation(zLocalRotate,45);	
+	shapeTransformation(zLocalTranslate, -3);
+	shapeTransformation(xLocalTranslate, -2);
 
 	pickedShape = 1;
 
@@ -63,6 +68,14 @@ void Game::Init()
 	shapeTransformation(yScale,3.30);
 	shapeTransformation(xScale,3.30);
 	shapeTransformation(zScale,3.30);
+
+
+	pickedShape = 3;
+
+	shapeTransformation(yScale, 1.5);
+	shapeTransformation(xScale, 1.5);
+	shapeTransformation(zScale, 1.5);
+
 
 	pickedShape = -1;
 	Activate();
