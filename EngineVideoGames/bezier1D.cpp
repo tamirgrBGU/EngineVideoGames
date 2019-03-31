@@ -1,5 +1,6 @@
 #include "bezier1D.h"
 #include <string>
+#include <iostream>
 
 Bezier1D::Bezier1D(void)
 {
@@ -57,7 +58,7 @@ IndexedModel Bezier1D::GetLine(int resT) {
 
 	std::vector<unsigned int> axisIndices;
 
-	for (int i = 0; i <segments.size()*( resT - 1); i++)
+	for (int i = 0; i < segments.size()*(resT - 1); i++)
 	{
 		axisIndices.push_back(i);
 		axisIndices.push_back(i + 1);
@@ -102,6 +103,62 @@ LineVertex Bezier1D::GetControlPoint(int seg, int index)
 	return output;
 }
 
+void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec4 newPosition) {
+	if (segment == 0 && indx == 0)
+		return;
+	
+	glm::mat4 sector = segments[segment];
+	glm::vec4 oldpos(sector[indx]);
+	glm::vec4 diff(newPosition - oldpos);
+	
+	segments[segment][indx][0] = newPosition[0];
+	segments[segment][indx][1] = newPosition[1];
+	segments[segment][indx][2] = newPosition[2];
+
+	sector = segments[segment];
+
+	std::cout << " matrix:" << std::endl;
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+			std::cout << sector[j][i] << " ";
+		std::cout << std::endl;
+	}
+
+	//glm::mat4 transmat(1.0);
+
+
+	/*transmat[0] = glm::vec4(0, 0, 0, 0);
+	transmat[1] = glm::vec4(0, 0, 0, 0);
+	transmat[2] = glm::vec4(0, 0, 0, 0);
+	transmat[3] = glm::vec4(0, 0, 0, 0);
+	transmat[indx] = diff;*/
+
+	//segments[segment] = segments[segment] + transmat;
+	//if (indx == 0)
+	//	(segments[segment - 1])[3] = newPosition;
+	//if (preserveC1)
+	//{
+	//	glm::vec4 diff(newPosition - oldpos);
+	//	switch (indx)
+	//	{
+	//	case 0:
+	//		segments[segment - 1][2] += diff;
+	//		segments[segment][1] += diff;
+	//		break;
+	//	case 1:
+	//		if (segment != 0)
+	//			segments[segment - 1][2] -= diff;
+	//		break;
+	//	case 2:
+	//		if (segment != segments.size())
+	//			segments[segment + 1][1] -= diff;
+	//		break;
+	//	}
+
+	//}
+
+}
 
 Bezier1D::~Bezier1D(void)
 {

@@ -38,11 +38,14 @@ void Game::Init()
 {
 	
 	addShape(Axis,-1,LINES);
-	addShape(Octahedron,-1,TRIANGLES);
+	//addShape(Octahedron,-1,TRIANGLES);
 	//addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
-	addShapeCopy(1,-1,TRIANGLES);
+	//addShapeCopy(1,-1,TRIANGLES);
 	addShape(BezierLine,-1, LINES);
-	
+	addShape(Cube, -1, TRIANGLES);
+	addShapeCopy(2, -1, TRIANGLES);
+	addShapeCopy(2, -1, TRIANGLES);
+	addShapeCopy(2, -1, TRIANGLES);
 	
 	//translate all scene away from camera
 	myTranslate(glm::vec3(0,0,-20),0);
@@ -54,28 +57,33 @@ void Game::Init()
 	shapeTransformation(zScale,10);
 
 
-	
+
 	ReadPixel();
 	
-	pickedShape = 2;
-	shapeTransformation(zLocalRotate,45);	
-	shapeTransformation(zLocalTranslate, -3);
-	shapeTransformation(xLocalTranslate, -2);
-
 	pickedShape = 1;
 
-	shapeTransformation(zGlobalTranslate,-10);
-	shapeTransformation(yScale,3.30);
-	shapeTransformation(xScale,3.30);
-	shapeTransformation(zScale,3.30);
+	//shapeTransformation(yScale, 1.5);
+	//shapeTransformation(xScale, 1.5);
+	//shapeTransformation(zScale, 1.5);
+	
+	
+	for (int i = 0; i < 4; i++)
+	{
+		pickedShape = i + 2;
+		LineVertex CP0 = curve->GetControlPoint(0, i);
 
 
-	pickedShape = 3;
 
-	shapeTransformation(yScale, 1.5);
-	shapeTransformation(xScale, 1.5);
-	shapeTransformation(zScale, 1.5);
 
+		//glm::vec3 point = *tmp;
+		shapeTransformation(xGlobalTranslate, CP0.GetPos()->x);
+		shapeTransformation(yGlobalTranslate, CP0.GetPos()->y);
+		shapeTransformation(zGlobalTranslate, CP0.GetPos()->z);
+
+		shapeTransformation(yScale, 0.2);
+		shapeTransformation(xScale, 0.2);
+		shapeTransformation(zScale, 0.2);
+	}
 
 	pickedShape = -1;
 	Activate();
@@ -83,6 +91,7 @@ void Game::Init()
 
 void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 {
+
 	int r = ((pickedShape+1) & 0x000000FF) >>  0;
 	int g = ((pickedShape+1) & 0x0000FF00) >>  8;
 	int b = ((pickedShape+1) & 0x00FF0000) >> 16;
@@ -90,7 +99,10 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
-	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);		
+	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
+	
+	
+
 }
 
 void Game::WhenRotate()
@@ -101,22 +113,24 @@ void Game::WhenRotate()
 
 void Game::WhenTranslate()
 {
-	if(pickedShape>=0)
+	if(pickedShape>1)
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0,0,0,1);
+		curve->MoveControlPoint((pickedShape - 2) / 3, (pickedShape - 2) % 3, false, pos);
+		
 	//	std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
 	}
 }
 
 void Game::Motion()
 {
-	if(isActive)
+	/*if(isActive)
 	{
 		int p = pickedShape;
 		pickedShape = 2;
 		shapeTransformation(zLocalRotate,0.45);
 		pickedShape = p;
-	}
+	}*/
 }
 
 Game::~Game(void)
