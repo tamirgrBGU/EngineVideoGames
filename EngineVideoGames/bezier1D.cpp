@@ -85,6 +85,8 @@ LineVertex Bezier1D::GetVertex(int segment, float t) {
 	LineVertex CP1 = GetControlPoint(segment, 2);
 	LineVertex CP0 = GetControlPoint(segment, 3);
 
+
+
 	glm::vec3 myvertex(
 		(CP0.GetPos()->x * t*t*t) + (CP1.GetPos()->x * 3 * t*t*(1 - t)) + (CP2.GetPos()->x * 3 * t*(1 - t)*(1 - t)) + (CP3.GetPos()->x * (1 - t)*(1 - t)*(1 - t)), // point x
 		(CP0.GetPos()->y * t*t*t) + (CP1.GetPos()->y * 3 * t*t*(1 - t)) + (CP2.GetPos()->y * 3 * t*(1 - t)*(1 - t)) + (CP3.GetPos()->y * (1 - t)*(1 - t)*(1 - t)), //point y
@@ -115,22 +117,6 @@ void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec
 	glm::vec4 oldpos(sector[indx]);
 	glm::vec4 diff(newPosition - oldpos);
 
-	//segments[segment][indx] = newPosition;
-
-	//segments[segment][indx][0] = newPosition[0];
-	//segments[segment][indx][1] = newPosition[1];
-	//segments[segment][indx][2] = newPosition[2];
-
-	//sector = segments[segment];
-
-	//std::cout << " matrix:" << std::endl;
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	for (int j = 0; j < 4; j++)
-	//		std::cout << sector[j][i] << " ";
-	//	std::cout << std::endl;
-	//}
-
 
 
 	segments[segment][indx] = newPosition;
@@ -156,6 +142,27 @@ void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec
 
 	}
 
+}
+
+
+glm::vec3  Bezier1D::GetVelosity(int segment, float t) {
+	glm::vec3 CP3 = *GetControlPoint(segment, 3).GetPos();
+	glm::vec3 CP2 = *GetControlPoint(segment, 2).GetPos();
+	glm::vec3 CP1 = *GetControlPoint(segment, 1).GetPos();
+	glm::vec3 CP0 = *GetControlPoint(segment, 0).GetPos();
+	float tp0 = (1 - t)*(1 - t);
+	float tp1 = -3 * t*t + 4 * t - 1;
+	float tp2 = 3 * t*t - 2 * t;
+	float tp3 = t * t;
+
+	return CP3 * tp3 + CP2 * tp2 + CP1 * tp1 + CP0 * tp0;
+	//	glm::vec3 myvertex(
+	//	(CP0.GetPos()->x * 3 * t*t) + (CP1.GetPos()->x * 6 * t*t*(1 - t)) + (CP2.GetPos()->x * 3 * t*(1 - t)*(1 - t)) + (CP3.GetPos()->x * (1 - t)*(1 - t)*(1 - t)), // point x
+	//	(CP0.GetPos()->y * t*t*t) + (CP1.GetPos()->y * 3 * t*t*(1 - t)) + (CP2.GetPos()->y * 3 * t*(1 - t)*(1 - t)) + (CP3.GetPos()->y * (1 - t)*(1 - t)*(1 - t)), //point y
+	//	(CP0.GetPos()->z * t*t*t) + (CP2.GetPos()->z * 3 * t*t*(1 - t)) + (CP2.GetPos()->z * 3 * t*(1 - t)*(1 - t)) + (CP3.GetPos()->z * (1 - t)*(1 - t)*(1 - t))  // point z
+	//);
+
+	//return myvertex;
 }
 
 Bezier1D::~Bezier1D(void)
