@@ -4,13 +4,14 @@
 
 Bezier1D::Bezier1D(void)
 {
+	numberOfPoints = 10;
 
 	glm::mat4 Model = glm::mat4(1.0);
 
-	glm::vec4 Position0 = glm::vec4(0.0, 1.0, 0.0, 0.0);
-	glm::vec4 Position1 = glm::vec4(1.0, 2.0, 0.0, 0.0);
-	glm::vec4 Position2 = glm::vec4(2.0, 3.0, 0.0, 0.0);
-	glm::vec4 Position3 = glm::vec4(0.0, 4.0, 0.0, 0.0);
+	glm::vec4 Position0 = glm::vec4(0.0, 0.0, 0.0, 0.0);
+	glm::vec4 Position1 = glm::vec4(1.0, 0.0, 0.0, 0.0);
+	glm::vec4 Position2 = glm::vec4(2.0, 0.0, 0.0, 0.0);
+	glm::vec4 Position3 = glm::vec4(3.0, 0.0, 0.0, 0.0);
 
 
 	Model[0] = Position0;
@@ -19,10 +20,10 @@ Bezier1D::Bezier1D(void)
 	Model[3] = Position3;
 	segments.push_back(Model);
 
-	Position0 = glm::vec4(0.0, 4.0, 0.0, 0.0);
-	Position1 = glm::vec4(1.0, 5.0, 0.0, 0.0);
-	Position2 = glm::vec4(1.0, 6.0, 0.0, 0.0);
-	Position3 = glm::vec4(0.0, 7.0, 0.0, 0.0);
+	Position0 = glm::vec4(3.0, 0.0, 0.0, 0.0);
+	Position1 = glm::vec4(4.0, 0.0, 0.0, 0.0);
+	Position2 = glm::vec4(5.0, 0.0, 0.0, 0.0);
+	Position3 = glm::vec4(6.0, 0.0, 0.0, 0.0);
 
 	Model[0] = Position0;
 	Model[1] = Position1;
@@ -30,10 +31,10 @@ Bezier1D::Bezier1D(void)
 	Model[3] = Position3;
 	segments.push_back(Model);
 
-	Position0 = glm::vec4(0.0, 7.0, 0.0, 0.0);
-	Position1 = glm::vec4(-1.0, 8.0, 0.0, 0.0);
-	Position2 = glm::vec4(-1.0, 9.0, 0.0, 0.0);
-	Position3 = glm::vec4(0.0, 10.0, 0.0, 0.0);
+	Position0 = glm::vec4(6.0, 0.0, 0.0, 0.0);
+	Position1 = glm::vec4(7.0, 0.0, 0.0, 0.0);
+	Position2 = glm::vec4(8.0, 0.0, 0.0, 0.0);
+	Position3 = glm::vec4(9.0, 0.0, 0.0, 0.0);
 
 	Model[0] = Position0;
 	Model[1] = Position1;
@@ -44,7 +45,6 @@ Bezier1D::Bezier1D(void)
 }
 IndexedModel Bezier1D::GetLine(int resT) {
 
-	printf("%s\n", "test");
 	std::vector<LineVertex> axisVertices;
 	glm::mat4 sector = segments[0];
 	for (int s = 0; s < segments.size(); s++)
@@ -55,15 +55,15 @@ IndexedModel Bezier1D::GetLine(int resT) {
 			axisVertices.push_back(GetVertex(s, t));
 		}
 	}
-
+	axisVertices.push_back(GetVertex(segments.size() - 1, 1));
 	std::vector<unsigned int> axisIndices;
 
-	for (int i = 0; i < segments.size()*(resT - 1); i++)
+	for (int i = 0; i < axisVertices.size() - 1; i++)
 	{
 		axisIndices.push_back(i);
 		axisIndices.push_back(i + 1);
 	}
-
+	axisIndices.push_back(axisVertices.size());
 
 	IndexedModel model;
 	for (unsigned int i = 0; i < axisVertices.size(); i++)
@@ -97,6 +97,10 @@ LineVertex Bezier1D::GetVertex(int segment, float t) {
 }
 LineVertex Bezier1D::GetControlPoint(int seg, int index)
 {
+	if (seg == segments.size()) {
+		seg--;
+		index = 3;
+	}
 	glm::mat4 sector = segments[seg];
 	glm::vec3 thepoint0(sector[index]);
 	LineVertex output(thepoint0, glm::vec3(0, 0, 1));
@@ -106,57 +110,51 @@ LineVertex Bezier1D::GetControlPoint(int seg, int index)
 void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec4 newPosition) {
 	if (segment == 0 && indx == 0)
 		return;
-	
+
 	glm::mat4 sector = segments[segment];
 	glm::vec4 oldpos(sector[indx]);
 	glm::vec4 diff(newPosition - oldpos);
-	
-	segments[segment][indx][0] = newPosition[0];
-	segments[segment][indx][1] = newPosition[1];
-	segments[segment][indx][2] = newPosition[2];
 
-	sector = segments[segment];
+	//segments[segment][indx] = newPosition;
 
-	std::cout << " matrix:" << std::endl;
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-			std::cout << sector[j][i] << " ";
-		std::cout << std::endl;
-	}
+	//segments[segment][indx][0] = newPosition[0];
+	//segments[segment][indx][1] = newPosition[1];
+	//segments[segment][indx][2] = newPosition[2];
 
-	//glm::mat4 transmat(1.0);
+	//sector = segments[segment];
 
-
-	/*transmat[0] = glm::vec4(0, 0, 0, 0);
-	transmat[1] = glm::vec4(0, 0, 0, 0);
-	transmat[2] = glm::vec4(0, 0, 0, 0);
-	transmat[3] = glm::vec4(0, 0, 0, 0);
-	transmat[indx] = diff;*/
-
-	//segments[segment] = segments[segment] + transmat;
-	//if (indx == 0)
-	//	(segments[segment - 1])[3] = newPosition;
-	//if (preserveC1)
+	//std::cout << " matrix:" << std::endl;
+	//for (int i = 0; i < 4; i++)
 	//{
-	//	glm::vec4 diff(newPosition - oldpos);
-	//	switch (indx)
-	//	{
-	//	case 0:
-	//		segments[segment - 1][2] += diff;
-	//		segments[segment][1] += diff;
-	//		break;
-	//	case 1:
-	//		if (segment != 0)
-	//			segments[segment - 1][2] -= diff;
-	//		break;
-	//	case 2:
-	//		if (segment != segments.size())
-	//			segments[segment + 1][1] -= diff;
-	//		break;
-	//	}
-
+	//	for (int j = 0; j < 4; j++)
+	//		std::cout << sector[j][i] << " ";
+	//	std::cout << std::endl;
 	//}
+
+
+
+	segments[segment][indx] = newPosition;
+	if (indx == 0)
+		(segments[segment - 1])[3] = newPosition;
+	if (preserveC1)
+	{
+		switch (indx)
+		{
+		case 0:
+			segments[segment - 1][2] += diff;
+			segments[segment][1] += diff;
+			break;
+		case 1:
+			if (segment != 0)
+				segments[segment - 1][2] -= diff;
+			break;
+		case 2:
+			if (segment != segments.size() - 1)
+				segments[segment + 1][1] -= diff;
+			break;
+		}
+
+	}
 
 }
 

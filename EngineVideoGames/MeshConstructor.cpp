@@ -43,7 +43,7 @@ MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int res
 	//}
 	//else
 	//{
-	//	InitLine( curve->GetLine(resT));
+		InitLine( curve->GetLine(resT));
 	//}
 }
 
