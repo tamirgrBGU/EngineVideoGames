@@ -114,9 +114,8 @@ void Game::WhenTranslate()
 	if (pickedShape > 2 && pickedShape < shapes.size() - 1)
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
-
 		glm::vec4 oldpos(*curve->GetControlPoint((pickedShape - 2) / 3, (pickedShape - 2) % 3).GetPos(), 1);
-		curve->MoveControlPoint((pickedShape - 2) / 3, (pickedShape - 2) % 3, true, pos);
+		curve->MoveControlPoint((pickedShape - 2) / 3, (pickedShape - 2) % 3, in_corect, pos);
 
 		glm::vec4 diff = scale * (pos - oldpos);
 
