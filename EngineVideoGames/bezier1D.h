@@ -16,6 +16,7 @@ public:
 	void MoveControlPoint(int segment, int indx,bool preserveC1, glm::vec4 newPosition); //change the positon of one control point. when preserveC1 is true it may affect other  control points 
 	
 	int numberOfPoints;
+	int numOfSegments;
 	~Bezier1D(void);
 };
 
