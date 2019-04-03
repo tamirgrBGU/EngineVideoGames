@@ -34,6 +34,7 @@
 				break;
 				case GLFW_KEY_SPACE:
 					scn->HideShape(0);
+					scn->Deactivate();
 				break;
 			default:
 				break;

@@ -92,7 +92,7 @@ using namespace glm;
 		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
 		int p = pickedShape;
 		shaders[shaderIndx]->Bind();
-		for (int i=0; i<shapes.size();i++)
+		for (unsigned int i=0; i<shapes.size();i++)
 		{
 			if(shapes[i]->Is2Render())
 			{
@@ -103,7 +103,6 @@ using namespace glm;
 					Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
 				}
 			
-
 				mat4 MVP1 = MVP * Normal1; 
 				Normal1 = Normal * Normal1;
 
@@ -324,7 +323,7 @@ using namespace glm;
 			pickedShape = pickedID;
 			std::cout<<"picked "<<pickedID<<std::endl;
 			xold = x;
-			yold =  y;
+			yold = y;
 		}
 		return depth;
 	}
@@ -400,8 +399,8 @@ using namespace glm;
 				//float zTmp = 2.0*depth -1.0;
 				glGetIntegerv(GL_VIEWPORT, viewport);
 				float z=cameras[cameraIndx]->GetFar()+depth*(cameras[cameraIndx]->GetNear()-cameras[cameraIndx]->GetFar());
-				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
-				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
+				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
+				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
 
 				shapeTransformation(xCameraTranslate,-transX);
 				shapeTransformation(yCameraTranslate,transY);
@@ -409,8 +408,8 @@ using namespace glm;
 			}
 			else
 			{
-				shapeTransformation(zGlobalRotate,xrel*.5);
-				shapeTransformation(xGlobalRotate,yrel*.5);
+				shapeTransformation(zGlobalRotate,xrel*.5f);
+				shapeTransformation(xGlobalRotate,yrel*.5f);
 				WhenRotate();
 			}		
 	}
@@ -419,7 +418,6 @@ using namespace glm;
 	{
 		glReadPixels(1,1,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&depth);
 	}
-
 
 	void Scene::updatePosition(float xpos, float ypos)
 	{

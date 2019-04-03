@@ -60,7 +60,7 @@ MeshConstructor::~MeshConstructor(void)
 {
 	if(ib)
 		delete ib;
-	for (int i = 0; i < vbs.size(); i++)
+	for (unsigned int i = 0; i < vbs.size(); i++)
 	{
 		if(vbs[i])
 			delete vbs[i];
