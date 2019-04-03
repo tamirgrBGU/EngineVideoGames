@@ -1,6 +1,7 @@
 #include "game.h"
 #include <iostream>
 
+int lateUpdate = 0;
 static void printMat(const glm::mat4 mat)
 {
 	std::cout << " matrix:" << std::endl;
@@ -47,7 +48,6 @@ void Game::Init()
 	for (int i = 0; i < curve->numberOfPoints - 1; i++)
 		addShapeCopy(2, -1, TRIANGLES);
 
-
 	//translate all scene away from camera
 	myTranslate(glm::vec3(0, 0, -20), 0);
 
@@ -83,6 +83,9 @@ void Game::Init()
 		shapeTransformation(zScale, 1 / scale);
 	}
 
+
+	addShape(BezierSurface, -1, TRIANGLES);
+
 	pickedShape = -1;
 	Activate();
 }
@@ -98,8 +101,14 @@ void Game::Update(glm::mat4 MVP, glm::mat4 Normal, Shader *s)
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f, 0.0f, -1.0f, 1.0f);
 	s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
-
-
+	if (lateUpdate == 100) {
+		shapes[shapes.size() - 1] = new Shape(curve, 10, 7, true, QUADS);
+		lateUpdate = 0;
+	}
+	else
+	{
+		lateUpdate++;
+	}
 
 }
 
@@ -156,6 +165,7 @@ void Game::WhenTranslate()
 			}
 			in_corect = true;
 			shapes[1] = new Shape(curve, 30, 30, false, LINES);
+
 		}
 		//	std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
 	}

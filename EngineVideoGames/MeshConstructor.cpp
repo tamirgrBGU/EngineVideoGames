@@ -36,15 +36,16 @@ MeshConstructor::MeshConstructor(const std::string& fileName)
 
 MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS)
 {
-	//if(isSurface)
-	//{
-	//	Bezier2D surface(*curve,glm::vec3(0,0,1),4);
-	//	InitMesh(surface.GetSurface(resT,resS));		
-	//}
-	//else
-	//{
+	if(isSurface)
+	{
+		Bezier2D surface(*curve,glm::vec3(0,0,1),4);
+		InitMesh(surface.GetSurface(resT,resS));		
+		//InitMesh(surface.GetSurface(30,30));
+	}
+	else
+	{
 		InitLine( curve->GetLine(resT));
-	//}
+	}
 }
 
 MeshConstructor::MeshConstructor(const MeshConstructor &mesh)

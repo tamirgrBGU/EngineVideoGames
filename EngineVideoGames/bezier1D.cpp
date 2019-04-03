@@ -4,14 +4,14 @@
 
 Bezier1D::Bezier1D(void)
 {
-	numberOfPoints = 10;
+	numberOfPoints = 4;
 
 	glm::mat4 Model = glm::mat4(1.0);
 
 	glm::vec4 Position0 = glm::vec4(0.0, 0.0, 0.0, 0.0);
-	glm::vec4 Position1 = glm::vec4(1.0, 0.0, 0.0, 0.0);
-	glm::vec4 Position2 = glm::vec4(2.0, 0.0, 0.0, 0.0);
-	glm::vec4 Position3 = glm::vec4(3.0, 0.0, 0.0, 0.0);
+	glm::vec4 Position1 = glm::vec4(7.0, 10, 0.0, 0.0);
+	glm::vec4 Position2 = glm::vec4(14.0, 10, 0.0, 0.0);
+	glm::vec4 Position3 = glm::vec4(20.0, 0.0, 0.0, 0.0);
 
 
 	Model[0] = Position0;
@@ -20,27 +20,27 @@ Bezier1D::Bezier1D(void)
 	Model[3] = Position3;
 	segments.push_back(Model);
 
-	Position0 = glm::vec4(3.0, 0.0, 0.0, 0.0);
-	Position1 = glm::vec4(4.0, 0.0, 0.0, 0.0);
-	Position2 = glm::vec4(5.0, 0.0, 0.0, 0.0);
-	Position3 = glm::vec4(6.0, 0.0, 0.0, 0.0);
+	//Position0 = glm::vec4(3.0, 1.0, 0.0, 0.0);
+	//Position1 = glm::vec4(4.0, 0.5, 0.0, 0.0);
+	//Position2 = glm::vec4(5.0, 0.5, 0.0, 0.0);
+	//Position3 = glm::vec4(6.0, 0.0, 0.0, 0.0);
 
-	Model[0] = Position0;
-	Model[1] = Position1;
-	Model[2] = Position2;
-	Model[3] = Position3;
-	segments.push_back(Model);
+	//Model[0] = Position0;
+	//Model[1] = Position1;
+	//Model[2] = Position2;
+	//Model[3] = Position3;
+	//segments.push_back(Model);
 
-	Position0 = glm::vec4(6.0, 0.0, 0.0, 0.0);
-	Position1 = glm::vec4(7.0, 0.0, 0.0, 0.0);
-	Position2 = glm::vec4(8.0, 0.0, 0.0, 0.0);
-	Position3 = glm::vec4(9.0, 0.0, 0.0, 0.0);
+	//Position0 = glm::vec4(6.0, 0.0, 0.0, 0.0);
+	//Position1 = glm::vec4(7.0, 0.0, 0.0, 0.0);
+	//Position2 = glm::vec4(8.0, 0.0, 0.0, 0.0);
+	//Position3 = glm::vec4(9.0, 0.0, 0.0, 0.0);
 
-	Model[0] = Position0;
-	Model[1] = Position1;
-	Model[2] = Position2;
-	Model[3] = Position3;
-	segments.push_back(Model);
+	//Model[0] = Position0;
+	//Model[1] = Position1;
+	//Model[2] = Position2;
+	//Model[3] = Position3;
+	//segments.push_back(Model);
 
 }
 IndexedModel Bezier1D::GetLine(int resT) {
@@ -164,6 +164,7 @@ glm::vec3  Bezier1D::GetVelosity(int segment, float t) {
 
 	//return myvertex;
 }
+
 
 Bezier1D::~Bezier1D(void)
 {
