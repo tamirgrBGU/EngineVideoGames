@@ -17,8 +17,7 @@
 	void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
 		Game *scn = (Game*)glfwGetWindowUserPointer(window);
-		scn->shapeTransformation(scn->zCameraTranslate,yoffset);
-		
+		scn->shapeTransformation(scn->zCameraTranslate,(float) yoffset);		
 	}
 	
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -34,6 +33,12 @@
 				break;
 				case GLFW_KEY_SPACE:
 					scn->HideShape(0);
+				break;
+				case GLFW_KEY_P:
+					scn->changeMode();
+				break;
+				case GLFW_KEY_O:
+					scn->changeSurfaceLine();
 				break;
 			default:
 				break;

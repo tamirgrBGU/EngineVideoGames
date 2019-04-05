@@ -374,7 +374,7 @@ static inline unsigned int ParseOBJIndexValue(const std::string& token, unsigned
 
 static inline float ParseOBJFloatValue(const std::string& token, unsigned int start, unsigned int end)
 {
-    return atof(token.substr(start, end - start).c_str());
+    return float(atof(token.substr(start, end - start).c_str()));
 }
 
 static inline std::vector<std::string> SplitString(const std::string &s, char delim)

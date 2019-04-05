@@ -1,4 +1,5 @@
 #include "game.h"
+
 #include <iostream>
 
 static void printMat(const glm::mat4 mat)
@@ -17,7 +18,24 @@ Game::Game():Scene(){curve = 0;}
 
 Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far) : Scene(position,angle,hwRelation,near,far)
 { 
-	curve = new Bezier1D();
+	curve = new Bezier1D();	
+}
+
+Bezier1D *Game::getBezier1D() {
+	return curve;
+};
+
+
+bool proj2D = true;
+int projMode = 0;
+unsigned int xResolution = 15, yResolution = 15;
+
+void Game::changeMode() {
+	projMode = (projMode + 1) % 6;
+}
+
+void Game::changeSurfaceLine() {
+	proj2D = proj2D^1;
 }
 
 void Game::addShape(int type,int parent,unsigned int mode)
@@ -27,23 +45,51 @@ void Game::addShape(int type,int parent,unsigned int mode)
 			shapes.push_back(new Shape(type,mode));
 		else
 		{
+			projMode = mode;
 			if(type == BezierLine)
-				shapes.push_back(new Shape(curve,30,30,false,mode));
+				shapes.push_back(new Shape(curve, xResolution, yResolution, false, mode));
 			else
-				shapes.push_back(new Shape(curve,30,30,true,mode));
+				shapes.push_back(new Shape(curve, xResolution, yResolution, true, mode));
 		}
+}
+
+void Game::updateBezier(int BezierShapeId, bool is2D, unsigned int mode)
+{
+	shapes[BezierShapeId] = new Shape(curve, xResolution, yResolution, is2D, mode);	
 }
 
 void Game::Init()
 {
 	addShape(Axis,-1,LINES);
-	addShape(Octahedron,-1,TRIANGLES);
+	//addShape(Octahedron,-1,TRIANGLES);
 	//addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
-	addShapeCopy(1,-1,TRIANGLES);
-	
+	//addShapeCopy(1,-1,TRIANGLES);
+	//modes{POINTS,LINES,LINE_LOOP,LINE_STRIP,TRIANGLES,QUADS};
+	if(proj2D)
+		addShape(BezierSurface, -1, QUADS);
+	else
+		addShape(BezierLine, -1, LINES);
 	
 	//translate all scene away from camera
 	myTranslate(glm::vec3(0,0,-20),0);
+	int index = 2;
+	for (unsigned int j = 0; j < 2; j++) {
+		for (unsigned int i = 0; i < 4; i++) {
+			if ((index == 2) || (((index - 2) % 4) != 0)) { //check for having only one shape between 2 segments
+				addShape(Octahedron, -1, TRIANGLES);
+				pickedShape = shapes.size()-1;
+				addControlPointShapeId(pickedShape);
+				glm::vec3 tmp = curve->GetControlPointPos(j, i);
+				shapeTransformation(xGlobalTranslate, tmp.x);
+				shapeTransformation(yGlobalTranslate, tmp.y);
+				shapeTransformation(zGlobalTranslate, tmp.z);
+				shapeTransformation(yScale, (float)0.3);
+				shapeTransformation(xScale, (float)0.3);
+				shapeTransformation(zScale, (float)0.3);
+			}
+			index++;
+		};
+	}
 
 	pickedShape = 0;
 
@@ -54,16 +100,6 @@ void Game::Init()
 	
 	ReadPixel();
 	
-	pickedShape = 2;
-	shapeTransformation(zLocalRotate,45);	
-
-	pickedShape = 1;
-
-	shapeTransformation(zGlobalTranslate,-10);
-	shapeTransformation(yScale,3.30);
-	shapeTransformation(xScale,3.30);
-	shapeTransformation(zScale,3.30);
-
 	pickedShape = -1;
 	Activate();
 }
@@ -77,7 +113,18 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
-	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);		
+	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
+	int controlpoint = getControlPointByShapeId(pickedShape);
+
+	if (pickedShape > 0) {
+		//printf("im in, sending %d and %d to MoveControlPoint \n", (controlpoint / 3), (controlpoint % 3));
+		savePastPositions(controlpoint);
+		//printf("finished pastt \n");
+		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
+		curve->MoveControlPoint(controlpoint / 3, controlpoint % 3, true, pos); 
+		updateBezier(1, proj2D, projMode);
+		updateControlShapes(controlpoint, curve);
+	}
 }
 
 void Game::WhenRotate()
@@ -92,21 +139,95 @@ void Game::WhenTranslate()
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0,0,0,1);
 	//	std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
+		if (pickedShape > 1) {
+			
+			int controlpoint = getControlPointByShapeId(pickedShape); //find the right control point seg and ind in out array.
+			//printf("%d is the controlpoint \n", controlpoint);
+			
+		}
 	}
+}
+
+void Game::savePastPositions(int controlPoint) {
+	 int indx = 0;
+	for ( int i = -1; i < 2; i=i+2) {
+		if (controlPoint+i > -1 && controlPoint + i < (signed)controlPointsShapesIds.size()) {
+			//printf("%d is the location \n", controlPoint + i);
+			if (controlPoint + i == controlPointsShapesIds.size()-1) {
+				pastLoc[indx] = curve->GetControlPointPos((controlPoint + i) / 3 - 1, 3);
+			}
+			else
+				pastLoc[indx] = curve->GetControlPointPos((controlPoint + i) / 3, (controlPoint + i) % 3);
+			indx++;
+		}
+	}
+}
+
+void Game::updateControlShapes(int controlPoint, Bezier1D *bez) {
+	int index = 0;
+	int pickedShape_tmp = pickedShape;
+	vec3 move_delta;
+	for (int i = -1; i < 2; i=i+2) {
+		if (controlPoint + i > -1 && controlPoint + i < (signed) controlPointsShapesIds.size()) {
+			if (controlPoint + i == controlPointsShapesIds.size() - 1) {
+				move_delta = bez->GetControlPointPos((controlPoint + i) / 3 -1, 3) -= pastLoc[index];
+			}
+			else
+				move_delta = bez->GetControlPointPos((controlPoint + i) / 3, (controlPoint + i) % 3) -= pastLoc[index];
+
+			pickedShape = controlPointsShapesIds[controlPoint + i];
+			//printf("shape: %d \n", pickedShape);
+			shapeTransformation(xGlobalTranslate, move_delta.x);
+			shapeTransformation(yGlobalTranslate, move_delta.y);
+			shapeTransformation(zGlobalTranslate, move_delta.z);
+			index++;
+		}
+	}			
 }
 
 void Game::Motion()
 {
-	if(isActive)
-	{
-		int p = pickedShape;
-		pickedShape = 2;
-		shapeTransformation(zLocalRotate,0.45);
-		pickedShape = p;
-	}
+	//if(isActive)
+	//{
+	//	int p = pickedShape;
+	//	pickedShape = 2;
+	//	//shapeTransformation(zLocalRotate,0.45);
+	//	pickedShape = p;
+	//}
 }
 
 Game::~Game(void)
 {
 	delete curve;
+}
+
+//int Game::getControlPointShapeId(int segment, int indx) {
+//	return controlPointsShapesIds[3 * segment + indx];
+//}
+
+int Game::getControlPointByShapeId(int shapeId) {
+	bool found = false;
+	int index = 0;
+	int ans = -1;
+	int arr_size = controlPointsShapesIds.size();
+	//printf("%d is the length of controlPointsShapesIds now.. \n", controlPointsShapesIds.size());
+	while (!found && (index < arr_size)) {
+		//printf("%d is equal to %d ?\n", controlPointsShapesIds[index], shapeId);
+		if (controlPointsShapesIds[index] == shapeId) {
+			ans = index;
+			found = true;
+		}
+		index++;
+	}
+	//printf("and is %d  \n", ans);
+	return ans;
+}
+
+//void Game::setControlPointShapeId(int segment, int indx, int shapeId) {
+//	controlPointsShapesIds[3 * segment + indx] = shapeId;
+//}
+
+void Game::addControlPointShapeId(int shapeId) {
+	controlPointsShapesIds.push_back(shapeId);
+	//printf("vector size: %d and got: %d \n", controlPointsShapesIds.size(), shapeId);
 }

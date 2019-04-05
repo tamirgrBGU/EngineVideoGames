@@ -92,7 +92,7 @@ using namespace glm;
 		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
 		int p = pickedShape;
 		shaders[shaderIndx]->Bind();
-		for (int i=0; i<shapes.size();i++)
+		for (unsigned int i=0; i<shapes.size(); i++)
 		{
 			if(shapes[i]->Is2Render())
 			{
@@ -323,8 +323,8 @@ using namespace glm;
 		{
 			pickedShape = pickedID;
 			std::cout<<"picked "<<pickedID<<std::endl;
-			xold = x;
-			yold =  y;
+			xold = (float) x;
+			yold = (float) y;
 		}
 		return depth;
 	}
@@ -399,9 +399,9 @@ using namespace glm;
 				GLint viewport[4];
 				//float zTmp = 2.0*depth -1.0;
 				glGetIntegerv(GL_VIEWPORT, viewport);
-				float z=cameras[cameraIndx]->GetFar()+depth*(cameras[cameraIndx]->GetNear()-cameras[cameraIndx]->GetFar());
-				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
-				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
+				float z = float(cameras[cameraIndx]->GetFar()+depth*(cameras[cameraIndx]->GetNear()-cameras[cameraIndx]->GetFar()));
+				float transX = float(cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z));
+				float transY = float((yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z));
 
 				shapeTransformation(xCameraTranslate,-transX);
 				shapeTransformation(yCameraTranslate,transY);
@@ -409,8 +409,8 @@ using namespace glm;
 			}
 			else
 			{
-				shapeTransformation(zGlobalRotate,xrel*.5);
-				shapeTransformation(xGlobalRotate,yrel*.5);
+				shapeTransformation(zGlobalRotate, float(xrel*.5));
+				shapeTransformation(xGlobalRotate, float(yrel*.5));
 				WhenRotate();
 			}		
 	}

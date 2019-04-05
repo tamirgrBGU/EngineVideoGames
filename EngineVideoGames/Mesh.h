@@ -1,6 +1,11 @@
 #pragma once
+#define GLM_FORCE_RADIANS
 #include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
 #include <vector>
+#define _USE_MATH_DEFINES
+#include "Math.h"
+using namespace glm;
 
 class IndexedModel
 {

@@ -27,7 +27,7 @@ vec4 normXY(glm::vec4 &vec, int iterations)
 		{
 			res[0] = res[0] / tmp;
 			res[1] = res[1] / tmp;
-			tmp = 0.5 + (res[0] * res[0] + res[1] * res[1])*0.5;
+			tmp = float(0.5 + (res[0] * res[0] + res[1] * res[1])*0.5);
 		}
 	}
 	return res;
@@ -203,7 +203,6 @@ void EulerAngles::split(glm::mat4 &mat, int iterations)
 {
 	
 	    glm::mat4 tmp;
-		float size;
 
 		if (mat[0][0] >= 0.9999999 && mat[1][1] >= 0.9999999 && mat[2][2] >= 0.9999999)
 		{

@@ -34,17 +34,18 @@ MeshConstructor::MeshConstructor(const std::string& fileName)
 	InitMesh(OBJModel(fileName).ToIndexedModel());
 }
 
-MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS)
+MeshConstructor::MeshConstructor(Bezier1D *curve, bool isSurface, unsigned int resT, unsigned int resS)
 {
-	//if(isSurface)
-	//{
-	//	Bezier2D surface(*curve,glm::vec3(0,0,1),4);
-	//	InitMesh(surface.GetSurface(resT,resS));		
-	//}
-	//else
-	//{
-	//	InitLine( curve->GetLine(resT));
-	//}
+	//printf("%d,%d,%d\n", isSurface, resT, resS);
+	if(isSurface)
+	{
+		Bezier2D surface(*curve,glm::vec3(1,0,0),4);
+		InitMesh(surface.GetSurface(resT,resS));		
+	}
+	else
+	{		
+		InitLine(curve->GetLine(resT));
+	}
 }
 
 MeshConstructor::MeshConstructor(const MeshConstructor &mesh)
@@ -60,7 +61,7 @@ MeshConstructor::~MeshConstructor(void)
 {
 	if(ib)
 		delete ib;
-	for (int i = 0; i < vbs.size(); i++)
+	for (unsigned int i = 0; i < vbs.size(); i++)
 	{
 		if(vbs[i])
 			delete vbs[i];

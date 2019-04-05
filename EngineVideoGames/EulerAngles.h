@@ -1,7 +1,6 @@
  #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#define M_PI 3.14159265359
 
 class EulerAngles
 {
