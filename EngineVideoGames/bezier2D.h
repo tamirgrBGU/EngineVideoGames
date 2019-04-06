@@ -26,14 +26,6 @@ public:
 private:
 	void moveByVector(mat4 *seg, float x);
 
-	static glm::vec4 calc_bezier_point_derivateS(glm::mat4 segmentT, glm::mat4 segmentS, float t, float s) {
-		return Bezier1D::calc_bezier_point(t, segmentT)*Bezier1D::calc_bezier_point_derivate(s, segmentS);
-	}
-
-	static glm::vec4 calc_bezier_point_derivateT(glm::mat4 segmentT, glm::mat4 segmentS, float t, float s) {
-		return Bezier1D::calc_bezier_point_derivate(t, segmentT)*Bezier1D::calc_bezier_point(s, segmentS);
-	}
-
 	static glm::vec4 calc_bezier_point2D(glm::mat4 segmentT, glm::mat4 segmentS, float t, float s) {
 		return Bezier1D::calc_bezier_point(s, segmentS);
 	}
@@ -72,6 +64,7 @@ private:
 		}
 	}
 
+	mat4 angleRotator;
 	void initParts(mat4 *parts, glm::vec3 axis) {
 		mat4 rotatorToX = glm::rotate((float) 90.0, glm::cross(vec3(0, 0, 1), axis));
 		parts[0] = initSegmentPartOfCycle(circularSubdivision);
@@ -81,11 +74,11 @@ private:
 			parts[0][i].x = 0;
 
 		float angle = (float) 360.0 / circularSubdivision;
-		mat4 rotator = glm::rotate(angle, axis);
+		angleRotator = glm::rotate(angle, axis);
 
 		for (int i = 1; i < circularSubdivision; i++) {
 			parts[i] = parts[i - 1];
-			rotateMat(&parts[i], &rotator);
+			rotateMat(&parts[i], &angleRotator);
 		}
 	}
 

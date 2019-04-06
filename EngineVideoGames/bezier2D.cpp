@@ -25,13 +25,18 @@ glm::mat4 *Bezier2D::TestHelper() {
 	return segmentCircleParts;
 }
 
+glm::vec3 color(glm::vec3(0.00005, 0.00005, -0.95));
 IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	IndexedModel model;
 	for (int segmentTindx = 0; segmentTindx < b.segNo(); segmentTindx++) {
 		mat4 segmentT = b.GetSegment(segmentTindx);
 		for (int t = 0; t < resT + 1; t++) {
+			float tPart = t / ((float)resT);
+			vec4 dt = Bezier1D::calc_bezier_point_derivate(tPart, segmentT);
+			vec3 dt3(dt.x, dt.y, dt.z);
+
 			for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
-				float tPart = t / ((float)resT);
+
 				mat4 segmentS = genSeg(this->b.calc_bezier_point(tPart, segmentT), segmentSindx);
 				vec4 vx4= this->b.calc_bezier_point(tPart, segmentT);
 				for (int s = 0; s < resS; s++) {
@@ -39,17 +44,18 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					vec4 pos = calc_bezier_point2D(segmentT, segmentS, tPart, sPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
 					
-					vec4 ds = calc_bezier_point_derivateS(segmentT, segmentS, tPart, sPart);
+					vec4 ds = Bezier1D::calc_bezier_point_derivate(sPart, segmentS);
 					vec3 ds3(ds.x, ds.y, ds.z);
 
-					vec4 dt = calc_bezier_point_derivateT(segmentT, segmentS, tPart, sPart);
-					vec3 dt3(dt.x, dt.y, dt.z);
-
 					model.positions.push_back(pos3);
-					model.colors.push_back(vec3(1.0f, 0.5f, 0.31f));
-					model.normals.push_back(glm::cross(ds3, dt3));
+					model.colors.push_back(color);
+					model.normals.push_back(glm::cross(dt3, ds3));// glm::cross(dt3, ds3));
 					model.texCoords.push_back(vec2(t,s));
 				}
+				/*dt = dt * angleRotator;
+				dt3.x = dt.x;
+				dt3.y = dt.y;
+				dt3.z = dt.z;*/
 			}
 		}
 	}
@@ -88,12 +94,12 @@ Vertex Bezier2D::GetVertex(int segmentT, int segmentS, float t, float s) {
 	vec4 pos = calc_bezier_point2D(segmentSBP, segmentSBP, t, s);
 	vec3 pos3(pos.x, pos.y, pos.z);
 
-	vec4 ds = calc_bezier_point_derivateS(segmentSBP, segmentSBP, t, s);
+	vec4 ds = Bezier1D::calc_bezier_point_derivate(s, segmentSBP);
 	vec3 ds3(ds.x, ds.y, ds.z);
-	vec4 dt = calc_bezier_point_derivateT(segmentTBP, segmentSBP, t, s);
+	vec4 dt = Bezier1D::calc_bezier_point_derivate(t, segmentTBP);
 	vec3 dt3(dt.x, dt.y, dt.z);
 
-	Vertex out(pos3, vec2(0), glm::cross(ds3, dt3), vec3(0));
+	Vertex out(pos3, vec2(t, s), glm::cross(ds3, dt3), color);
 	return out;
 }
 
@@ -101,9 +107,9 @@ glm::vec3 Bezier2D::GetNormal(int segmentT, int segmentS, float t, float s) {
 	mat4 segmentTBP = b.GetSegment(segmentT);
 	mat4 segmentSBP = genSeg(this->b.calc_bezier_point(t, segmentTBP), segmentS);
 
-	vec4 ds = calc_bezier_point_derivateS(segmentSBP, segmentSBP, t, s);
+	vec4 ds = Bezier1D::calc_bezier_point_derivate(s, segmentSBP);
 	vec3 ds3(ds.x, ds.y, ds.z);
-	vec4 dt = calc_bezier_point_derivateT(segmentTBP, segmentSBP, t, s);
+	vec4 dt = Bezier1D::calc_bezier_point_derivate(t, segmentTBP);
 	vec3 dt3(dt.x, dt.y, dt.z);
 	return glm::cross(ds3, dt3);
 }
