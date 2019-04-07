@@ -72,13 +72,16 @@ void Game::Init()
 	
 	//translate all scene away from camera
 	myTranslate(glm::vec3(0,0,-20),0);
-	int index = 2;
-	for (unsigned int j = 0; j < 2; j++) {
+	int shape_par = 1;
+	int init_shapes_num = shapes.size();
+	int index = shapes.size();
+	for (unsigned int j = 0; j < curve->segNo(); j++) {
 		for (unsigned int i = 0; i < 4; i++) {
-			if ((index == 2) || (((index - 2) % 4) != 0)) { //check for having only one shape between 2 segments
+			if ((index == init_shapes_num) || (((index - init_shapes_num) % 4) != 0)) { //check for having only one shape between 2 segments
 				addShape(Octahedron, -1, TRIANGLES);
 				pickedShape = shapes.size()-1;
 				addControlPointShapeId(pickedShape);
+				//printf("here pos %d, %d! \n", j,i);
 				glm::vec3 tmp = curve->GetControlPointPos(j, i);
 				shapeTransformation(xGlobalTranslate, tmp.x);
 				shapeTransformation(yGlobalTranslate, tmp.y);
@@ -102,6 +105,7 @@ void Game::Init()
 	
 	pickedShape = -1;
 	Activate();
+	//printf("here first %d! \n", pickedShape);
 }
 
 void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
@@ -115,15 +119,14 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
 	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
 	int controlpoint = getControlPointByShapeId(pickedShape);
-
-	if (pickedShape > 0) {
+	if ( pickedShape > 1 ) {
 		//printf("im in, sending %d and %d to MoveControlPoint \n", (controlpoint / 3), (controlpoint % 3));
 		savePastPositions(controlpoint);
 		//printf("finished pastt \n");
-		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
-		curve->MoveControlPoint(controlpoint / 3, controlpoint % 3, true, pos); 
-		updateBezier(1, proj2D, projMode);
-		updateControlShapes(controlpoint, curve);
+		//glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
+			//printf("here %d! \n", pickedShape);
+			updateControlShapes(controlpoint, curve);
+		//pickedShape = -1;
 	}
 }
 
@@ -135,16 +138,21 @@ void Game::WhenRotate()
 
 void Game::WhenTranslate()
 {
-	if(pickedShape>=0)
+
+	if(pickedShape>1)
 	{
+		
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0,0,0,1);
-	//	std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
-		if (pickedShape > 1) {
-			
-			int controlpoint = getControlPointByShapeId(pickedShape); //find the right control point seg and ind in out array.
-			//printf("%d is the controlpoint \n", controlpoint);
-			
-		}
+		int controlpoint = getControlPointByShapeId(pickedShape);
+		curve->MoveControlPoint(controlpoint / 3, controlpoint % 3, true, pos);
+		updateBezier(1, proj2D, projMode);
+		//std::cout<<"( "<<pos.x<<", "<<pos.y<<", "<<pos.z<<")"<<std::endl;
+		//if (pickedShape > 1) {
+		//	
+		//	int controlpoint = getControlPointByShapeId(pickedShape); //find the right control point seg and ind in out array.
+		//	printf("%d is the controlpoint \n", controlpoint);
+		//	
+		//}
 	}
 }
 
@@ -174,15 +182,17 @@ void Game::updateControlShapes(int controlPoint, Bezier1D *bez) {
 			}
 			else
 				move_delta = bez->GetControlPointPos((controlPoint + i) / 3, (controlPoint + i) % 3) -= pastLoc[index];
-
 			pickedShape = controlPointsShapesIds[controlPoint + i];
 			//printf("shape: %d \n", pickedShape);
 			shapeTransformation(xGlobalTranslate, move_delta.x);
 			shapeTransformation(yGlobalTranslate, move_delta.y);
 			shapeTransformation(zGlobalTranslate, move_delta.z);
 			index++;
+			pickedShape = pickedShape_tmp;
 		}
-	}			
+	}
+	pickedShape = pickedShape_tmp;
+	
 }
 
 void Game::Motion()
