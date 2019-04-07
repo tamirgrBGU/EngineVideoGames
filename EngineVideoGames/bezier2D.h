@@ -32,8 +32,8 @@ private:
 			for (int j = 0; j < SEG_CON_PTS; j++)
 			{
 				location = location +
-					b.calc_bezier_factor(i, t)*
-					b.calc_bezier_factor(j, s)*
+					b.calc_bezier_factor(i, s)*
+					b.calc_bezier_factor(j, t)*
 					surfaceSeg[i][j];
 			}
 		}

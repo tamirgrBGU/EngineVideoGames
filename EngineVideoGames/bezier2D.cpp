@@ -49,18 +49,21 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					model.texCoords.push_back(vec2(tPart, sPart));
 				}
 			}
-			//if (segmentTindx == b.segNo() - 1) {
-			//	for (int t = 0; t < resT; t++) {
-			//		float tPart = t / float(resT);
-			//		vec4 pos = calc_bezier_point2D(surface, tPart, 1);
-			//		vec3 pos3(pos.x, pos.y, pos.z);
-			//		//printf("%d %d %f %f <%f %f %f>\n", segmentTindx, segmentSindx, tPart, sPart, pos.x, pos.y, pos.z);
-			//		model.positions.push_back(pos3);
-			//		model.colors.push_back(color);
-			//		model.normals.push_back(calc_bezier_point2D_get_normal(surface, tPart, 1));
-			//		model.texCoords.push_back(vec2(tPart, 1));
-			//	}
-			//}
+			printf("%d/%d.%d\n", t, resT, segmentTindx);
+		}
+	}
+
+	for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
+		for (int s = 0; s < resS; s++) {
+			float sPart = s / float(resS);
+			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, sPart);
+			vec3 pos3(pos.x, pos.y, pos.z);
+			//printf("%d %d %f %f <%f %f %f>\n", segmentTindx, segmentSindx, tPart, sPart, pos.x, pos.y, pos.z);
+			model.positions.push_back(pos3);
+			model.colors.push_back(color);
+			vec3 normal(0, pos.y, pos.z);
+			model.normals.push_back(normal);// calc_bezier_point2D_get_normal(surfaces[segmentSindx], tPart, sPart));
+			model.texCoords.push_back(vec2(1, sPart));
 		}
 	}
 

@@ -28,14 +28,16 @@ Bezier1D *Game::getBezier1D() {
 
 bool proj2D = true;
 int projMode = 0;
-unsigned int xResolution = 15, yResolution = 15;
+unsigned int xResolution = 50, yResolution = 50;
 
 void Game::changeMode() {
 	projMode = (projMode + 1) % 6;
+	updateBezier(1, proj2D, projMode);
 }
 
 void Game::changeSurfaceLine() {
 	proj2D = proj2D^1;
+	updateBezier(1, proj2D, projMode);
 }
 
 void Game::addShape(int type,int parent,unsigned int mode)
@@ -75,7 +77,7 @@ void Game::Init()
 	int shape_par = 1;
 	int init_shapes_num = shapes.size();
 	int index = shapes.size();
-	for (unsigned int j = 0; j < curve->segNo(); j++) {
+	for (int j = 0; j < curve->segNo(); j++) {
 		for (unsigned int i = 0; i < 4; i++) {
 			if ((index == init_shapes_num) || (((index - init_shapes_num) % 4) != 0)) { //check for having only one shape between 2 segments
 				addShape(Octahedron, -1, TRIANGLES);
