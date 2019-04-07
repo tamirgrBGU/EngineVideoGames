@@ -2,6 +2,7 @@
 
 Bezier1D::Bezier1D(void)
 {
+	initBinomTree();
 	mat4 seg0 = mat4(0);
 	seg0[0] = vec4(0, 1, 0, 1);
 	seg0[1] = vec4(1, 1, 0, 1);
@@ -11,7 +12,7 @@ Bezier1D::Bezier1D(void)
 	seg1[0] = vec4(3, 0, 0, 1);
 	seg1[1] = vec4(4, 1, 0, 1);
 	seg1[2] = vec4(5, 1, 0, 1);
-	seg1[3] = vec4(6, 0, 0, 1); 
+	seg1[3] = vec4(6, 0, 0, 1);
 	mat4 seg2 = mat4(0);
 	seg2[0] = vec4(6, 0, 0, 1);
 	seg2[1] = vec4(7, -1, 0, 1);
@@ -40,7 +41,7 @@ IndexedModel Bezier1D::GetLine(int resT) {
 	IndexedModel model;
 
 	for (unsigned int j = 0; j<segments.size(); j++) {
-		for (int i = 0; i<resT + 1; i++) {
+		for (int i = 0; i <= resT; i++) {
 			vec4 v4 = calc_bezier_point(i / ((float)resT), segments[j]);
 			vec3 beizeLine(v4.x, v4.y, v4.z);
 			model.positions.push_back(beizeLine);
@@ -50,13 +51,13 @@ IndexedModel Bezier1D::GetLine(int resT) {
 
 	model.indices.push_back(0);
 
-	for (unsigned int i = 1; i<model.positions.size()-1; i++) {
+	for (unsigned int i = 1; i<model.positions.size() - 1; i++) {
 		model.indices.push_back(i);
 		model.indices.push_back(i);
 	}
 
 	if (resT>1) {
-		model.indices.push_back(model.positions.size()-1);
+		model.indices.push_back(model.positions.size() - 1);
 	}
 
 	return model;
