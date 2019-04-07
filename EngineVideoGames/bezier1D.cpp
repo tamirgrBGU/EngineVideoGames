@@ -3,25 +3,29 @@
 Bezier1D::Bezier1D(void)
 {
 	mat4 seg0 = mat4(0);
-	seg0[0] = vec4(0, 0, -3, 1);
-	seg0[1] = vec4(1, 1, -2, 1);
-	seg0[2] = vec4(2, 1, -1, 1);
-	seg0[3] = vec4(3, 0, 0, 1);
-	/*seg0[0] = vec4(0, 1, 0, 1);
+	seg0[0] = vec4(0, 1, 0, 1);
 	seg0[1] = vec4(1, 1, 0, 1);
 	seg0[2] = vec4(2, 1, 0, 1);
-	seg0[3] = vec4(3, 1, 0, 1);*/
+	seg0[3] = vec4(3, 0, 0, 1);
 	mat4 seg1 = mat4(0);
 	seg1[0] = vec4(3, 0, 0, 1);
-	seg1[1] = vec4(4, -1, 1, 1);
-	seg1[2] = vec4(5, -1, 2, 1);
-	seg1[3] = vec4(6, 0, 5, 1);
-	/*seg1[0] = vec4(3, 1, 0, 1);
 	seg1[1] = vec4(4, 1, 0, 1);
 	seg1[2] = vec4(5, 1, 0, 1);
-	seg1[3] = vec4(6, 1, 0, 1);*/
+	seg1[3] = vec4(6, 0, 0, 1); 
+	mat4 seg2 = mat4(0);
+	seg2[0] = vec4(6, 0, 0, 1);
+	seg2[1] = vec4(7, -1, 0, 1);
+	seg2[2] = vec4(8, -1, 0, 1);
+	seg2[3] = vec4(9, 0, 0, 1);
+	mat4 seg3 = mat4(0);
+	seg3[0] = vec4(9, 0, 0, 1);
+	seg3[1] = vec4(10, 2, 0, 1);
+	seg3[2] = vec4(11, 2, 0, 1);
+	seg3[3] = vec4(12, 3, 0, 1);
 	segments.push_back(seg0);
 	segments.push_back(seg1);
+	segments.push_back(seg2);
+	segments.push_back(seg3);
 }
 
 float randomTillOne() {
