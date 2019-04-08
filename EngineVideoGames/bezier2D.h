@@ -25,58 +25,46 @@ public:
 private:
 	void moveByVector(mat4 *seg, float x);
 
-	glm::vec4 calc_bezier_point2D(glm::mat4* surfaceSeg, float t, float s) {
+	glm::vec4 calc_bezier_point2D(glm::mat4* surfaceSeg, float u, float v) {
 		vec4 location(0);
 		for (int i = 0; i < SEG_CON_PTS; i++)
 		{
+			float temp_factor = b.calc_bezier_factor(i, u);
 			for (int j = 0; j < SEG_CON_PTS; j++)
 			{
 				location = location +
-					b.calc_bezier_factor(i, s)*
-					b.calc_bezier_factor(j, t)*
-					surfaceSeg[i][j];
+				   (
+					temp_factor*
+					b.calc_bezier_factor(j, v)
+					)*surfaceSeg[j][i];
 			}
 		}
 		location.w = 1;
 		return location;
 	}
 
-	glm::vec3 calc_bezier_point2D_get_normal(glm::mat4* surfaceSeg, float t, float s) {
-		vec4 dt = calc_bezier_point2D_velosityT(surfaceSeg, t, s);
+	glm::vec3 calc_bezier_point2D_get_normal(glm::mat4* surfaceSeg, float u, float v) {
+		vec4 dt = calc_bezier_point2D_velosity(surfaceSeg, v, u);
 		vec3 dt3(dt.x, dt.y, dt.z);
-		vec4 ds = calc_bezier_point2D_velosityS(surfaceSeg, t, s);
+		vec4 ds = calc_bezier_point2D_velosity(surfaceSeg, u, v);
 		vec3 ds3(ds.x, ds.y, ds.z);
 		return glm::cross(dt3, ds3);
 	}
+	
 
-	glm::vec4 calc_bezier_point2D_velosityS(glm::mat4* surfaceSeg, float t, float s) {
+	//will derivate v
+	glm::vec4 calc_bezier_point2D_velosity(glm::mat4* surfaceSeg, float u, float v) {
 		vec4 velosity(0);
 		for (int i = 0; i < SEG_CON_PTS; i++)
 		{
-			for (int j = 1; j < SEG_CON_PTS - 1; j++)
+			float temp_factor = b.calc_bezier_factor(i, u);
+			for (int j = 0; j < SEG_CON_PTS; j++)
 			{
 				velosity = velosity +
 					(
-						b.calc_bezier_factor(i, t) *
-						b.calc_bezier_factor_derivate(j, s)
-						)*surfaceSeg[i][j];
-			}
-		}
-		velosity.w = 0;
-		return velosity;
-	}
-
-	glm::vec4 calc_bezier_point2D_velosityT(glm::mat4* surfaceSeg, float t, float s) {
-		vec4 velosity(0);
-		for (int i = 0; i < SEG_CON_PTS; i++)
-		{
-			for (int j = 1; j < SEG_CON_PTS - 1; j++)
-			{
-				velosity = velosity +
-					(
-						b.calc_bezier_factor_derivate(i, t) *
-						b.calc_bezier_factor(j, s)
-						)*surfaceSeg[i][j];
+						temp_factor *
+						b.calc_bezier_factor_derivate(j, v)
+						)*surfaceSeg[j][i];
 			}
 		}
 		velosity.w = 0;

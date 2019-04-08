@@ -49,7 +49,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					model.texCoords.push_back(vec2(tPart, sPart));
 				}
 			}
-			printf("%d/%d.%d\n", t, resT, segmentTindx);
+			//printf("%d/%d.%d\n", t, resT, segmentTindx);
 		}
 	}
 
@@ -62,7 +62,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			model.positions.push_back(pos3);
 			model.colors.push_back(color);
 			vec3 normal(0, pos.y, pos.z);
-			model.normals.push_back(normal);// calc_bezier_point2D_get_normal(surfaces[segmentSindx], tPart, sPart));
+			model.normals.push_back(normal);// calc_bezier_point2D_get_normal(surfaces[segmentSindx], 1, sPart));
 			model.texCoords.push_back(vec2(1, sPart));
 		}
 	}

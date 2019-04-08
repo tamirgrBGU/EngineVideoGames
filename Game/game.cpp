@@ -28,7 +28,7 @@ Bezier1D *Game::getBezier1D() {
 
 bool proj2D = true;
 int projMode = 0;
-unsigned int xResolution = 50, yResolution = 50;
+unsigned int xResolution = 25, yResolution = 25;
 
 void Game::changeMode() {
 	projMode = (projMode + 1) % 6;

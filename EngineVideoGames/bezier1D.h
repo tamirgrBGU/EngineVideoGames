@@ -23,21 +23,21 @@ public:
 			segment[1].operator*=(3 - 6 * t + 3 * pow(t, 2)) + segment[0].operator*=(3 * pow(t - 1, 2));
 	}
 
-	static glm::vec4 calc_bezier_point(float t, glm::mat4 segment) {
-		return segment[3].operator*=(pow(t, 3)) + segment[2].operator*=(3 * pow(t, 2)*(1 - t)) +
-			segment[1].operator*=(3 * pow(1 - t, 2)*t) + segment[0].operator*=(pow(1 - t, 3));
+	static glm::vec4 calc_bezier_point(float u, glm::mat4 segment) {
+		return segment[3].operator*=(pow(u, 3)) + segment[2].operator*=(3 * pow(u, 2)*(1 - u)) +
+			segment[1].operator*=(3 * pow(1 - u, 2)*u) + segment[0].operator*=(pow(1 - u, 3));
 	}
 
-	float calc_bezier_factor(int i, float t) {
-		return binomTree[i] * pow(t, i) * pow(1 - t, SEG_CON_PTS - 1 - i);
+	float calc_bezier_factor(int i, float u) {
+		return binomTree[i] * pow(u, i) * pow(1-u, SEG_CON_PTS-1-i);
 	}
 
-	float calc_bezier_factor_derivate(int i, float t) {
+	float calc_bezier_factor_derivate(int i, float u) {
 		return 
-			i == 0 ?			   (SEG_CON_PTS - 1 - i) * pow(1 - t, SEG_CON_PTS - 2 - i) :
-			i == SEG_CON_PTS - 1 ?  i * pow(t, i - 1) :
-									binomTree[i] * (i + (SEG_CON_PTS - 1 - 2 * i)*t) *
-									pow(t, i - 1) * pow(1 - t, SEG_CON_PTS - 2 - i);
+			i == 0 ?			 (SEG_CON_PTS-1) * pow(1-u, SEG_CON_PTS-2) :
+			i == SEG_CON_PTS-1 ? (SEG_CON_PTS-1) * pow(  u, SEG_CON_PTS-2) :
+									binomTree[i] *    (i + (SEG_CON_PTS-1 -2*i)*u) *
+									pow(u, i-1)  * pow(1-u, SEG_CON_PTS-2 -i);
 	}
 
 	vec3 GetControlPointPos(int seg, int indx) {
