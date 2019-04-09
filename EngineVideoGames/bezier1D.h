@@ -19,8 +19,8 @@ public:
 	glm::vec3 GetVelosity(int segment, float t);			//returns the derivative of the curve in the requested segment for value of t
 	glm::mat4 GetSegment(int segmentT);
 	glm::vec4 calc_bezier_point_derivate(float u, glm::mat4 segment) {
-		return segment[3]*calc_bezier_factor_derivate(3,u) + segment[2]* calc_bezier_factor_derivate(2, u) +
-			   segment[1]*calc_bezier_factor_derivate(1,u) + segment[0]* calc_bezier_factor_derivate(0, u);
+		return segment[0]*calc_bezier_factor_derivate(0,u) + segment[1]* calc_bezier_factor_derivate(1, u) +
+			   segment[2]*calc_bezier_factor_derivate(2,u) + segment[3]* calc_bezier_factor_derivate(3, u);
 	}
 
 	static glm::vec4 calc_bezier_point(float u, glm::mat4 segment) {

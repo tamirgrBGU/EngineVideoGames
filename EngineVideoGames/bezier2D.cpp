@@ -12,14 +12,11 @@ Bezier2D::Bezier2D(Bezier1D &b, glm::vec3 axis, int circularSubdivision) {
 	this->circularSubdivision = circularSubdivision;
 	segmentCircleParts = new mat4[circularSubdivision];
 	initParts(segmentCircleParts, axis);
-	radiusRotator = new mat4(0);
-	*radiusRotator = glm::rotate(float(90.0), axis);
 }
 
 Bezier2D::~Bezier2D(void)
 {
 	b.~Bezier1D();
-	free(radiusRotator);
 	if (segmentCircleParts != nullptr)
 		free(segmentCircleParts);
 }
@@ -44,14 +41,12 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					float sPart = s / float(resS);
 					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], tPart, sPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
-					//printf("%d %d %f %f <%f %f %f>\n", segmentTindx, segmentSindx, tPart, sPart, pos.x, pos.y, pos.z);
 					model.positions.push_back(pos3);
 					model.colors.push_back(color);
 					model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
 					model.texCoords.push_back(vec2(tPart, sPart));
 				}
 			}
-			//printf("%d/%d.%d\n", t, resT, segmentTindx);
 		}
 	}
 
@@ -60,7 +55,6 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			float sPart = s / float(resS);
 			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, sPart);
 			vec3 pos3(pos.x, pos.y, pos.z);
-			//printf("%d %d %f %f <%f %f %f>\n", segmentTindx, segmentSindx, tPart, sPart, pos.x, pos.y, pos.z);
 			model.positions.push_back(pos3);
 			model.colors.push_back(color);
 			vec3 normal(0.01, pos.y, pos.z);
@@ -96,9 +90,8 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 		model.indices.push_back(b);
 	}
 
-	//while (true);
 	return model;
-}						//generates model for rendering using MeshConstructor::initMeshs
+}
 
 Vertex Bezier2D::GetVertex(int segmentT, int segmentS, float t, float s) {
 	mat4 segmentTBP = b.GetSegment(segmentT);
@@ -141,5 +134,4 @@ void Bezier2D::gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS) {
 			gen_surface[j][i] = requiredSeg[j];
 		}
 	}
-	//dumpMat4(*gen_surface, segmentS);
 }

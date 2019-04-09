@@ -5,14 +5,12 @@
 #define BEIZER2D_H
 #include "bezier1D.h"
 #include "stdio.h"
-#include <iostream>//toremove
 #define M_double_PI 2*M_PI
 class Bezier2D
 {
 	int circularSubdivision; //(usualy 4) how many subdivision in circular direction
 	Bezier1D b;
 	vec3 axis;
-	mat4 *radiusRotator;
 
 public:
 	Bezier2D(void);
@@ -61,27 +59,6 @@ private:
 		return location;
 	}
 
-	//glm::vec3 calc_bezier_point2D_get_normal(glm::mat4* surfaceSeg, float u, float v) {
-	//	/*printf("%f %f\n", u, v);
-	//	dumpMat4(surfaceSeg[0], 1);
-	//	dumpMat4(surfaceSeg[1], 2);
-	//	dumpMat4(surfaceSeg[2], 3);
-	//	dumpMat4(surfaceSeg[3], 4);*/
-	//	vec4 dt = calc_bezier_point2D_velosity(surfaceSeg, v, u);
-	//	vec3 dt3(dt.x, dt.y, dt.z);
-	//	//dumpVec4(dt);
-	//	vec4 ds = calc_bezier_point2D_velosity(surfaceSeg, u, v);
-	//	vec3 ds3(ds.x, ds.y, ds.z);
-
-	//	/*dumpVec4(ds);
-	//	vec3 out = glm::cross(dt3, ds3);
-	//	dumpVec3(out);
-	//	int age;
-	//	std::cin >> age;
-	//	return out;*/
-	//	return glm::cross(dt3, ds3);
-	//}
-
 	glm::vec3 normaliz(vec3 &pos) {
 		float len = glm::length(pos);
 		if (len > 0)
@@ -106,14 +83,11 @@ private:
 			float temp_factor = b.calc_bezier_factor(i, u);
 			for (int j = 0; j < SEG_CON_PTS; j++)
 			{
-				/*printf("%d %d %f %f\n", i, j, temp_factor, b.calc_bezier_factor_derivate(j, v));
-				dumpVec4(surfaceSeg[j][i]);*/
 				velosity = velosity +
 				   (
 					temp_factor *
 					b.calc_bezier_factor_derivate(j, v)
 					)*surfaceSeg[j][i];
-				//dumpVec4(velosity);
 			}
 		}
 		velosity.w = 0;

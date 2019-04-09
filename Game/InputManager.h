@@ -32,7 +32,7 @@
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
 				case GLFW_KEY_SPACE:
-					scn->HideShape(0);
+					scn->changeSurfaceLineSpace();
 				break;
 				case GLFW_KEY_P:
 					scn->changeMode();

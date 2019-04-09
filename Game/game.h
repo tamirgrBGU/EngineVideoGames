@@ -7,6 +7,10 @@ class Game : public Scene
 	Bezier1D *curve;
 	std::vector<int> controlPointsShapesIds;
 	vec3 pastLoc[7];
+	bool proj2D = false;
+	int projMode = -1;
+	unsigned int xResolution = 25, yResolution = 25;
+
 public:
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
@@ -21,8 +25,30 @@ public:
 	void savePastPositions(int controlPoint);
 	void updateControlShapes(int controlPoint, Bezier1D *bez);
 	void Motion();
-	void changeMode();//CHANGE DRAWING MODE
-	void Game::changeSurfaceLine();//CHANGE FROM BEZIER TO SURFACE
+	
+	void Game::changeMode() {
+		projMode = (projMode + 1) % 6;
+		updateBezier(1, proj2D, projMode);
+	}
+
+	//CHANGE FROM BEZIER Line TO SURFACE without changing mode
+	void Game::changeSurfaceLine() {
+		proj2D = proj2D ^ 1;
+		updateBezier(1, proj2D, projMode);
+	}
+
+	//CHANGE FROM BEZIER Line TO SURFACE and changing plotting mode
+	void Game::changeSurfaceLineSpace() {
+		if (proj2D) {
+			projMode = Scene::LINES;
+		}
+		else {
+			projMode = Scene::QUADS;
+		}
+		proj2D = proj2D ^ 1;
+		updateBezier(1, proj2D, projMode);
+	}
+
 	~Game(void);
 
 
