@@ -6,9 +6,9 @@ Bezier2D::Bezier2D(void)
 }
 
 mat4 *segmentCircleParts;
-Bezier2D::Bezier2D(Bezier1D &b, glm::vec3 axis, int circularSubdivision) {
+Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision) {
 	this->b = b;
-	this->axis = axis;
+	updateAxis();
 	this->circularSubdivision = circularSubdivision;
 	segmentCircleParts = new mat4[circularSubdivision];
 	initParts(segmentCircleParts, axis);
@@ -57,8 +57,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			vec3 pos3(pos.x, pos.y, pos.z);
 			model.positions.push_back(pos3);
 			model.colors.push_back(color);
-			vec3 normal(0.01, pos.y, pos.z);
-			model.normals.push_back(glm::normalize(normal));
+			model.normals.push_back(calc_bezier_point2D_get_normal(b.segNo()-1, pos3, 1));
 			model.texCoords.push_back(vec2(1, sPart));
 		}
 	}
@@ -116,22 +115,28 @@ glm::vec3 Bezier2D::GetNormal(int segmentT, int segmentS, float t, float s) {
 	return calc_bezier_point2D_get_normal(segmentT, pos3, t);
 }
 
-void Bezier2D::moveByVector(mat4 *seg, float toAdd) {
+void Bezier2D::moveByVector(mat4 *seg, vec3 toAdd) {
 	for (int i = 0; i < SEG_CON_PTS; i++) {
-		(*seg)[i].x += toAdd;
+		(*seg)[i].x += toAdd.x;
+		(*seg)[i].y += toAdd.y;
+		(*seg)[i].z += toAdd.z;
 	}
 }
 
 void Bezier2D::gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS) {
 	for (int i = 0; i<SEG_CON_PTS; i++) {
-		vec4 radius = segmentT[i];
-		vec3 v3(0, radius.y, radius.z);
-		float numericRad = glm::length(v3);
+		vec3 p0 = Bezier1D::v4to3(segmentT[i]);
+
+		vec3 radius = p0 - this->first;
+		float angleToRotate = angle_mine_rad(radius, axis);
+		float numericRad = glm::length(radius)*glm::sin(angleToRotate);
+		radius = this->first + axis*(glm::length(radius)*glm::cos(angleToRotate));
+
 		mat4 requiredSeg = segmentCircleParts[segmentS];
 		scaleMat(&requiredSeg, numericRad);
-		moveByVector(&requiredSeg, radius.x);
+		moveByVector(&requiredSeg, radius);
 		for (int j = 0; j<SEG_CON_PTS; j++) {
-			gen_surface[j][i] = requiredSeg[j];
+			gen_surface[i][j] = requiredSeg[j];
 		}
 	}
 }

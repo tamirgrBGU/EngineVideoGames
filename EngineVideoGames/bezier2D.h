@@ -11,15 +11,23 @@ class Bezier2D
 	int circularSubdivision; //(usualy 4) how many subdivision in circular direction
 	Bezier1D b;
 	vec3 axis;
+	vec3 first;
+	vec3 last;
 
 public:
 	Bezier2D(void);
-	Bezier2D(Bezier1D &b, glm::vec3 axis, int circularSubdivision);
+	Bezier2D(Bezier1D &b, int circularSubdivision);
 
 	IndexedModel GetSurface(int resT, int resS);						//generates model for rendering using MeshConstructor::initMeshs
 	Vertex GetVertex(int segmentT, int segmentS, float t, float s);		//returns point on surface in the requested segments for value of t and s
 	glm::vec3 GetNormal(int segmentT, int segmentS, float t, float s);		//returns point on surface in the requested segments for value of t and s
 	
+	void updateAxis() {
+		this->first = Bezier1D::v4to3(b.GetSegment(0)[0]);
+		this->last  = Bezier1D::v4to3(b.GetSegment(b.segNo() - 1)[3]);
+		this->axis  = glm::normalize(this->last - this->first);
+	}
+
 	~Bezier2D(void);
 
 private:
@@ -39,7 +47,7 @@ private:
 		printf("<%f %f %f %f>\n", a.x, a.y, a.z, a.w);
 	}
 
-	void moveByVector(mat4 *seg, float x);
+	void moveByVector(mat4 *seg, vec3 x);
 
 	glm::vec4 calc_bezier_point2D(glm::mat4* surfaceSeg, float u, float v) {
 		vec4 location(0);
@@ -52,7 +60,7 @@ private:
 				   (
 					temp_factor*
 					b.calc_bezier_factor(j, v)
-					)*surfaceSeg[j][i];
+					)*surfaceSeg[i][j];
 			}
 		}
 		location.w = 1;
@@ -67,9 +75,11 @@ private:
 	}
 
 	glm::vec3 calc_bezier_point2D_get_normal(int segmentT, vec3 &pos, float u) {
-		vec3 rad(0, pos.y, pos.z);
-		vec3 sN = normaliz(glm::cross(rad, axis));
-		vec3 tN = glm::normalize(b.GetVelosity(segmentT, u));
+		vec3 radius = pos - this->first;
+		float angleToRotate = angle_mine_rad(radius, axis);
+		radius = pos - axis*(glm::length(radius)*glm::cos(angleToRotate));
+		vec3 sN = normaliz(glm::cross(radius, axis));
+		vec3 tN = normaliz(b.GetVelosity(segmentT, u));
 		vec3 out = glm::cross(tN, sN);
 		return out;
 	}
@@ -87,7 +97,7 @@ private:
 				   (
 					temp_factor *
 					b.calc_bezier_factor_derivate(j, v)
-					)*surfaceSeg[j][i];
+					)*surfaceSeg[i][j];
 			}
 		}
 		velosity.w = 0;
@@ -120,16 +130,46 @@ private:
 	}
 
 	void gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS);
+	
+	float multParams(vec3 Axis, vec3 rotateBy) {
+		return Axis.x * rotateBy.x + Axis.y * rotateBy.y + Axis.z * rotateBy.z;
+	}
+
+	float angle_mine_rad(vec3 v1, vec3 v2) {
+		float lens = glm::length(v1) * glm::length(v2);
+		if (lens == 0)
+			return 0;
+		float angleToRotate = glm::acos(multParams(v1, v2) / lens);
+		return angleToRotate;
+	}
+
+	float angle_mine_deg(vec3 v1, vec3 v2) {
+		float lens = glm::length(v1) * glm::length(v2);
+		if (lens == 0)
+			return 0;
+		float angleToRotate = glm::acos(multParams(v1, v2) / lens);
+		return glm::degrees(angleToRotate);
+	}
+
+	void rotataByAxis(vec3 Axis, vec3 rotateBy, mat4 *toRotate) {
+		float angleToRotate = angle_mine_deg(Axis,rotateBy);
+
+		if (angleToRotate > 0) {
+			mat4 rotator = glm::rotate(angleToRotate, glm::cross(Axis, rotateBy));
+			rotateMat(toRotate, &rotator);
+		}
+	}
 
 	mat4 angleRotator;
+	vec3 xAxis = vec3(1, 0, 0);
+	vec3 yAxis = vec3(0, 1, 0);
+	vec3 zAxis = vec3(0, 0, 1);
 	void initParts(mat4 *parts, glm::vec3 axis) {
-		mat4 rotatorToX = glm::rotate((float) 90.0, glm::cross(vec3(0, 0, 1), axis));
 		parts[0] = initSegmentPartOfCycle(circularSubdivision);
-		rotateMat(&parts[0], &rotatorToX);
-
-		for (int i = 0; i < 4; i++)
-			parts[0][i].x = 0;
-
+		//rotataByAxis(xAxis, axis, &parts[0]);
+		//rotataByAxis(yAxis, axis, &parts[0]);
+		rotataByAxis(zAxis, axis, &parts[0]);
+		
 		float angle = float(360.0 / circularSubdivision);
 		angleRotator = glm::rotate(angle, axis);
 

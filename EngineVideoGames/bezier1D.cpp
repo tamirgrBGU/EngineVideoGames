@@ -5,6 +5,19 @@ Bezier1D::Bezier1D(void)
 	initBinomTree();
 	mat4 seg0 = mat4(0);
 	seg0[0] = vec4(0, 1, 0, 1);
+	seg0[1] = vec4(1, 2, 0, 1);
+	seg0[2] = vec4(1, 3, 0, 1);
+	seg0[3] = vec4(1, 4, 0, 1);
+	mat4 seg1 = mat4(0);
+	seg1[0] = vec4(1, 4, 0, 1);
+	seg1[1] = vec4(1, 5, 0, 1);
+	seg1[2] = vec4(1, 6, 0, 1);
+	seg1[3] = vec4(0, 7, 0, 1);
+	segments.push_back(seg0);
+	segments.push_back(seg1);
+
+	/*mat4 seg0 = mat4(0);
+	seg0[0] = vec4(0, 0, 0, 1);
 	seg0[1] = vec4(1, 1, 0, 1);
 	seg0[2] = vec4(2, 1, 0, 1);
 	seg0[3] = vec4(3, 0, 0, 1);
@@ -22,11 +35,11 @@ Bezier1D::Bezier1D(void)
 	seg3[0] = vec4(9, 0, 0, 1);
 	seg3[1] = vec4(10, 2, 0, 1);
 	seg3[2] = vec4(11, 2, 0, 1);
-	seg3[3] = vec4(12, 3, 0, 1);
+	seg3[3] = vec4(16, 0, 0, 1);
 	segments.push_back(seg0);
 	segments.push_back(seg1);
 	segments.push_back(seg2);
-	segments.push_back(seg3);
+	segments.push_back(seg3);*/
 }
 
 float randomTillOne() {

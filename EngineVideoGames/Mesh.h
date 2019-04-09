@@ -2,6 +2,7 @@
 #define GLM_FORCE_RADIANS
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
+#include "glm/gtx/vector_angle.hpp"
 #include <vector>
 #define _USE_MATH_DEFINES
 #include "Math.h"
