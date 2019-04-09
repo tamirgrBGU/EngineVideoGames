@@ -18,14 +18,14 @@ public:
 	LineVertex GetControlPoint(int segment, int indx);	//returns a control point in the requested segment. indx will be 0,1,2,3, for p0,p1,p2,p3	
 	glm::vec3 GetVelosity(int segment, float t);			//returns the derivative of the curve in the requested segment for value of t
 	glm::mat4 GetSegment(int segmentT);
-	static glm::vec4 calc_bezier_point_derivate(float t, glm::mat4 segment) {
-		return segment[3].operator*=(pow(t, 2) * 3) + segment[2].operator*=(3 - 12 * t - 9 * pow(t, 2)) +
-			segment[1].operator*=(3 - 6 * t + 3 * pow(t, 2)) + segment[0].operator*=(3 * pow(t - 1, 2));
+	glm::vec4 calc_bezier_point_derivate(float u, glm::mat4 segment) {
+		return segment[3]*calc_bezier_factor_derivate(3,u) + segment[2]* calc_bezier_factor_derivate(2, u) +
+			   segment[1]*calc_bezier_factor_derivate(1,u) + segment[0]* calc_bezier_factor_derivate(0, u);
 	}
 
 	static glm::vec4 calc_bezier_point(float u, glm::mat4 segment) {
-		return segment[3].operator*=(pow(u, 3)) + segment[2].operator*=(3 * pow(u, 2)*(1 - u)) +
-			segment[1].operator*=(3 * pow(1 - u, 2)*u) + segment[0].operator*=(pow(1 - u, 3));
+		return segment[3]*(pow(u, 3))			+ segment[2]*(3 * pow(u, 2)*(1 - u)) +
+			   segment[1]*(3 * pow(1 - u, 2)*u) + segment[0]*(pow(1 - u, 3));
 	}
 
 	float calc_bezier_factor(int i, float u) {
