@@ -103,7 +103,6 @@ using namespace glm;
 					Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
 				}
 			
-
 				mat4 MVP1 = MVP * Normal1; 
 				Normal1 = Normal * Normal1;
 
@@ -323,8 +322,8 @@ using namespace glm;
 		{
 			pickedShape = pickedID;
 			std::cout<<"picked "<<pickedID<<std::endl;
-			xold = (float) x;
-			yold = (float) y;
+			xold = x;
+			yold = y;
 		}
 		return depth;
 	}
@@ -420,13 +419,12 @@ using namespace glm;
 		glReadPixels(1,1,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,&depth);
 	}
 
-
 	void Scene::updatePosition(float xpos, float ypos)
 	{
-		xrel = xold - xpos;
-		yrel = yold - ypos;
-		xold = xpos;
-		yold = ypos;
+		xrel = xold - int(xpos);
+		yrel = yold - int(ypos);
+		xold = int(xpos);
+		yold = int(ypos);
 	}
 
 	void Scene::HideShape(int shpIndx)

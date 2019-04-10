@@ -5,8 +5,10 @@ bin-int/
 display/
 engine3D/
 Debug/
+*/Debug/
 **/Debug/
 Release/
+*/Release/
 **/Release/
 
 # Files

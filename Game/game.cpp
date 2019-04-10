@@ -84,9 +84,7 @@ void Game::Init()
 
 	
 	ReadPixel();
-	
 	pickedShape = -1;
-	Activate();
 }
 
 void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)

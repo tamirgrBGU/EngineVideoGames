@@ -88,7 +88,7 @@ private:
 	int indicesSize;
 
 	float depth;
-	float xold, yold,xrel, yrel;
+	int xold, yold,xrel, yrel;
 	int cameraIndx;
 
 protected:

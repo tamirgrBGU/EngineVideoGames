@@ -37,8 +37,12 @@
 				case GLFW_KEY_P:
 					scn->changeMode();
 				break;
-				case GLFW_KEY_O:
+				case GLFW_KEY_I:
 					scn->changeSurfaceLine();
+					break;
+				case GLFW_KEY_O:
+					scn->HideShape(0);
+					scn->Deactivate();
 				break;
 			default:
 				break;
