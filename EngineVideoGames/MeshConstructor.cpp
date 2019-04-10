@@ -39,8 +39,10 @@ MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int res
 	if(isSurface)
 	{
 		Bezier2D surface(*curve,glm::vec3(0,0,1),4);
-		InitMesh(surface.GetSurface(resT,resS));		
-		//InitMesh(surface.GetSurface(30,30));
+		InitMesh(surface.GetSurface(resT,resS));
+
+		//use this line for debugging
+		//InitLine(surface.GetSurface(10,7));
 	}
 	else
 	{

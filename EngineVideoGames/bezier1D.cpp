@@ -4,14 +4,14 @@
 
 Bezier1D::Bezier1D(void)
 {
-	numberOfPoints = 4;
+	numberOfPoints = 10;
 
 	glm::mat4 Model = glm::mat4(1.0);
 
-	glm::vec4 Position0 = glm::vec4(0.0, 0.0, 0.0, 0.0);
-	glm::vec4 Position1 = glm::vec4(7.0, 10, 0.0, 0.0);
-	glm::vec4 Position2 = glm::vec4(14.0, 10, 0.0, 0.0);
-	glm::vec4 Position3 = glm::vec4(20.0, 0.0, 0.0, 0.0);
+	glm::vec4 Position0 = glm::vec4(-8.0, 0.0, 0.0, 0.0);
+	glm::vec4 Position1 = glm::vec4(-6.0, 1.0, 0.0, 0.0);
+	glm::vec4 Position2 = glm::vec4(-3.0, 1.0, 0.0, 0.0);
+	glm::vec4 Position3 = glm::vec4(-1.0, 1.0, 0.0, 0.0);
 
 
 	Model[0] = Position0;
@@ -20,27 +20,27 @@ Bezier1D::Bezier1D(void)
 	Model[3] = Position3;
 	segments.push_back(Model);
 
-	//Position0 = glm::vec4(3.0, 1.0, 0.0, 0.0);
-	//Position1 = glm::vec4(4.0, 0.5, 0.0, 0.0);
-	//Position2 = glm::vec4(5.0, 0.5, 0.0, 0.0);
-	//Position3 = glm::vec4(6.0, 0.0, 0.0, 0.0);
+	Position0 = glm::vec4(-1.0, 1.0, 0.0, 0.0);
+	Position1 = glm::vec4(2.0, 1.0, 0.0, 0.0);
+	Position2 = glm::vec4(4.0, 1.0, 0.0, 0.0);
+	Position3 = glm::vec4(6.0, 1.0, 0.0, 0.0);
 
-	//Model[0] = Position0;
-	//Model[1] = Position1;
-	//Model[2] = Position2;
-	//Model[3] = Position3;
-	//segments.push_back(Model);
+	Model[0] = Position0;
+	Model[1] = Position1;
+	Model[2] = Position2;
+	Model[3] = Position3;
+	segments.push_back(Model);
 
-	//Position0 = glm::vec4(6.0, 0.0, 0.0, 0.0);
-	//Position1 = glm::vec4(7.0, 0.0, 0.0, 0.0);
-	//Position2 = glm::vec4(8.0, 0.0, 0.0, 0.0);
-	//Position3 = glm::vec4(9.0, 0.0, 0.0, 0.0);
+	Position0 = glm::vec4(6.0, 1.0, 0.0, 0.0);
+	Position1 = glm::vec4(8.0, 1.0, 0.0, 0.0);
+	Position2 = glm::vec4(9.0, 1.0, 0.0, 0.0);
+	Position3 = glm::vec4(10.0, 0.0, 0.0, 0.0);
 
-	//Model[0] = Position0;
-	//Model[1] = Position1;
-	//Model[2] = Position2;
-	//Model[3] = Position3;
-	//segments.push_back(Model);
+	Model[0] = Position0;
+	Model[1] = Position1;
+	Model[2] = Position2;
+	Model[3] = Position3;
+	segments.push_back(Model);
 
 }
 IndexedModel Bezier1D::GetLine(int resT) {
@@ -150,10 +150,14 @@ glm::vec3  Bezier1D::GetVelosity(int segment, float t) {
 	glm::vec3 CP2 = *GetControlPoint(segment, 2).GetPos();
 	glm::vec3 CP1 = *GetControlPoint(segment, 1).GetPos();
 	glm::vec3 CP0 = *GetControlPoint(segment, 0).GetPos();
-	float tp0 = -3 * pow((1 - t),2);
-	float tp1 = -3*(-3 * t*t + 4 * t - 1);
-	float tp2 = -3*(3 * pow(t, 2) - 2 * t);
-	float tp3 = 3 * pow(t,2);
+	//CP3.z = 0;
+	//CP2.z = 0;
+	//CP1.z = 0;
+	//CP0.z = 0;
+	float tp0 = -3 * pow((1 - t), 2);
+	float tp1 = 3 * (1 - t)*(1 - t) - 6 * t*(1 - t);	//-3 * (-3 * t*t + 4 * t - 1);
+	float tp2 = 6 * t*(1 - t) - 3 * t*t; // -3 * (3 * pow(t, 2) - 2 * t);
+	float tp3 = 3 * pow(t, 2);
 
 	return (CP3 * tp3 + CP2 * tp2 + CP1 * tp1 + CP0 * tp0);
 	//	glm::vec3 myvertex(

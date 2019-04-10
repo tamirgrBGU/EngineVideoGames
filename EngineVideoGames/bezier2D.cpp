@@ -148,11 +148,17 @@ Vertex Bezier2D::GetVertex(int segmentT, int segmentS, float t, float s) {
 }
 
 glm::vec3 Bezier2D::GetNormal(int segmentT, int segmentS, float t, float s) {
-	glm::vec4 normal_2d = glm::vec4(glm::cross(this->my_curve.GetVelosity(segmentT, t), glm::vec3(0, 0, 1)), 0);
+	glm::vec4 normal_2d = glm::vec4(glm::cross(glm::vec3(0, 0, 1),this->my_curve.GetVelosity(segmentT, t)), 0);
 	float angle = (360 / circularSubdivision)*segmentS + (360 / circularSubdivision)*s;
-	glm::vec4 normal_3d = normal_2d * glm::rotate(angle, glm::vec3(1, 0, 0));
-	glm::vec3 temp(-1, -1, -1);
-	return temp * glm::vec3(normal_3d);
+	if (angle >30 && angle <90 && t>0.3)
+		int e = 3;
+	glm::vec4 normal_3d = normal_2d * glm::rotate(angle , glm::vec3(1, 0, 0));
+	float size = normal_3d.x*normal_3d.x + normal_3d.y*normal_3d.y + normal_3d.z*normal_3d.z;
+	size = glm::sqrt(size);
+	//printf("%f -", size);
+	glm::vec3 temp(1/size, 1/size, 1/size);
+	
+	return   temp* glm::vec3(normal_3d);
 }
 
 Bezier2D::~Bezier2D(void)

@@ -83,8 +83,8 @@ void Game::Init()
 		shapeTransformation(zScale, 1 / scale);
 	}
 
-
-	addShape(BezierSurface, -1, TRIANGLES);
+/*
+	addShape(BezierSurface, -1, QUADS);*/
 
 	pickedShape = -1;
 	Activate();
@@ -101,6 +101,7 @@ void Game::Update(glm::mat4 MVP, glm::mat4 Normal, Shader *s)
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f, 0.0f, -1.0f, 1.0f);
 	s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+	/*
 	if (lateUpdate == 100) {
 		shapes[shapes.size() - 1] = new Shape(curve, 10, 7, true, QUADS);
 		lateUpdate = 0;
@@ -108,7 +109,7 @@ void Game::Update(glm::mat4 MVP, glm::mat4 Normal, Shader *s)
 	else
 	{
 		lateUpdate++;
-	}
+	}*/
 
 }
 
@@ -120,7 +121,7 @@ void Game::WhenRotate()
 
 void Game::WhenTranslate()
 {
-	if (pickedShape > 2 && pickedShape < shapes.size() - 1)
+	if (pickedShape > 2 && pickedShape < curve->numberOfPoints + 2 -1)
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
 		glm::vec4 oldpos(*curve->GetControlPoint((pickedShape - 2) / 3, (pickedShape - 2) % 3).GetPos(), 1);
@@ -153,8 +154,8 @@ void Game::WhenTranslate()
 					pickedShape += 2;
 				}
 				break;
-			case 2:
-				if ((pickedShape - 2) / 3 < ((shapes.size() - 2) / 3) - 1) {
+			case 2:								//shape.size
+				if ((pickedShape - 2) / 3 < ((curve->numberOfPoints + 2 - 1  - 2) / 3) - 1) {
 					pickedShape += 2;
 					shapeTransformation(xGlobalTranslate, -diff.x);
 					shapeTransformation(yGlobalTranslate, -diff.y);
@@ -186,3 +187,5 @@ Game::~Game(void)
 {
 	delete curve;
 }
+
+

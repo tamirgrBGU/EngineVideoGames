@@ -36,7 +36,7 @@ void Display::addKeyCallBack(void(*keyCallback)(GLFWwindow *,int,int,int,int))
 	//glfwSetKeyCallback(m_window,[](GLFWwindow *window,int key,int scancode,int action,int mods){
 	//	func(glfwGetWindowUserPointer(window),key,scancode,action,mods);
 	//});
-		//key_callback);
+	//	key_callback);
 	
 	
 
