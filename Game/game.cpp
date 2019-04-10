@@ -99,9 +99,12 @@ void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
 	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
 	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
-	int controlpoint = getControlPointByShapeId(pickedShape);
-	if ( pickedShape > 1 ) {
+	
+	if (pickedShape > 1) {
+		int controlpoint = getControlPointByShapeId(pickedShape);
 		savePastPositions(controlpoint);
+		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
+		curve->MoveControlPoint(controlpoint / 3, controlpoint % 3, true, pos);
 		updateControlShapes(controlpoint, curve);
 	}
 }
@@ -110,11 +113,10 @@ void Game::WhenRotate(){}
 
 void Game::WhenTranslate()
 {
-
+	
 	if(pickedShape>1)
 	{
-		
-		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0,0,0,1);
+		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
 		int controlpoint = getControlPointByShapeId(pickedShape);
 		curve->MoveControlPoint(controlpoint / 3, controlpoint % 3, true, pos);
 		updateBezier(1, proj2D, projMode);
@@ -162,10 +164,10 @@ void Game::Motion()
 {
 	if(isActive)
 	{
-		int p = pickedShape;
-		pickedShape = 2;
+		//int p = pickedShape;
+		//pickedShape = 2;
 		//shapeTransformation(zLocalRotate,0.45);
-		pickedShape = p;
+		//pickedShape = p;
 	}
 }
 
