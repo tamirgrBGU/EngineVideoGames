@@ -162,13 +162,13 @@ void Game::updateControlShapes(int controlPoint, Bezier1D *bez) {
 
 void Game::Motion()
 {
-	if(isActive)
+	/*if(isActive)
 	{
-		//int p = pickedShape;
-		//pickedShape = 2;
-		//shapeTransformation(zLocalRotate,0.45);
-		//pickedShape = p;
-	}
+		int p = pickedShape;
+		pickedShape = 2;
+		shapeTransformation(zLocalRotate,0.45);
+		pickedShape = p;
+	}*/
 }
 
 Game::~Game(void)

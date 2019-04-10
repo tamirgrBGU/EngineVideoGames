@@ -34,11 +34,12 @@ MeshConstructor::MeshConstructor(const std::string& fileName)
 	InitMesh(OBJModel(fileName).ToIndexedModel());
 }
 
+const int circularSubdivisions = 4;
 MeshConstructor::MeshConstructor(Bezier1D *curve, bool isSurface, unsigned int resT, unsigned int resS)
 {
 	if(isSurface)
 	{
-		Bezier2D surface(*curve, 4);
+		Bezier2D surface(*curve, circularSubdivisions);
 		InitMesh(surface.GetSurface(resT,resS));		
 	}
 	else

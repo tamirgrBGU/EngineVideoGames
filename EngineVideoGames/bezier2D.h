@@ -67,21 +67,24 @@ private:
 		return location;
 	}
 
-	glm::vec3 normaliz(vec3 &pos) {
-		float len = glm::length(pos);
+	glm::vec3 normaliz(vec3 &normal) {
+		float len = glm::length(normal);
 		if (len > 0)
-			return glm::normalize(pos);
-		return pos;
+			return glm::normalize(normal);
+		return normal;
 	}
 
 	glm::vec3 calc_bezier_point2D_get_normal(int segmentT, vec3 &pos, float u) {
 		vec3 radius = pos - this->first;
+		//if (std::isnan(pos.x)) printf("yo");//bad thing
 		float angleToRotate = angle_mine_rad(radius, axis);
-		radius = pos - axis*(glm::length(radius)*glm::cos(angleToRotate));
-		vec3 sN = normaliz(glm::cross(radius, axis));
-		vec3 tN = normaliz(b.GetVelosity(segmentT, u));
-		vec3 out = glm::cross(tN, sN);
-		return out;
+		if (!std::isnan(angleToRotate)) {
+			radius = pos - axis*(glm::length(radius)*glm::cos(angleToRotate));
+			vec3 sN = normaliz(glm::cross(radius, axis));
+			vec3 tN = normaliz(b.GetVelosity(segmentT, u));
+			return glm::cross(tN, sN);
+		}
+		return vec3(0);
 	}
 	
 
@@ -135,12 +138,13 @@ private:
 		return Axis.x * rotateBy.x + Axis.y * rotateBy.y + Axis.z * rotateBy.z;
 	}
 
+	float nan = std::sqrt(-1);
 	float angle_mine_rad(vec3 v1, vec3 v2) {
-		float lens = glm::length(v1) * glm::length(v2);
-		if (lens == 0)
-			return 0;
-		float angleToRotate = glm::acos(multParams(v1, v2) / lens);
-		return angleToRotate;
+		if (std::isnan(v1.x) || std::isnan(v2.x))
+			return nan;
+		v1 = normaliz(v1);
+		v2 = normaliz(v2);
+		return glm::acos(multParams(v1, v2));
 	}
 
 	float angle_mine_deg(vec3 v1, vec3 v2) {

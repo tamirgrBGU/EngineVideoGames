@@ -23,8 +23,8 @@ Bezier2D::~Bezier2D(void)
 
 glm::vec3 color(glm::vec3(0.2f, 0.1f, 0.90f));
 IndexedModel Bezier2D::GetSurface(int resT, int resS) {
-
 	IndexedModel model;
+	updateAxis();
 	mat4** surfaces = new mat4*[circularSubdivision];
 	for (int i = 0; i < circularSubdivision; ++i)
 		surfaces[i] = new mat4[SEG_CON_PTS];
@@ -43,7 +43,8 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					vec3 pos3(pos.x, pos.y, pos.z);
 					model.positions.push_back(pos3);
 					model.colors.push_back(color);
-					model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
+					vec3 normal = calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart);
+					model.normals.push_back(normal);
 					model.texCoords.push_back(vec2(tPart, sPart));
 				}
 			}
