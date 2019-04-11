@@ -9,7 +9,7 @@ class Game : public Scene
 	vec3 pastLoc[7];
 	bool proj2D = false;
 	int projMode = -1;
-	unsigned int xResolution = 10, yResolution = 10;
+	unsigned int xResolution = 15, yResolution = 15;
 
 public:
 	Game(void);

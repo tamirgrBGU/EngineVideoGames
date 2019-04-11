@@ -67,7 +67,7 @@ private:
 		return location;
 	}
 
-	glm::vec3 normaliz(vec3 &normal) {
+	static glm::vec3 normaliz(vec3 &normal) {
 		float len = glm::length(normal);
 		if (len > 0)
 			return glm::normalize(normal);
@@ -76,7 +76,6 @@ private:
 
 	glm::vec3 calc_bezier_point2D_get_normal(int segmentT, vec3 &pos, float u) {
 		vec3 radius = pos - this->first;
-		//if (std::isnan(pos.x)) printf("yo");//bad thing
 		float angleToRotate = angle_mine_rad(radius, axis);
 		if (!std::isnan(angleToRotate)) {
 			radius = pos - axis*(glm::length(radius)*glm::cos(angleToRotate));
@@ -134,7 +133,7 @@ private:
 
 	void gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS);
 	
-	float multParams(vec3 Axis, vec3 rotateBy) {
+	static float multParams(vec3 Axis, vec3 rotateBy) {
 		return Axis.x * rotateBy.x + Axis.y * rotateBy.y + Axis.z * rotateBy.z;
 	}
 
@@ -144,22 +143,35 @@ private:
 			return nan;
 		v1 = normaliz(v1);
 		v2 = normaliz(v2);
-		return glm::acos(multParams(v1, v2));
+		float mult = multParams(v1, v2);
+		if		(mult > 1)  mult = 1;
+		else if (mult < -1) mult = -1;
+		return glm::acos(mult);
 	}
 
 	float angle_mine_deg(vec3 v1, vec3 v2) {
-		float lens = glm::length(v1) * glm::length(v2);
-		if (lens == 0)
-			return 0;
-		float angleToRotate = glm::acos(multParams(v1, v2) / lens);
-		return glm::degrees(angleToRotate);
+		return glm::degrees(angle_mine_rad(v1, v2));
 	}
 
 	void rotataByAxis(vec3 Axis, vec3 rotateBy, mat4 *toRotate) {
-		float angleToRotate = angle_mine_deg(Axis,rotateBy);
-
-		if (angleToRotate > 0) {
+		float angleToRotate = angle_mine_deg(Axis, rotateBy);
+		if (angleToRotate != 0) {
 			mat4 rotator = glm::rotate(angleToRotate, glm::cross(Axis, rotateBy));
+			rotateMat(toRotate, &rotator);
+		}
+	}
+
+	void rotataByVecs(vec3 Axis, vec3 v1, vec3 v2, mat4 *toRotate) {
+		float angleToRotate = angle_mine_deg(v1, v2);
+		if (angleToRotate != 0) {
+			mat4 rotator = glm::rotate(angleToRotate, Axis);
+			rotateMat(toRotate, &rotator);
+		}
+	}
+
+	void rotataByVecAngle(vec3 Axis, float angleToRotate, mat4 *toRotate) {
+		if (angleToRotate != 0) {
+			mat4 rotator = glm::rotate(angleToRotate, Axis);
 			rotateMat(toRotate, &rotator);
 		}
 	}
@@ -168,11 +180,13 @@ private:
 	vec3 xAxis = vec3(1, 0, 0);
 	vec3 yAxis = vec3(0, 1, 0);
 	vec3 zAxis = vec3(0, 0, 1);
-	void initParts(mat4 *parts, glm::vec3 axis) {
+	void initParts(mat4 *parts) {
 		parts[0] = initSegmentPartOfCycle(circularSubdivision);
 		//rotataByAxis(xAxis, axis, &parts[0]);
 		//rotataByAxis(yAxis, axis, &parts[0]);
+		//rotataByVecs(yAxis, xAxis, vec3(axis.x, 0, axis.z), &parts[0]);
 		rotataByAxis(zAxis, axis, &parts[0]);
+		//rotataByVecAngle(glm::cross(axis,zAxis), float(90), &parts[0]);
 		
 		float angle = float(360.0 / circularSubdivision);
 		angleRotator = glm::rotate(angle, axis);

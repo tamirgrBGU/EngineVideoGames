@@ -11,7 +11,7 @@ Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision) {
 	updateAxis();
 	this->circularSubdivision = circularSubdivision;
 	segmentCircleParts = new mat4[circularSubdivision];
-	initParts(segmentCircleParts, axis);
+	initParts(segmentCircleParts);
 }
 
 Bezier2D::~Bezier2D(void)
@@ -136,8 +136,7 @@ void Bezier2D::gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS) {
 		mat4 requiredSeg = segmentCircleParts[segmentS];
 		scaleMat(&requiredSeg, numericRad);
 		moveByVector(&requiredSeg, radius);
-		for (int j = 0; j<SEG_CON_PTS; j++) {
-			gen_surface[i][j] = requiredSeg[j];
-		}
+		for (int j = 0; j<SEG_CON_PTS; j++)
+			gen_surface[i][j] = requiredSeg[j];		
 	}
 }
