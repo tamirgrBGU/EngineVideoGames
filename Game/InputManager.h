@@ -33,7 +33,8 @@
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
 				case GLFW_KEY_SPACE:
-					scn->HideShape(0);
+				// 	scn->HideShape(0);
+					scn->addShape(5, -1, 5);//addShape(BezierSurface, -1, QUADS);
 				break;
 			default:
 				break;
