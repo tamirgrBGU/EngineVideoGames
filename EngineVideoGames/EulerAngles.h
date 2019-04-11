@@ -19,7 +19,7 @@ protected:
 	void alignedRot(int XorZ,float angle,int mode);
 	void buildAngMatrices(glm::mat4 &mat);
 	glm::mat4 makeRot() const;
-
+	inline void ZeroAngles() {phi = glm::mat4(1); theta = glm::mat4(1); psi = glm::mat4(1);}
 private:
 	glm::mat4 phi,theta,psi;
 	

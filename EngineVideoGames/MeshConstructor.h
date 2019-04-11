@@ -41,6 +41,7 @@ public:
 	void Bind() {vao.Bind();}
 	void Unbind() {vao.Unbind();}
 	inline unsigned int GetIndicesNum(){return indicesNum;}
+	inline bool Is2D() {return is2D;}
 	~MeshConstructor(void);
 
 };

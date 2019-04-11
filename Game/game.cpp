@@ -75,7 +75,7 @@ void Game::Init()
 	Activate();
 }
 
-void Game::Update(glm::mat4 MVP,glm::mat4 Normal,Shader *s)
+void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s)
 {
 	int r = ((pickedShape+1) & 0x000000FF) >>  0;
 	int g = ((pickedShape+1) & 0x0000FF00) >>  8;

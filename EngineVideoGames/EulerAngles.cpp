@@ -185,7 +185,6 @@ void EulerAngles::alignedRot(int XorZ,float angle,int mode )
 			
 				phi =  glm::rotate(phi,ang,glm::vec3(0,0,1));
 				psi =  glm::rotate(psi,-ang,glm::vec3(0,0,1));
-			
 		}
 		else
 		{
@@ -203,7 +202,7 @@ void EulerAngles::buildAngMatrices(glm::mat4 &mat)
 	glm::vec3 n = glm::normalize(glm::cross(z,newZ));
 	float c = glm::dot(n,glm::vec3(1,0,0));
 	
-	buildAngMatrix(zAxis1,c*glm::sign(newZ.y),sqrt(1.0f-c*c)*glm::sign(n.y*newZ.y));
+	buildAngMatrix(zAxis12,c*glm::sign(newZ.y),sqrt(1.0f-c*c)*glm::sign(n.y*newZ.y));
 
 	c= glm::dot(z,newZ);
 
@@ -213,7 +212,7 @@ void EulerAngles::buildAngMatrices(glm::mat4 &mat)
 	glm::vec3 x = glm::vec3(makeRot()*glm::vec4(1,0,0,0));
 	c = glm::dot(x,newX);
 
-	buildAngMatrix(zAxis2,c,sqrt(1.0f-c*c)*glm::sign(x.y));
+	//buildAngMatrix(zAxis2,c,sqrt(1.0f-c*c)*glm::sign(x.y));
 
 }
 

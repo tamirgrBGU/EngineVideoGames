@@ -91,13 +91,13 @@ using namespace glm;
 		glm::mat4 Normal = makeTrans();
 		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
 		int p = pickedShape;
-		shaders[shaderIndx]->Bind();
+//		shaders[shaderIndx]->Bind();
 		for (unsigned int i=0; i<shapes.size();i++)
 		{
 			if(shapes[i]->Is2Render())
 			{
 				mat4 Normal1 = mat4(1);
-				pickedShape =i;
+				pickedShape = i;
 				for (int j = i; chainParents[j] > -1; j = chainParents[j])
 				{
 					Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
@@ -108,7 +108,12 @@ using namespace glm;
 
 				MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
 				Normal1 = Normal1 * shapes[i]->makeTrans();
-			
+			    if(i>=1)
+				{
+				//	printMat(shapes[i]->makeTrans());
+				//	printMat(Normal1);
+				//	printMat(MVP1);
+				}
 				Update(MVP1,Normal1,shaders[shaderIndx]);
 
 				if(shaderIndx == 1)
@@ -122,10 +127,10 @@ using namespace glm;
 
 	 void Scene::shapeRotation(vec3 v, float ang,int indx)
 		{
-			if(v.x >0.999)
+			if(v.x >0.9999)
 				shapes[indx]->myRotate(ang,v,xAxis1);
 			else 
-				if(v.z >0.999)
+				if(v.z >0.9999)
 					shapes[indx]->myRotate(ang,v,zAxis12);
 			else
 				shapes[indx]->myRotate(ang,v,-1);
@@ -150,7 +155,7 @@ using namespace glm;
 				if(pickedShape ==-1)
 					myTranslate(vec3(0,amt,0),1);
 				else
-								{
+					{
 						int i = pickedShape;
 						for (; chainParents[i] > -1; i = chainParents[i]);
 						shapes[i]->myTranslate(vec3(0,amt,0),1);
@@ -212,25 +217,67 @@ using namespace glm;
 				if(pickedShape ==-1)
 					myRotate(amt,vec3(0,0,1),zAxis1);
 				else
+
 					shapes[pickedShape]->myRotate(amt,vec3(0,0,1),zAxis1);
 			break;
 			case xGlobalRotate:
 				if(pickedShape ==-1)
 					globalSystemRot(amt,vec3(1,0,0),xAxis1);
 				else
-					shapes[pickedShape]->globalSystemRot(amt,vec3(1,0,0),xAxis1);
+				{
+					
+					if(direction == -1 && pickedShape+2<shapes.size())
+					{
+						glm::vec3 posStart = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
+						std::cout<<"start ("<<posStart.x <<", "<<posStart.y<<", "<<posStart.z<<")"<<std::endl;
+						shapes[pickedShape+2]->globalSystemRot(amt,vec3(1,0,0),xAxis1);
+						int i=pickedShape;
+						for (; chainParents[i] > 0; i = chainParents[i]);
+						shapes[pickedShape]->globalSystemRot(-amt,glm::vec3(1,0,0),xAxis1);
+						glm::vec3 posEnd = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
+						std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;
+						shapes[i]->myTranslate(posStart-posEnd,0);
+					}
+					else
+						shapes[pickedShape]->globalSystemRot(amt,vec3(1,0,0),xAxis1);
+				}
 				break;
 			case yGlobalRotate:
 				if(pickedShape ==-1)
 					globalSystemRot(amt,vec3(0,1,0),-1);
 				else
+				{
 					shapes[pickedShape]->globalSystemRot(amt,vec3(0,1,0),-1);
+					if(direction == -1)
+					{
+						int i=pickedShape;
+						for (; chainParents[i] > -1; i = chainParents[i]);
+						shapes[i]->globalSystemRot(-amt,vec3(0,1,0),-1);
+					}
+				}
 				break;
 			case zGlobalRotate:
 				if(pickedShape ==-1)
 					globalSystemRot(amt,vec3(0,0,1),zAxis12);
 				else
-					shapes[pickedShape]->globalSystemRot(amt,vec3(0,0,1),zAxis12);
+				{
+					
+					
+					if(direction == -1 && pickedShape+2<shapes.size())
+					{
+						glm::vec3 posStart = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
+						std::cout<<"start ("<<posStart.x <<", "<<posStart.y<<", "<<posStart.z<<")"<<std::endl;
+						shapes[pickedShape+2]->myRotate(amt,vec3(0,0,1),zAxis12);
+						int i=pickedShape;
+						for (; chainParents[i] > 0; i = chainParents[i]);
+						shapes[pickedShape]->globalSystemRot(-amt,shapes[pickedShape+2]->getVectorInSystem(glm::mat4(1),vec3(0,0,1)),-1);
+						glm::vec3 posEnd = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
+						std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;
+						shapes[i]->myTranslate(posStart-posEnd,1);
+					}
+					else
+						shapes[pickedShape]->globalSystemRot(amt,vec3(0,0,1),zAxis12);
+				}
 			break;
 			case xScale:
 				if(pickedShape ==-1)
@@ -328,7 +375,7 @@ using namespace glm;
 		return depth;
 	}
 
-	vec3 Scene::getTipPosition(int indx)
+	glm::vec3 Scene::GetPositionInSystem(int indx,glm::vec3 pos)
 	{
 		mat4 Normal1 = mat4(1);
 		if(indx>-1)
@@ -337,63 +384,40 @@ using namespace glm;
 			{
 				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
 			}
-			return shapes[indx]->getPointInSystem(Normal1,vec3(0,0,1));
+			return shapes[indx]->getPointInSystem(Normal1,pos);
 			//return shapes[indx]->getTipPos(Normal1);
 		}
 		else
 		{
-			return shapes[0]->getPointInSystem(mat4(1),vec3(0,0,-1)); 
+			return pos; 
 				//shapes[0]->getRootPos(mat4(1));
 		}
 	}
 
-	vec3 Scene::getDistination(int indx)
+	glm::vec3 Scene::GetVectorInSystem(int indx,glm::vec3 vec)
 	{
 		mat4 Normal1 = mat4(1);
-		if( indx>-1)
+		if(indx>-1)
 		{
-			for (int j = indx; chainParents[j] > -1; j = chainParents[j])
+			for (int j = indx;  chainParents[j] > -1; j = chainParents[j])
 			{
 				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
 			}
-			return shapes[indx]->getPointInSystem(Normal1,vec3(0,0,0));
-			//return shapes[indx]->getCenterOfRotation(Normal1);
+			return shapes[indx]->getVectorInSystem(Normal1,vec);
+			//return shapes[indx]->getTipPos(Normal1);
 		}
 		else
 		{
-			return vec3(0,0,0);
+			return vec; 
+				//shapes[0]->getRootPos(mat4(1));
 		}
-	}
-
-	vec3 Scene::getAxisDirection(int indx,int axis)
-	{
-		if(axis == xAxis)
-		{
-			mat4 Normal1 = mat4(1);
-			for (int j = indx; chainParents[j] > -1; j = chainParents[j])
-			{
-				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
-			}
-			return shapes[indx]->getPointInSystem(Normal1,vec3(1,0,0)); 
-				//shapes[indx]->getXdirection(Normal1);
-		}
-		else
-		{
-			mat4 Normal1 = mat4(1);
-			for (int j = indx; chainParents[j] > -1; j = chainParents[j])
-			{
-				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
-			}
-			return shapes[indx]->getVectorInSystem(Normal1,vec3(0,0,1)); 
-				//shapes[indx]->getZdirection(Normal1);
-		}
-
 	}
 	
 	void Scene::mouseProccessing(int button)
 	{
-
-			if(button == 1)
+		if(pickedShape == -1 || shapes[pickedShape]->Is2D())
+		{
+			if(button == 1 )
 			{				
 				GLint viewport[4];
 				//float zTmp = 2.0*depth -1.0;
@@ -411,7 +435,18 @@ using namespace glm;
 				shapeTransformation(zGlobalRotate,xrel*.5f);
 				shapeTransformation(xGlobalRotate,yrel*.5f);
 				WhenRotate();
-			}		
+			}
+		}
+	}
+
+	void Scene::ZeroShapesTrans()
+	{
+		for (unsigned int i = 0; i < shapes.size(); i++)
+		{
+			shapes[i]->zeroTrans();
+			shapes[i]->zeroRot(false);
+		//	shapes[i]->zeroRot(true);
+		}
 	}
 
 	void Scene::ReadPixel()
@@ -454,3 +489,9 @@ using namespace glm;
 
 }
 	 
+	void Scene::ScaleAllDirections(int factor)
+	{
+		shapeTransformation(xScale,factor);
+		shapeTransformation(yScale,factor);
+		shapeTransformation(zScale,factor);
+	}

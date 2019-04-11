@@ -125,12 +125,15 @@ void MovableGLM::zeroTrans()
 {
 	translateMat[0] = mat4(1);
 	translateMat[1] = mat4(1);
+	scaleFactor =vec3(1);
 }
 
 void MovableGLM::zeroRot(bool generalRot)
 {
 	if(generalRot)
 		rotateMat = mat4(1);
+	else
+		ZeroAngles();
 }
 
 glm::vec4 MovableGLM::getTraslate()
