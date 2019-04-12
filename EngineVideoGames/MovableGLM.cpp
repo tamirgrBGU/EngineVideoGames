@@ -52,6 +52,11 @@ mat4 MovableGLM::makeTrans(mat4 &prevTransformations) const
 	return prevTransformations * makeTrans();
 }
 
+mat4 MovableGLM::GetRot() const
+{
+	return  rotateMat * makeRot()  ;
+}
+
 mat4 MovableGLM::makeTrans() const
 {
 	return  translateMat[0]   *rotateMat * makeRot() * translateMat[1] ;

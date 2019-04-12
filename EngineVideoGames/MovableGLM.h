@@ -29,6 +29,7 @@ public:
 	glm::mat4 makeTransScale() const;
 	glm::mat4 makeTrans(glm::mat4 &prevTransformations) const;
 	glm::mat4 makeTrans() const;
+	glm::mat4 GetRot() const;
 	void myRotate(float ang, glm::vec3 &vec, int indx);
 	void myTranslate(glm::vec3 &vec, int indx);
 	void myScale(glm::vec3 &vec);
@@ -40,6 +41,8 @@ public:
 	void translateInSystem(const MovableGLM  &system,glm::vec3 &vec, int indx, bool toScale);
 	void mergeRot2Euler();
 	void printRot(bool generalRot);
+
+	
 
 	glm::vec4 getTraslate();
 	glm::vec3 getPointInSystem(glm::mat4 &prevTransformations,glm::vec3 point);

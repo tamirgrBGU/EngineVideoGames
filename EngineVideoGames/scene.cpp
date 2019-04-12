@@ -228,15 +228,7 @@ using namespace glm;
 					
 					if(direction == -1 && pickedShape+2<shapes.size())
 					{
-						glm::vec3 posStart = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
-						std::cout<<"start ("<<posStart.x <<", "<<posStart.y<<", "<<posStart.z<<")"<<std::endl;
-						shapes[pickedShape+2]->globalSystemRot(amt,vec3(1,0,0),xAxis1);
-						int i=pickedShape;
-						for (; chainParents[i] > 0; i = chainParents[i]);
-						shapes[pickedShape]->globalSystemRot(-amt,glm::vec3(1,0,0),xAxis1);
-						glm::vec3 posEnd = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
-						std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;
-						shapes[i]->myTranslate(posStart-posEnd,0);
+						OpositeDirectionRot(glm::vec3(1,0,0),amt);
 					}
 					else
 						shapes[pickedShape]->globalSystemRot(amt,vec3(1,0,0),xAxis1);
@@ -250,10 +242,10 @@ using namespace glm;
 					shapes[pickedShape]->globalSystemRot(amt,vec3(0,1,0),-1);
 					if(direction == -1)
 					{
-						int i=pickedShape;
-						for (; chainParents[i] > -1; i = chainParents[i]);
-						shapes[i]->globalSystemRot(-amt,vec3(0,1,0),-1);
+						OpositeDirectionRot(glm::vec3(0,1,0),amt);
 					}
+					else
+						shapes[pickedShape]->globalSystemRot(amt,vec3(1,0,0),xAxis1);
 				}
 				break;
 			case zGlobalRotate:
@@ -265,15 +257,7 @@ using namespace glm;
 					
 					if(direction == -1 && pickedShape+2<shapes.size())
 					{
-						glm::vec3 posStart = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
-						std::cout<<"start ("<<posStart.x <<", "<<posStart.y<<", "<<posStart.z<<")"<<std::endl;
-						shapes[pickedShape+2]->myRotate(amt,vec3(0,0,1),zAxis12);
-						int i=pickedShape;
-						for (; chainParents[i] > 0; i = chainParents[i]);
-						shapes[pickedShape]->globalSystemRot(-amt,shapes[pickedShape+2]->getVectorInSystem(glm::mat4(1),vec3(0,0,1)),-1);
-						glm::vec3 posEnd = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
-						std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;
-						shapes[i]->myTranslate(posStart-posEnd,1);
+						OpositeDirectionRot(glm::vec3(0,0,1),amt);
 					}
 					else
 						shapes[pickedShape]->globalSystemRot(amt,vec3(0,0,1),zAxis12);
@@ -338,6 +322,32 @@ using namespace glm;
 			}
 
 		
+	}
+
+	void Scene::OpositeDirectionRot(glm::vec3 vec,float angle)
+	{
+		glm::mat4 localMat = shapes[pickedShape+2]->GetRot();
+		glm::mat4 rotMat = localMat*glm::rotate(glm::mat4(1),angle,vec)*glm::transpose(localMat); 
+		
+		glm::vec3 posStart = GetPositionInSystem(pickedShape,glm::vec3(0,0,1) );
+		std::cout<<"start ("<<posStart.x <<", "<<posStart.y<<", "<<posStart.z<<")"<<std::endl;
+		
+		int i=pickedShape;
+		for (; chainParents[i] > 0; i = chainParents[i]);
+		glm::mat4 globalMat = shapes[i]->GetRot();
+		globalMat = localMat* shapes[i]->GetRot();
+
+		shapes[pickedShape]->zeroRot(true);
+
+		shapes[i]->buildAngMatrices(shapes[pickedShape]->GetRot()*rotMat);
+		if(vec.x>0,99)
+			shapes[pickedShape+2]->myRotate(-angle,vec,xAxis1);
+		else
+			shapes[pickedShape+2]->myRotate(-angle,vec,zAxis1);
+
+		glm::vec3 posEnd = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
+		std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;
+		shapes[i]->myTranslate((posStart-posEnd),0);
 	}
 	
 	void Scene::resize(int width,int height)
@@ -404,12 +414,10 @@ using namespace glm;
 				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
 			}
 			return shapes[indx]->getVectorInSystem(Normal1,vec);
-			//return shapes[indx]->getTipPos(Normal1);
 		}
 		else
 		{
 			return vec; 
-				//shapes[0]->getRootPos(mat4(1));
 		}
 	}
 	

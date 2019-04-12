@@ -72,6 +72,7 @@ public:
 	inline int GetDirection() {return direction;}
 	glm::vec3 GetPositionInSystem(int indx,glm::vec3 pos);
 	glm::vec3 GetVectorInSystem(int indx,glm::vec3 vec);
+	void Scene::OpositeDirectionRot(glm::vec3 vec,float angle);
 private:	
 
 	std::vector<Camera*> cameras; //light will have the properties of camera
