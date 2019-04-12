@@ -10,7 +10,7 @@ class Game : public Scene
 	bool proj2D = false;
 	int projMode = -1;
 	unsigned int xResolution = 15, yResolution = 15;
-
+	float movement_ = 0;
 public:
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
@@ -47,6 +47,9 @@ public:
 		}
 		proj2D = proj2D ^ 1;
 		updateBezier(1, proj2D, projMode);
+	}
+	void Game::change_movement(float num) {
+		movement_ += num;
 	}
 
 	~Game(void);

@@ -44,6 +44,12 @@
 					scn->HideShape(0);
 					scn->Deactivate();
 				break;
+				case GLFW_KEY_LEFT:
+					scn->change_movement(-0.01);
+					break;
+				case GLFW_KEY_RIGHT:
+					scn->change_movement(0.01);
+					break;
 			default:
 				break;
 			}
