@@ -70,7 +70,7 @@ public:
 	virtual ~Scene(void);
 	inline void SetDirection() {direction = -direction;}
 	inline int GetDirection() {return direction;}
-	glm::vec3 GetPositionInSystem(int indx,glm::vec3 pos);
+	glm::vec3 GetTipPositionInSystem(int indx);
 	glm::vec3 GetVectorInSystem(int indx,glm::vec3 vec);
 	void Scene::OpositeDirectionRot(glm::vec3 vec,float angle);
 private:	

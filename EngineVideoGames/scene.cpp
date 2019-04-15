@@ -288,7 +288,7 @@ using namespace glm;
 				{
 					//newAxis = findAxis(vec3(1,0,0));					
 						int i = pickedShape;
-					for (; chainParents[i] > -1; i = chainParents[i]);
+					for (; chainParents[i] > 0; i = chainParents[i]);
 				
 					shapes[i]->translateInSystem(*this,vec3(amt,0,0),0,false);
 				}
@@ -300,7 +300,7 @@ using namespace glm;
 					{
 						//newAxis = findAxis(vec3(0,1,0));
 							int i = pickedShape;
-						for (; chainParents[i] > -1; i = chainParents[i]);
+						for (; chainParents[i] > 0; i = chainParents[i]);
 						
 						shapes[i]->translateInSystem(*this,vec3(0,amt,0),0,false);
 					}
@@ -312,7 +312,7 @@ using namespace glm;
 					{
 					//	newAxis = findAxis(vec3(0,0,1));
 							int i = pickedShape;
-						for (; chainParents[i] > -1; i = chainParents[i]);
+						for (; chainParents[i] > 0; i = chainParents[i]);
 			
 						shapes[i]->translateInSystem(*this,vec3(0,0,amt),0,false);
 					}
@@ -329,7 +329,7 @@ using namespace glm;
 		glm::mat4 localMat = shapes[pickedShape+2]->GetRot();
 		glm::mat4 rotMat = localMat*glm::rotate(glm::mat4(1),angle,vec)*glm::transpose(localMat); 
 		
-		glm::vec3 posStart = GetPositionInSystem(pickedShape,glm::vec3(0,0,1) );
+		glm::vec3 posStart = GetTipPositionInSystem(pickedShape);
 		std::cout<<"start ("<<posStart.x <<", "<<posStart.y<<", "<<posStart.z<<")"<<std::endl;
 		
 		int i=pickedShape;
@@ -345,7 +345,7 @@ using namespace glm;
 		else
 			shapes[pickedShape+2]->myRotate(-angle,vec,zAxis1);
 
-		glm::vec3 posEnd = GetPositionInSystem(pickedShape,glm::vec3(0,0,1));
+		glm::vec3 posEnd = GetTipPositionInSystem(pickedShape);
 		std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;
 		shapes[i]->myTranslate((posStart-posEnd),0);
 	}
@@ -385,22 +385,25 @@ using namespace glm;
 		return depth;
 	}
 
-	glm::vec3 Scene::GetPositionInSystem(int indx,glm::vec3 pos)
+	//return coordinates in global system for a tip of arm position is local system 
+	glm::vec3 Scene::GetTipPositionInSystem(int indx)
 	{
 		mat4 Normal1 = mat4(1);
 		if(indx>-1)
 		{
-			for (int j = indx;  chainParents[j] > -1; j = chainParents[j])
+			int j = indx;
+			glm::vec3 vec = glm::vec3(0);
+			for (;  chainParents[j] > 0; j = chainParents[j])
 			{
-				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
+				vec = shapes[j]->getVectorInSystem(glm::mat4(1),vec + glm::vec3(0,0,2));
 			}
-			return shapes[indx]->getPointInSystem(Normal1,pos);
+			glm::vec3 origin = vec3(shapes[j]->getTraslate());
+			return origin + shapes[j]->getVectorInSystem(glm::mat4(1),vec+glm::vec3(0,0,2))*(float)scaleFactor;
 			//return shapes[indx]->getTipPos(Normal1);
 		}
 		else
 		{
-			return pos; 
-				//shapes[0]->getRootPos(mat4(1));
+			return vec3(0,0,0); 
 		}
 	}
 
@@ -411,7 +414,7 @@ using namespace glm;
 		{
 			for (int j = indx;  chainParents[j] > -1; j = chainParents[j])
 			{
-				Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
+				Normal1 = shapes[chainParents[j]]->makeTrans() * Normal1;
 			}
 			return shapes[indx]->getVectorInSystem(Normal1,vec);
 		}

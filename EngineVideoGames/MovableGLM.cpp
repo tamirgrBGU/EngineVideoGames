@@ -143,8 +143,9 @@ void MovableGLM::zeroRot(bool generalRot)
 
 glm::vec4 MovableGLM::getTraslate()
 {
-	mat4 mat = makeTrans();
-	return mat[3];
+	//mat4 mat = makeTrans();
+	
+	return translateMat[0][3];
 }
 
 void MovableGLM::mergeRot2Euler()
