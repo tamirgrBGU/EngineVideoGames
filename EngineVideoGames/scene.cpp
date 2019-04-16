@@ -27,7 +27,7 @@ using namespace glm;
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(3);
 		
-		cameras.push_back(new Camera(vec3(0,0,-20.0f),60.0f,1.0f,0.1f,100.0f));
+		cameras.push_back(new Camera(vec3(0,0,1.0f),60.0f,1.0f,0.1f,100.0f));
 		pickedShape = -1;
 		depth = 0;
 		cameraIndx = 0;
@@ -90,6 +90,7 @@ using namespace glm;
 	{
 		glm::mat4 Normal = makeTrans();
 		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
+		
 		int p = pickedShape;
 //		shaders[shaderIndx]->Bind();
 		for (unsigned int i=0; i<shapes.size();i++)
