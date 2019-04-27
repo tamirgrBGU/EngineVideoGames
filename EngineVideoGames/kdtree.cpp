@@ -2,7 +2,7 @@
 *
 * k-d tree implementation file
 *	
-* author: Arvind Rao	
+* author: Arvind Rao
 * license: GNU
 * 
 *
@@ -69,9 +69,6 @@ void Kdtree::print_data(vecType pt)
 */
 void Kdtree::printTree( Node* head )
 {
-	//find the tree depth 
-	int maxdepth = 3;
-	int spaces = int(pow(2, maxdepth +1 ) - 1);
 	int depth = 0;
 	
 	std::cout<< "\n**** Print of Tree **********\n";
@@ -104,6 +101,22 @@ void Kdtree::printTree( Node* head )
 /*
 *  algorithm is based on http://en.wikipedia.org/wiki/Kd_tree
 */
+void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
+{
+	Node* head = new Node(3);
+	std::list<Kdtree::vecType> point_list;
+	glm::vec3 v;
+	vecType v4;
+	for (auto i = 0; i < pvec.size(); i++)
+	{
+		v = pvec[i];
+		v4 = glm::vec4(v.x, v.y, v.z, 1);
+		point_list.push_back(v4);
+	}
+	Kdtree::_makeTree(head, point_list, 0);
+	Kdtree::root = head;
+}
+
 void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 {
 	Node* head = new Node(3);
@@ -115,16 +128,15 @@ void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType>& plist, int depth
 {	
 	if( !plist.empty() ) 
 	{
-		int k = N;
-		int axis = depth % k;
+		int axis = depth % N;
 		
 		std::list<Kdtree::vecType> left_list;
 		std::list<Kdtree::vecType> right_list;
 		Kdtree::vecType median = Kdtree::findMedian(axis, plist, left_list, right_list); 
 		head->data = median;
 		
-		Node* left_node = new Node(k);
-		Node* right_node = new Node(k);
+		Node* left_node = new Node(N);
+		Node* right_node = new Node(N);
 		
 		Kdtree::_makeTree( left_node, left_list, depth+1);
 		if (!left_list.empty()) head->left = left_node;

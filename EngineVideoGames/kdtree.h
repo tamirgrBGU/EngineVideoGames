@@ -75,8 +75,7 @@ class Kdtree
 								std::list<vecType> &right );
 	//function for making the tree
 	void makeTree( std::list<vecType> &plist );
-	
-	
+	void makeTree(std::vector<glm::vec3> &pvec );
  private:
 	//helper for makeTree 
 	void _makeTree( Node* head, std::list<vecType> &plist, int depth );

@@ -53,7 +53,7 @@ public:
 	}
 
 	static vec4 v3to4(vec3 v) {
-		return vec4(v.x, v.y, v.z, 0);
+		return vec4(v.x, v.y, v.z, 1);
 	}
 
 	static vec3 v4to3(vec4 v) {

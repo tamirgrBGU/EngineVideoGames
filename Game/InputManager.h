@@ -42,14 +42,32 @@
 					break;
 				case GLFW_KEY_O:
 					scn->HideShape(0);
-					scn->Deactivate();
+					if(scn->IsActive())
+						scn->Deactivate();
+					else
+						scn->Deactivate();
 				break;
-				case GLFW_KEY_LEFT:
-					scn->change_movement(-0.01);
+				case GLFW_KEY_A:
+					scn->change_movement(-0.001);
+					break;
+				case GLFW_KEY_D:
+					scn->change_movement(0.001);
 					break;
 				case GLFW_KEY_RIGHT:
-					scn->change_movement(0.01);
+					//scn->shapeTransformation(scn->zGlobalRotate,-20.1f);
+					scn->shapeTransformation(scn->zLocalRotate,5.1f);
 					break;
+				case GLFW_KEY_LEFT:
+					//scn->shapeTransformation(scn->zGlobalRotate,20.1f);
+					scn->shapeTransformation(scn->zLocalRotate,-5.0f);
+					break;
+				case GLFW_KEY_UP:
+					scn->shapeTransformation(scn->xLocalRotate,5.f);
+					break;
+				case GLFW_KEY_DOWN:
+					scn->shapeTransformation(scn->xGlobalRotate,-5.f);
+					break;
+
 			default:
 				break;
 			}

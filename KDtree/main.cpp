@@ -10,14 +10,19 @@
 
 #include "kdtree.h"
 #include <iostream>
-#include <random>
-#include <cmath>
 #include <array>
+#include <bezier1D.cpp>
+#include <bezier2D.cpp>
+#include <mesh.h>
 
 
 const int _numpts = 10;
 const int _dim = 3;
 
+
+Bezier2D b2d = Bezier2D::Bezier2D(Bezier1D::Bezier1D(), 3);
+IndexedModel model = b2d.Bezier2D::GetSurface(5, 5);
+std::vector<glm::vec3> testpoints2 = model.positions;
 Node::vecType testpoints[_numpts] =
 	{
 		Node::vecType(38.40924, 4.11543, 8.10499,1), 
@@ -46,10 +51,10 @@ int main(int argc, char ** argv)
 	
 	//make a list of vectors out of the testpoints array
 	std::list<Node::vecType> point_list;
-	for(auto i = 0; i < _numpts; i++ )
-	{
-	
-		point_list.push_back(testpoints[i]);
+	//for(auto i = 0; i < _numpts; i++ )
+	for (auto i = 0; i < testpoints2.size(); i++)
+	{	
+		point_list.push_back(Bezier1D::v3to4(testpoints2[i]));
 	}
 	
 	Kdtree kd;
@@ -57,5 +62,5 @@ int main(int argc, char ** argv)
 	kd.printTree(kd.getRoot());
  	
 	std::cout<<"\n\n";
-	getchar();
+	int a;	std::cin>>a;
 }

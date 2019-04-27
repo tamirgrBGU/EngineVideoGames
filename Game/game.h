@@ -18,7 +18,8 @@ public:
 	void addShape(int type,int parent,unsigned int mode);
 	void updateBezier(int BezierShapeId, bool is2D, unsigned int mode);
 //	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
-	void Update( glm::mat4 MVP ,glm::mat4 Normals,Shader* s);
+	void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s);
+	void ControlPointUpdate();
 	void WhenRotate();
 	void WhenTranslate();
 	Bezier1D *getBezier1D();

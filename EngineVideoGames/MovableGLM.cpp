@@ -52,6 +52,11 @@ mat4 MovableGLM::makeTrans(mat4 &prevTransformations) const
 	return prevTransformations * makeTrans();
 }
 
+mat4 MovableGLM::GetRot() const
+{
+	return  rotateMat * makeRot()  ;
+}
+
 mat4 MovableGLM::makeTrans() const
 {
 	return  translateMat[0]   *rotateMat * makeRot() * translateMat[1] ;
@@ -125,18 +130,22 @@ void MovableGLM::zeroTrans()
 {
 	translateMat[0] = mat4(1);
 	translateMat[1] = mat4(1);
+	scaleFactor =vec3(1);
 }
 
 void MovableGLM::zeroRot(bool generalRot)
 {
 	if(generalRot)
 		rotateMat = mat4(1);
+	else
+		ZeroAngles();
 }
 
 glm::vec4 MovableGLM::getTraslate()
 {
-	mat4 mat = makeTrans();
-	return mat[3];
+	//mat4 mat = makeTrans();
+	
+	return translateMat[0][3];
 }
 
 void MovableGLM::mergeRot2Euler()
