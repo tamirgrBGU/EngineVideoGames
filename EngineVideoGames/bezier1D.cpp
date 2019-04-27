@@ -110,9 +110,11 @@ LineVertex Bezier1D::GetControlPoint(int seg, int index)
 }
 
 void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec4 newPosition) {
-	if (segment == 0 && indx == 0)
-		return;
 
+	if (segment == segments.size()) { // and..
+		segment = segment - 1;
+		indx = 3;
+	}
 	glm::mat4 sector = segments[segment];
 	glm::vec4 oldpos(sector[indx]);
 	glm::vec4 diff(newPosition - oldpos);
@@ -120,10 +122,15 @@ void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec
 
 
 	segments[segment][indx] = newPosition;
-	if (indx == 0)
+
+	if (indx == 0 && segment != 0) // we need to move the copy of the point on the previos seg
 		(segments[segment - 1])[3] = newPosition;
 	if (preserveC1)
 	{
+		if (segment == 0 && indx == 0) {
+			segments[segment][1] += diff; // segments[0][1] += diff;
+			return;
+		}
 		switch (indx)
 		{
 		case 0:
@@ -138,6 +145,8 @@ void Bezier1D::MoveControlPoint(int segment, int indx, bool preserveC1, glm::vec
 			if (segment != segments.size() - 1)
 				segments[segment + 1][1] -= diff;
 			break;
+		case 3: // last point on line
+			segments[segment][2] += diff;
 		}
 
 	}

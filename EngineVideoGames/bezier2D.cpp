@@ -35,13 +35,22 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	std::vector<glm::ivec3> joint_indices = std::vector<glm::ivec3>();
 	std::vector<unsigned int> indices = std::vector<unsigned int>();
 	for (int T = 0; T < numberofSegments_in_curve; T++) {
-		for (int S = 0; S < this->circularSubdivision; S++) {
-			for (float s = 0; s < 1; s = s + s_step) {
-				for (float t = 0; t < 1; t = t + t_step) {
-					Vertex p0 = this->GetVertex(T, S, t, s);
-					Vertex p1 = this->GetVertex(T, S, t + t_step, s);
-					Vertex p2 = this->GetVertex(T, S, t + t_step, s + s_step);
-					Vertex p3 = this->GetVertex(T, S, t, s + s_step);
+		for (float t = 0; t < 1; t = t + t_step) {
+			for (int S = 0; S < this->circularSubdivision; S++) {
+				for (float s = 0; s < 1; s = s + s_step) {
+
+					float ct, cs;
+					ct = t;
+					cs = s;
+					Vertex p0 = this->GetVertex(T, S, ct, cs);
+					if (ct + t_step > 1) ct = 1;
+					else ct += t_step;
+					Vertex p1 = this->GetVertex(T, S, ct, cs);
+					if (cs + s_step > 1) cs = 1;
+					else cs += s_step;
+					Vertex p2 = this->GetVertex(T, S, ct, cs);
+					ct -= t_step;
+					Vertex p3 = this->GetVertex(T, S, ct, cs);
 					//push p0
 					positions.push_back(*p0.GetPos());
 					colors.push_back(my_colors[S]);
@@ -89,10 +98,12 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					glm::vec3 thepoint3(*p3.GetPos());
 					LineVertex temp3(thepoint3, glm::vec3(0, 0, 1));
 					axisVertices.push_back(temp3);*/
-
+					//indices.push_back(i);
 					indices.push_back(i);
+					indices.push_back(i + 3);
 					indices.push_back(i + 1);
 					indices.push_back(i + 3);
+					indices.push_back(i + 1);
 					indices.push_back(i + 2);
 					i = i + 4;
 					//for (int j = 0; j < 4; j++) {
@@ -100,8 +111,11 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					//	i++;
 					//}
 				}
+				//indices.push_back(i);
+				//indices.push_back(i);
 			}
 		}
+		
 	}
 	ans.positions = positions;
 	ans.colors = colors;

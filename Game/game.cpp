@@ -121,7 +121,7 @@ void Game::WhenRotate()
 
 void Game::WhenTranslate()
 {
-	if (pickedShape > 2 && pickedShape < curve->numberOfPoints + 2 -1)
+	if (pickedShape > 1 && pickedShape < curve->numberOfPoints + 2 )
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
 		glm::vec4 oldpos(*curve->GetControlPoint((pickedShape - 2) / 3, (pickedShape - 2) % 3).GetPos(), 1);
@@ -135,15 +135,20 @@ void Game::WhenTranslate()
 			switch ((pickedShape - 2) % 3)
 			{
 			case 0:
-				pickedShape--;
-				shapeTransformation(xGlobalTranslate, diff.x);
-				shapeTransformation(yGlobalTranslate, diff.y);
-				shapeTransformation(zGlobalTranslate, diff.z);
-				pickedShape += 2;
-				shapeTransformation(xGlobalTranslate, diff.x);
-				shapeTransformation(yGlobalTranslate, diff.y);
-				shapeTransformation(zGlobalTranslate, diff.z);
-				pickedShape--;
+				if (pickedShape != 2) {
+					pickedShape--;
+					shapeTransformation(xGlobalTranslate, diff.x);
+					shapeTransformation(yGlobalTranslate, diff.y);
+					shapeTransformation(zGlobalTranslate, diff.z);
+					pickedShape++;
+				}
+					if (pickedShape != curve->numberOfPoints + 2 - 1) {
+						pickedShape ++;
+						shapeTransformation(xGlobalTranslate, diff.x);
+						shapeTransformation(yGlobalTranslate, diff.y);
+						shapeTransformation(zGlobalTranslate, diff.z);
+						pickedShape--;
+					}
 				break;
 			case 1:
 				if ((pickedShape - 2) / 3 != 0) {
