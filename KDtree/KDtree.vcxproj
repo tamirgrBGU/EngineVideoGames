@@ -68,10 +68,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\EngineVideoGames\kdtree.cpp" />
+    <ClCompile Include="intersect.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\EngineVideoGames\kdtree.h" />
+    <ClInclude Include="Itersect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
