@@ -21,7 +21,7 @@ private:
 public:
 	B_Node(int low, int high, std::vector<glm::vec3>* points[]);
 	B_Node(const B_Node &other);
-	bool isColiding(B_Node &other);
+	bool isColiding(glm::mat4 myMat, B_Node &other,glm::mat4 otherMat);
 
 	~B_Node(void);
 };
@@ -31,6 +31,7 @@ class MeshConstructor
 	VertexArray vao;
 	IndexBuffer *ib;
 	//TO DO: add bounding box data base and build it in the constructor 
+	B_Node boundingTree;
 	std::vector<VertexBuffer*> vbs;
 	bool is2D;
 	int unsigned indicesNum;
