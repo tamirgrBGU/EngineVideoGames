@@ -5,7 +5,26 @@
 #include "Mesh.h"
 #include "bezier1D.h"
 #include "kdtree.h"
+#include "Mesh.h"
 
+class B_Node 
+{
+private:
+	BoundingBox bb;
+	int low;
+	int high;
+	B_Node* left;
+	B_Node* right;
+
+	BoundingBox getBoundingbox(int low, int high,std::vector<glm::vec3>* points[]);
+	BoundingBox getDefultBoundingbox(glm::vec3 point);
+public:
+	B_Node(int low, int high, std::vector<glm::vec3>* points[]);
+	B_Node(const B_Node &other);
+	bool isColiding(B_Node &other);
+
+	~B_Node(void);
+};
 
 class MeshConstructor
 {
