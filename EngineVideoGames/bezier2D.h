@@ -3,8 +3,8 @@
 
 class Bezier2D
 {
-	int circularSubdivision; //usualy 4 how many subdivision in circular direction
-	Bezier1D my_curve;
+	int circularSubdivision; //usualy 4, how many subdivision in circular direction
+	Bezier1D b;				 
 
 public:
 	Bezier2D(void);

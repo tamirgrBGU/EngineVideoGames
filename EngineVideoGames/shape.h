@@ -12,7 +12,6 @@ private:
 
 	MeshConstructor *mesh;
 	Texture *tex;
-	
 	bool isCopy;
 	unsigned int mode;
 	bool toRender;
@@ -36,6 +35,8 @@ public:
 	inline void Unhide() {toRender = true;}
 
 	inline bool Is2Render() {return toRender;}
+
+	inline bool Is2D(){return mesh->Is2D();}
 
 	virtual ~Shape(void);
 };

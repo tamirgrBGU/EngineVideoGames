@@ -33,9 +33,31 @@
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
 				case GLFW_KEY_SPACE:
-				// 	scn->HideShape(0);
-					scn->addShape(5, -1, 5);//addShape(BezierSurface, -1, QUADS);
+					scn->HideShape(0);
+					if(scn->IsActive())
+						scn->Deactivate();
+					else
+						scn->Deactivate();
 				break;
+								case GLFW_KEY_RIGHT:
+					//scn->shapeTransformation(scn->zGlobalRotate,-20.1f);
+					scn->shapeTransformation(scn->zLocalRotate,5.1f);
+//						cout<< "right: "<<endl;
+					break;
+				case GLFW_KEY_LEFT:
+					//scn->shapeTransformation(scn->zGlobalRotate,20.1f);
+					scn->shapeTransformation(scn->zLocalRotate,-5.0f);
+//					cout<< "left: "<<endl;
+					break;
+				case GLFW_KEY_UP:
+					//cout<< "up: "<<endl;
+					scn->shapeTransformation(scn->xLocalRotate,5.f);
+					break;
+				case GLFW_KEY_DOWN:
+					scn->shapeTransformation(scn->xGlobalRotate,-5.f);
+					//cout<< "down: "<<endl;
+					break;
+
 			default:
 				break;
 			}

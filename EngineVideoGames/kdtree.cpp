@@ -32,7 +32,7 @@ Kdtree::vecType Kdtree::findMedian(int axis, std::list<Kdtree::vecType> &plist, 
 {
 	Kdtree::vecType median;
 	int size = plist.size();
-	int med = ceil( float(size) / float(2) );
+	int med = (int)ceil( float(size) / float(2) );
 	int count = 0;
 	
 	if ( size == 1)
@@ -71,7 +71,7 @@ void Kdtree::printTree( Node* head )
 {
 	//find the tree depth 
 	int maxdepth = 3;
-	int spaces = pow(2, maxdepth +1 ) - 1;
+	int spaces = (int)pow(2, maxdepth +1 ) - 1;
 	int depth = 0;
 	
 	std::cout<< "\n**** Print of Tree **********\n";

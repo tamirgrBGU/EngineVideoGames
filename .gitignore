@@ -8,7 +8,10 @@ Debug/
 Game/Debug/
 Release/
 Game/Release/
+RubiksCube/
+IK/
 
 # Files
 *.user
 EngineVideoGames.opensdf
+EngineVideoGames.sdf

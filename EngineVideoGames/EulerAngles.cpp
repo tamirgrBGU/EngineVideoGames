@@ -3,9 +3,8 @@
 #include <stdio.h>
 #include <iostream>
 
-using namespace glm;
 
-static void printMat(const mat4 mat)
+static void printMat(const glm::mat4 mat)
 {
 	printf(" matrix: \n");
 	for (int i = 0; i < 4; i++)
@@ -16,23 +15,6 @@ static void printMat(const mat4 mat)
 	}
 }
 
-vec4 normXY(glm::vec4 &vec, int iterations)
-{
-	glm::vec4 v = vec,res = vec;
-	float tmp = 1 - vec[2] * vec[2];
-	res[2] = 0;
-	if (tmp > 0)
-	{
-		for (int i = 0; i < iterations; i++)
-		{
-			res[0] = res[0] / tmp;
-			res[1] = res[1] / tmp;
-			tmp = 0.5 + (res[0] * res[0] + res[1] * res[1])*0.5;
-		}
-	}
-	return res;
-}
-
 EulerAngles::EulerAngles()
 {
 	phi = glm::mat4(1);
@@ -40,7 +22,7 @@ EulerAngles::EulerAngles()
 	psi = glm::mat4(1);
 }
 
-EulerAngles::EulerAngles(glm::mat4 &mat, int iterations)
+EulerAngles::EulerAngles(glm::mat4 &mat)
 {
 	EulerAngles();
 	buildAngMatrices(mat);
@@ -124,6 +106,21 @@ void EulerAngles::printAngles(int ang)
 	
 }
 
+float EulerAngles::GetCosAng(int ang)
+{
+	switch (ang)
+	{
+	case zAxis1:
+		return phi[1][1];
+	case xAxis1:
+		return theta[1][1];
+	case zAxis2:
+		return psi[1][1];
+	default:
+		return 1;
+	}
+}
+
 void EulerAngles::buildAngMatrix(int XorZ, float c, float s)
 {
 	switch (XorZ)
@@ -166,98 +163,63 @@ void EulerAngles::alignedRot(int XorZ,float angle,int mode )
 	{
 	case zAxis1:
 		if(mode == 0)
-			phi =  rotate(phi,ang,vec3(0,0,1));
+			phi =  glm::rotate(phi,ang,glm::vec3(0,0,1));
 		else 
-			phi = rotate(mat4(1),ang,vec3(0,0,1)) * phi;
+			phi = glm::rotate(glm::mat4(1),ang,glm::vec3(0,0,1)) * phi;
 		break;
 	case xAxis1:
 		if(mode == 0)
-			theta = rotate(theta,ang,vec3(1,0,0));
+			theta = glm::rotate(theta,ang,glm::vec3(1,0,0));
 		else
-			theta = rotate(mat4(1),ang,vec3(1,0,0)) * theta;
+			theta = glm::rotate(glm::mat4(1),ang,glm::vec3(1,0,0)) * theta;
 		break;
 	case zAxis2:
 		if(mode == 0)
-			psi =  rotate(psi,ang,vec3(0,0,1));
+			psi =  glm::rotate(psi,ang,glm::vec3(0,0,1));
 		else
-			psi = rotate(mat4(1),ang,vec3(0,0,1)) * psi;
+			psi = glm::rotate(glm::mat4(1),ang,glm::vec3(0,0,1)) * psi;
 		break;
 	case zAxis12:
 		if(mode == 0)
 		{
 			
-				phi =  rotate(phi,ang,vec3(0,0,1));
-				psi =  rotate(psi,-ang,vec3(0,0,1));
-			
+				phi =  glm::rotate(phi,ang,glm::vec3(0,0,1));
+				psi =  glm::rotate(psi,-ang,glm::vec3(0,0,1));
 		}
 		else
 		{
-			phi = rotate(mat4(1),ang,vec3(0,0,1)) * phi;
-			psi = rotate(mat4(1),-ang,vec3(0,0,1)) * psi;
+			phi =glm::rotate(glm::mat4(1),ang,glm::vec3(0,0,1)) * phi;
+			psi = glm::rotate(glm::mat4(1),-ang,glm::vec3(0,0,1)) * psi;
 		}
 		break;
 	}
 }
-
-void EulerAngles::split(glm::mat4 &mat, int iterations)
-{
-	
-	    glm::mat4 tmp;
-		float size;
-
-		if (mat[0][0] >= 0.9999999 && mat[1][1] >= 0.9999999 && mat[2][2] >= 0.9999999)
-		{
-			phi = glm::mat4(1);
-			theta = glm::mat4(1);
-			psi = glm::mat4(1);
-			return;
-		}
-		float angle = 90.0f;
-		if (psi[0][0] * mat[0][0] + mat[0][1] * psi[1][0] == 0 && psi[0][0] * mat[1][0] + psi[0][1] * mat[1][1] == 0)
-		{
-			
-			psi = glm::rotate(psi,angle,glm::vec3(0,0,1)); 
-
-		}
-		glm::mat4 rot90(1);
-		rot90 = glm::rotate(rot90, angle, glm::vec3(0, 0, 1));
-		//printMat(rot90); 
-		for (int i = 0; i<iterations; i++)
-		{
-			tmp = mat * glm::transpose(psi); 
-			phi[0] = normXY(tmp[0], 10);
-			phi[1] = rot90*phi[0];
-
-			tmp = glm::transpose(mat) * phi;
-			psi[0] = normXY(tmp[0], 10);
-			psi[1] = psi[0]*rot90;
-		}
-	
-		tmp = glm::transpose(phi) * mat * glm::transpose(psi);
-		theta = glm::matrixCompMult(tmp, glm::mat4(1,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1));
-		theta[0][0] = 1.0f;
-	}
 	
 void EulerAngles::buildAngMatrices(glm::mat4 &mat)
 {
-	vec3 z = vec3(0,0,1);
-	vec3 newZ = vec3(mat*vec4(z,0));
-	vec3 n = normalize(cross(z,newZ));
-	float c = dot(n,vec3(1,0,0));
+	glm::vec3 z = glm::vec3(0,0,1);
+	glm::vec3 newZ = glm::vec3(mat*glm::vec4(z,0));
+	glm::vec3 n = glm::normalize(glm::cross(z,newZ));
+	float c = glm::clamp(glm::dot(n,glm::vec3(1,0,0)),-1.0f,1.0f);
 	
-	if(n.y*glm::sign(newZ.y)>0)
-		buildAngMatrix(zAxis12,c*glm::sign(newZ.y),sqrt(1.0f-c*c));
-	else
-		buildAngMatrix(zAxis12,c*glm::sign(newZ.y),-sqrt(1.0f-c*c));
-	c= dot(z,newZ);
-	if(cross(z,n).y<0)
-		buildAngMatrix(xAxis1,c,sqrt(1.0f-c*c));
-	else
-		buildAngMatrix(xAxis1,c,-sqrt(1.0f-c*c));
-	
+	buildAngMatrix(zAxis1,c*glm::sign(newZ.y),sqrt(1.0f-c*c)*glm::sign(n.y*newZ.y));
+
+	c= glm::clamp(glm::dot(z,newZ),-1.0f,1.0f);
+
+	buildAngMatrix(xAxis1,c,-glm::sign(glm::cross(z,n).y)*sqrt(1.0f-c*c));
+
+	glm::vec3 newX = glm::vec3(mat*glm::vec4(1,0,0,0));
+	glm::vec3 x = glm::vec3(phi*theta*glm::vec4(1,0,0,0));
+ 	c = glm::clamp(glm::dot(x,newX),-1.0f,1.0f);
+	//if(c<1.0 && c>-1.0)
+		buildAngMatrix(zAxis2,c,sqrt(1.0f-c*c)*glm::sign(x.y));
+	//else if(c<=-1.0f)
+	//	buildAngMatrix(zAxis2,-1,0);
+	//else
+	//	psi = glm::mat4(1);
 }
 
-mat4 EulerAngles::makeRot() const
+glm::mat4 EulerAngles::makeRot() const
 {
 	return phi*theta*psi;
 }

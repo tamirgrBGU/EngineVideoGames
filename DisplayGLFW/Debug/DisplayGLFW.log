@@ -1,4 +1,4 @@
-﻿Build started 27/03/2019 19:58:57.
+﻿Build started 15/04/2019 12:09:19.
      1>Project "C:\Dev\EngineVideoGames\DisplayGLFW\DisplayGLFW.vcxproj" on node 3 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IC:\Dev\EngineVideoGames\DisplayGLFW /IC:\Dev\EngineVideoGames\res/includes /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt display.cpp
@@ -10,4 +10,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.34
+Time Elapsed 00:00:02.70

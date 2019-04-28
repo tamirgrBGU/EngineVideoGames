@@ -53,7 +53,7 @@ MeshConstructor::MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int res
 MeshConstructor::MeshConstructor(const MeshConstructor &mesh)
 {
 	indicesNum = mesh.indicesNum;
-	if(is2D)
+	if(mesh.is2D)
 		CopyMesh(mesh);
 	else
 		CopyLine(mesh);
@@ -63,7 +63,7 @@ MeshConstructor::~MeshConstructor(void)
 {
 	if(ib)
 		delete ib;
-	for (int i = 0; i < vbs.size(); i++)
+	for (unsigned int i = 0; i < vbs.size(); i++)
 	{
 		if(vbs[i])
 			delete vbs[i];
