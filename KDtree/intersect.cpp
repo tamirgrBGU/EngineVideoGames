@@ -1,5 +1,6 @@
 #include "intersect.h"
 #include <stdlib.h>
+#include <list>
 
 std::vector<float> findthightbox(std::vector<glm::vec3> positions) {
 	std::vector<float> critical_point;
@@ -94,16 +95,16 @@ int isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> b
 	return 0;
 }
 
-std::vector<glm::vec3> floats_to_vec(std::vector<float> boundbox) {
-	std::vector<glm::vec3> vec;
-	vec.push_back(vec3(boundbox[0], 0, 0));
-	vec.push_back(vec3(boundbox[1], 0, 0));
-	vec.push_back(vec3(0, boundbox[2], 0));
-	vec.push_back(vec3(0, boundbox[3], 0));
-	vec.push_back(vec3(0, 0, boundbox[4]));
-	vec.push_back(vec3(0, 0, boundbox[5]));
-	return vec;
-}
+//std::vector<glm::vec3> floats_to_vec(std::vector<float> boundbox) {
+//	std::vector<glm::vec3> vec;
+//	vec.push_back(vec3(boundbox[0], 0, 0));
+//	vec.push_back(vec3(boundbox[1], 0, 0));
+//	vec.push_back(vec3(0, boundbox[2], 0));
+//	vec.push_back(vec3(0, boundbox[3], 0));
+//	vec.push_back(vec3(0, 0, boundbox[4]));
+//	vec.push_back(vec3(0, 0, boundbox[5]));
+//	return vec;
+//}
 
 std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox) {
 	std::vector<glm::vec3> vec;
@@ -118,49 +119,94 @@ std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox) {
 	return vec;
 }
 
-IndexedModel areIntersecting(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2) {
+void merge(std::vector<std::vector<glm::vec3>> *a, std::vector<std::vector<glm::vec3>> *b) {
+	for (int i = 0; i < b->size(); i++) 
+		a->push_back((*b)[i]);
+}
+
+std::vector<std::vector<glm::vec3>> rec_is_intersect(Node *current, std::vector<float> *boundingbox, std::vector<glm::vec3> *intersectwith, int depth) {
+	std::vector<std::vector<glm::vec3>> output;
+	//printf("depth %d\n", depth);
+
+	int axis = depth % 3;
+	std::vector<glm::vec3> boxvec = bound_vec_to_boundbox(*boundingbox);
+	std::vector<float> boundingboxcopy = *boundingbox;
+	bool done_flag = 0;
+
+	Node *next = current->right;
+	if (!next) {
+		//printf("2");
+		output.push_back(boxvec);
+		if (!(current->left))
+			return output;
+	}
+	else {
+		boundingboxcopy[axis * 2] = current->data[axis];
+		int res = isThereSeparatingPanel(bound_vec_to_boundbox(boundingboxcopy), *intersectwith);
+		//printf("resa %d\n", res);
+		if (res == 0) {
+			if (boundingboxcopy[axis * 2] == boundingboxcopy[axis * 2 + 1]) {
+				done_flag = 1;
+				//printf("0");
+				//output.push_back(boxvec);//will be done by max places that will get to null continuation afterwards
+			}
+			else {
+				//printf("4");
+				std::vector<std::vector<glm::vec3>> outa = rec_is_intersect(next, &boundingboxcopy, intersectwith, depth + 1);
+				//printf("1");
+				merge(&output, &outa);
+			}
+		}
+	}
+
+
+	next = current->left;
+	if (!next) {
+		//printf("3");
+		output.push_back(boxvec);
+	}
+	else {
+		boundingboxcopy[axis * 2]	  = (*boundingbox)[axis * 2];//retrive the last value
+		boundingboxcopy[axis * 2 + 1] = current->data[axis];
+		int res = isThereSeparatingPanel(bound_vec_to_boundbox(boundingboxcopy), *intersectwith);
+		//printf("resb %d\n", res);
+		if (res == 0) {
+			if (boundingboxcopy[axis * 2] == boundingboxcopy[axis * 2 + 1]) {
+				//if (done_flag) return output;
+				//printf("0");
+				//output.push_back(boxvec);//will be done by max places that will get to null continuation afterwards
+			}
+			else { 
+				//printf("5");
+				std::vector<std::vector<glm::vec3>> outb = rec_is_intersect(next, &boundingboxcopy, intersectwith, depth + 1);
+				//printf("1");
+				merge(&output, &outb);
+			}
+		}
+	}
+
+	return output;
+}
+
+std::vector<std::vector<glm::vec3>> areIntersecting(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2) {
 	std::vector<float> boundbox1 = findthightbox(shape1);
 	std::vector<float> boundbox2 = findthightbox(shape2);
-
-	Kdtree kd;	kd.makeTree(shape1);
-	Kdtree kd2;	kd2.makeTree(shape2);
 
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox1);
 	std::vector<glm::vec3> boundboxvec2 = bound_vec_to_boundbox(boundbox2);
 
-	recursive_box_yeah(kd.getRoot(), kd2.getRoot(), boundboxvec1, boundboxvec2);
+	int res = isThereSeparatingPanel(boundboxvec1, boundboxvec2);
+	//printf("res %d\n", res);
+	if (res > 0)
+		return std::vector<std::vector<glm::vec3>>();
+
+	Kdtree kd;	kd.makeTree(shape1);
+	Kdtree kd2;	kd2.makeTree(shape2);
+
+	std::vector<std::vector<glm::vec3>> intersect_boxes1 = rec_is_intersect(kd.getRoot(), &boundbox1, &boundboxvec2, 0);
+	std::vector<std::vector<glm::vec3>> intersect_boxes2 = rec_is_intersect(kd2.getRoot(), &boundbox2, &boundboxvec1, 0);
+
+	//minimize_both();
+	merge(&intersect_boxes1, &intersect_boxes2);
+	return intersect_boxes1;
 }
-	/*std::queue< Node* > box1, box2;
-	box1.push(kd.getRoot());
-	box2.push(kd2.getRoot());
-
-	while (!last_nodes_in_some_box)
-	{
-		temp = current.front();
-		current.pop();
-
-		if (temp == nullptr)
-			std::cout << "NULL\n";
-		else
-		{
-			Kdtree::print_data(temp->data);
-			next.push(temp->left);
-			next.push(temp->right);
-		}
-		if (current.empty())
-		{
-			depth++;
-			std::cout << "level: " << depth << "\n";
-			std::swap(current, next);
-		}
-	}
-/*
-	//todo find gold iterative
-	isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2)
-		if (meak > search right)
-			s;
-		else if (meak < search left) {
-
-		}
-	return smallest meak;
-}*/

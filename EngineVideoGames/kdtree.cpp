@@ -107,7 +107,7 @@ void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
 	std::list<Kdtree::vecType> point_list;
 	glm::vec3 v;
 	vecType v4;
-	for (auto i = 0; i < pvec.size(); i++)
+	for (unsigned int i = 0; i < pvec.size(); i++)
 	{
 		v = pvec[i];
 		v4 = glm::vec4(v.x, v.y, v.z, 1);

@@ -9,14 +9,17 @@
 */  
 
 #include "kdtree.h"
+#include "intersect.h"
 #include <iostream>
 #include <array>
 #include <bezier1D.cpp>
 #include <bezier2D.cpp>
 #include <mesh.h>
+#include <list>
 
 
 const int _numpts = 10;
+const int _numbox = 26;
 const int _dim = 3;
 
 
@@ -37,6 +40,50 @@ Node::vecType testpoints[_numpts] =
 		Node::vecType(6.50697, 2.70078, 1.93852,1) 
 	};
 
+Node::vecType box[_numbox] =
+	{
+		Node::vecType(1, 1, 1, 1),
+		Node::vecType(1, 1, -1, 1),
+		Node::vecType(1, -1, 1, 1),
+		Node::vecType(1, -1, -1, 1),
+		Node::vecType(1, 0, 1, 1),
+		Node::vecType(1, 1, 0, 1),
+		Node::vecType(1, 0, -1, 1),
+		Node::vecType(1, -1, 0, 1),
+		Node::vecType(1, 0, 0, 1),
+
+		Node::vecType(-1, 1, 1, 1),
+		Node::vecType(-1, 1, -1, 1),
+		Node::vecType(-1, -1, 1, 1),
+		Node::vecType(-1, -1, -1, 1),
+		Node::vecType(-1, 0, 1, 1),
+		Node::vecType(-1, 1, 0, 1),
+		Node::vecType(-1, 0, -1, 1),
+		Node::vecType(-1, -1, 0, 1),
+		Node::vecType(-1, 0, 0, 1),
+
+		Node::vecType(0, 1, 0, 1),
+		Node::vecType(0, 0, 1, 1),
+		Node::vecType(0, -1, 0, 1),
+		Node::vecType(0, 0, -1, 1),
+		Node::vecType(0, 1, 1, 1),
+		Node::vecType(0, 1, -1, 1),
+		Node::vecType(0, -1, 1, 1),
+		Node::vecType(0, -1, -1, 1)
+	};
+
+Node::vecType box2[_numbox] =
+{
+	Node::vecType(3, 3, 3, 1),
+	Node::vecType(3, 2, 3, 1),
+	Node::vecType(2, 3, 3, 1),
+	Node::vecType(3, 3, 2, 1),
+	Node::vecType(3, 2, 2, 1),
+	Node::vecType(2, 3, 2, 1),
+	Node::vecType(2, 2, 3, 1),
+	Node::vecType(2, 2, 2, 1)
+};
+
 
 void printVector(Node::vecType pt)
 {
@@ -46,13 +93,33 @@ void printVector(Node::vecType pt)
 }
 
 int main(int argc, char ** argv)
-{ 
-   
+{
+	std::vector<glm::vec3> point_list;
+	for (int i = 0; i < _numbox; i++)
+	{
+		point_list.push_back(Bezier1D::v4to3(box[i]));
+	}
+	std::vector<glm::vec3> point_list2;
+	for (int i = 0; i < _numbox; i++)
+	{
+		point_list2.push_back(vec3(box[i][0]+1.1, box[i][1], box[i][2]));
+	}
+	std::vector<std::vector<glm::vec3>> sol = areIntersecting(point_list, point_list2);
+
+	int i = 0;
+	for (std::vector<glm::vec3> stdvec : sol) {
+		printf("\n\n box %d", ++i);
+		for (unsigned int i = 0; i<stdvec.size(); i++) {
+			if (i % 2 == 0) printf("\n");
+			printf("%f %f %f\t\t", stdvec[i][0], stdvec[i][1], stdvec[i][2]);
+		}
+	}
+	printf("\n done");
+	int a;	std::cin >> a;
 	
 	//make a list of vectors out of the testpoints array
-	std::list<Node::vecType> point_list;
-	//for(auto i = 0; i < _numpts; i++ )
-	for (auto i = 0; i < testpoints2.size(); i++)
+	/*std::list<Node::vecType> point_list;
+	for(auto i = 0; i < _numpts; i++ )//testpoints2.size()
 	{	
 		point_list.push_back(Bezier1D::v3to4(testpoints2[i]));
 	}
@@ -62,5 +129,5 @@ int main(int argc, char ** argv)
 	kd.printTree(kd.getRoot());
  	
 	std::cout<<"\n\n";
-	int a;	std::cin>>a;
+	int a;	std::cin>>a;*/
 }

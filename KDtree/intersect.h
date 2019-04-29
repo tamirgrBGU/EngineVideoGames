@@ -4,7 +4,7 @@
 
 //will prepare minimal bounding box of intersection, if one exist. 
 //iterative function
-IndexedModel areIntersecting(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2);
+std::vector<std::vector<glm::vec3>> areIntersecting(std::vector<glm::vec3> shape1, std::vector<glm::vec3> shape2);
 
 //will be use to find the first bounding box
 std::vector<float> findthightbox(std::vector<glm::vec3> positions);

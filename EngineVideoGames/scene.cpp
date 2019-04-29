@@ -503,7 +503,7 @@ using namespace glm;
 	 
 	void Scene::ScaleAllDirections(int factor)
 	{
-		shapeTransformation(float(xScale),factor);
-		shapeTransformation(float(yScale),factor);
-		shapeTransformation(float(zScale),factor);
+		shapeTransformation(xScale, float(factor));
+		shapeTransformation(yScale,factor);
+		shapeTransformation(zScale,factor);
 	}

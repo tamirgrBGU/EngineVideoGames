@@ -73,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\EngineVideoGames\kdtree.h" />
-    <ClInclude Include="Itersect.h" />
+    <ClInclude Include="intersect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
