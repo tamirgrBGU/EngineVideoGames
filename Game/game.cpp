@@ -86,6 +86,9 @@ void Game::Init()
 	//addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
 	addShape(Octahedron, -1, TRIANGLES);
 	addShape(Octahedron, -1, TRIANGLES);
+	shapes_models[1] = OctahedronGenerator();
+	shapes_models[2] = OctahedronGenerator();
+
 	myTranslate(glm::vec3(0, 0, -40), 0);
 	pickedShape = 0;
 
@@ -98,7 +101,6 @@ void Game::Init()
 	shapeTransformation(xGlobalTranslate,-20);
 	//shapeTransformation(yGlobalTranslate, tmp.y);
 	//shapeTransformation(zGlobalTranslate, tmp.z);
-
 
 	ReadPixel();
 	pickedShape = -1;
@@ -115,6 +117,9 @@ void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s)
 	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
 	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
 	
+
+
+
 	/*if (pickedShape > 1) {
 		int controlpoint = getControlPointByShapeId(pickedShape);
 		savePastPositions(controlpoint);
@@ -127,8 +132,7 @@ void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s)
 void Game::WhenRotate(){}
 
 void Game::WhenTranslate()
-{
-	
+{	
 	/*if(pickedShape>1)
 	{
 		glm::vec4 pos = GetShapeTransformation()*glm::vec4(0, 0, 0, 1);
@@ -179,11 +183,17 @@ void Game::Motion()
 {
 	//if(isActive)
 	//{
+	std::cout << " here:" << std::endl;
 		int p = pickedShape;
 		pickedShape = 1;
 		shapeTransformation(xGlobalTranslate,movement_);
+		glm::mat4 pos1 = GetShapeTransformation();
+		//sendToRoy(shapes_models[pickedShape], pos1);
+		pickedShape = 2;
+		glm::mat4 pos2 = GetShapeTransformation();
+		//sendToRoy(shapes_models[pickedShape], pos2);
 		pickedShape = p;
-	//}
+
 }
 
 Game::~Game(void)

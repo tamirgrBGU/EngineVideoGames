@@ -73,6 +73,7 @@ public:
 	glm::vec3 GetTipPositionInSystem(int indx);
 	glm::vec3 GetVectorInSystem(int indx,glm::vec3 vec);
 	void Scene::OpositeDirectionRot(glm::vec3 vec,float angle);
+	std::vector<Shape*> shapes;
 private:	
 
 	std::vector<Camera*> cameras; //light will have the properties of camera
@@ -86,7 +87,7 @@ private:
 	int cameraIndx;
 
 protected:
-	std::vector<Shape*> shapes;
+	
 	std::vector<Shader*> shaders;
 	std::vector<int> chainParents;
 	int pickedShape;

@@ -5,6 +5,7 @@
 class Game : public Scene
 {
 	Bezier1D *curve;
+	IndexedModel shapes_models[3];
 	std::vector<int> controlPointsShapesIds;
 	vec3 pastLoc[7];
 	bool proj2D = false;

@@ -104,7 +104,7 @@ int main(int argc, char ** argv)
 	{
 		point_list2.push_back(vec3(box[i][0]+1.1, box[i][1], box[i][2]));
 	}
-	std::vector<std::vector<glm::vec3>> sol = areIntersecting(point_list, point_list2);
+	std::vector<std::vector<glm::vec3>> sol;// = areIntersecting(point_list, point_list2);
 
 	int i = 0;
 	for (std::vector<glm::vec3> stdvec : sol) {
