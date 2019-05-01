@@ -21,6 +21,14 @@ Shape::Shape(const std::string& fileName, unsigned int mode){
 	toRender = true;
 }
 
+Shape::Shape(const IndexedModel &model, unsigned int mode){
+	mesh = new MeshConstructor(model);
+	//mesh->Bind();
+	this->mode = mode;
+	isCopy = false;
+	toRender = true;
+}
+
 Shape::Shape(const int SimpleShapeType,unsigned int mode)
 {
 	mesh = new MeshConstructor(SimpleShapeType);

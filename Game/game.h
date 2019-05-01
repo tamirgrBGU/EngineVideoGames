@@ -5,7 +5,6 @@
 class Game : public Scene
 {
 	Bezier1D *curve;
-	IndexedModel shapes_models[3];
 	std::vector<int> controlPointsShapesIds;
 	vec3 pastLoc[7];
 	bool proj2D = false;
@@ -17,6 +16,7 @@ public:
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	void Init();
 	void addShape(int type,int parent,unsigned int mode);
+	void addShape(IndexedModel model, int parent, unsigned int mode);
 	void updateBezier(int BezierShapeId, bool is2D, unsigned int mode);
 //	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
 	void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s);

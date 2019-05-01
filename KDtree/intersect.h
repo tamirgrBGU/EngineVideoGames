@@ -7,7 +7,7 @@ class intersect
 {
 
 public:
-	//default constructor
+	//constructor
 	intersect(std::vector<glm::vec3> shape);
 
 	/*
@@ -17,7 +17,10 @@ public:
 	*/
 	std::vector<IndexedModel> isIntersect(glm::mat4 transMe, glm::mat4 transOther, intersect other);
 
-	std::vector<glm::vec3> intersect::getBoundingBox();
+	/*
+	* the model bounding box
+	*/
+	IndexedModel intersect::getBoundingBox();
 	
 	static vec4 v3to4(vec3 v) {
 		return vec4(v.x, v.y, v.z, 1);
@@ -34,6 +37,10 @@ protected:
 private:
 	std::vector<IndexedModel> makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> intersect_boxes);
 
+	bool intersect::isEqual(std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
+	//will not add duplicates
+	void intersect::insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vector<glm::vec3> boxvec);
+
 	//will be use to find the first bounding box
 	std::vector<float> findthightbox(std::vector<glm::vec3> positions);
 
@@ -45,4 +52,6 @@ private:
 	std::vector<std::vector<glm::vec3>> rec_is_intersect(Node *current, std::vector<float> *boundingbox, std::vector<glm::vec3> *intersectwith, int depth);
 
 	std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox);
+
+	IndexedModel intersect::boxVertexesToIndexModel(std::vector<glm::vec3> intesect_box);
 };

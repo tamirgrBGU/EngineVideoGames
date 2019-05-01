@@ -11,8 +11,8 @@ intersect::intersect(std::vector<glm::vec3> shape) {
 }
 
 //default constructor
-std::vector<glm::vec3> intersect::getBoundingBox() {
-	return boundboxvec;
+IndexedModel intersect::getBoundingBox() {
+	return boxVertexesToIndexModel(boundboxvec);
 }
 
 glm::mat4 currentTransMe, currentTransOther;
@@ -24,15 +24,17 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 transMe, glm::mat4 tr
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox);
 	std::vector<glm::vec3> boundboxvec2 = bound_vec_to_boundbox(other.boundbox);
 
-	currentTransMe    = transMe;
+	currentTransMe = transMe;
 	currentTransOther = transOther;
 
 	int res = isThereSeparatingPanel(boundboxvec1, boundboxvec2);
 	//printf("res %d\n", res);
 	if (res > 0)
 		return std::vector<IndexedModel>();
-	
+
 	std::vector<std::vector<glm::vec3>> intersect_boxes1 = rec_is_intersect(kd.getRoot(), &boundbox, &boundboxvec2, 0);
+	currentTransMe    = transOther;
+	currentTransOther = transMe;
 	std::vector<std::vector<glm::vec3>> intersect_boxes2 = rec_is_intersect(other.kd.getRoot(), &other.boundbox, &boundboxvec1, 0);
 
 	//delete_duplicate()
@@ -67,10 +69,10 @@ std::vector<float> intersect::findthightbox(std::vector<glm::vec3> positions) {
 
 int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2) {
 	glm::vec3 frontleftdown = v4to3(currentTransMe * v3to4(box1[0]));
-	glm::vec3 backleftdown = v4to3(currentTransMe * v3to4(box1[1]));
+	glm::vec3 backleftdown  = v4to3(currentTransMe * v3to4(box1[1]));
 	glm::vec3 backrightdown = v4to3(currentTransMe * v3to4(box1[2]));
-	glm::vec3 backleftup = v4to3(currentTransMe * v3to4(box1[5]));
-	glm::vec3 frontupright = v4to3(currentTransMe * v3to4(box1[7]));
+	glm::vec3 backleftup    = v4to3(currentTransMe * v3to4(box1[5]));
+	glm::vec3 frontupright  = v4to3(currentTransMe * v3to4(box1[7]));
 	glm::vec3 PA = (backleftdown + frontupright) / 2.0f;//coordinate position of the center of A
 	glm::vec3 Ax = backrightdown - backleftdown;//unit vector representing the x - axis of A
 	glm::vec3 Ay = backleftup    - backleftdown;// unit vector representing the y - axis of A
@@ -85,11 +87,11 @@ int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<g
 	Az = Az / DA;
 	DA /= 2.0f;
 
-	frontleftdown = v4to3(currentTransMe * v3to4(box2[0]));
-	backleftdown = v4to3(currentTransMe * v3to4(box2[1]));
-	backrightdown = v4to3(currentTransMe * v3to4(box2[2]));
-	backleftup = v4to3(currentTransMe * v3to4(box2[5]));
-	frontupright = v4to3(currentTransMe * v3to4(box2[7]));
+	frontleftdown= v4to3(currentTransOther * v3to4(box2[0]));
+	backleftdown = v4to3(currentTransOther * v3to4(box2[1]));
+	backrightdown= v4to3(currentTransOther * v3to4(box2[2]));
+	backleftup   = v4to3(currentTransOther * v3to4(box2[5]));
+	frontupright = v4to3(currentTransOther * v3to4(box2[7]));
 	glm::vec3 PB = (backleftdown + frontupright) / 2.0f;//coordinate position of the center of B
 	glm::vec3 Bx = backrightdown - backleftdown;//unit vector representing the x - axis of B
 	glm::vec3 By = backleftup - backleftdown;//unit vector representing the y - axis of B
@@ -170,8 +172,26 @@ std::vector<glm::vec3> intersect::bound_vec_to_boundbox(std::vector<float> bound
 }
 
 void intersect::merge(std::vector<std::vector<glm::vec3>> *a, std::vector<std::vector<glm::vec3>> *b) {
-	for (int i = 0; i < b->size(); i++) 
+	for (unsigned int i = 0; i < b->size(); i++) 
 		a->push_back((*b)[i]);
+}
+
+bool intersect::isEqual(std::vector<glm::vec3> &boxvec1, std::vector<glm::vec3> &boxvec2) {
+	if (boxvec1.size() > boxvec2.size())
+		return false;
+	bool out = 1;
+	for (unsigned int i = 0; i < boxvec1.size(); i++)
+		out &= boxvec1[i] == boxvec2[i];
+	return out;
+}
+
+void intersect::insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vector<glm::vec3> boxvec) {
+	for (std::vector<glm::vec3> box : boxes)
+		if(intersect::isEqual(box, boxvec)) return;
+
+	for (int i = 0; i < boxvec.size(); i++)
+		boxvec[i] = v4to3(currentTransMe * v3to4(boxvec[i]));
+	boxes.push_back(boxvec);
 }
 
 std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, std::vector<float> *boundingbox, std::vector<glm::vec3> *intersectwith, int depth) {
@@ -186,7 +206,7 @@ std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, s
 	Node *next = current->right;
 	if (!next) {
 		//printf("2");
-		output.push_back(boxvec);
+		insert_box(output, boxvec);
 		if (!(current->left))
 			return output;
 	}
@@ -213,7 +233,7 @@ std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, s
 	next = current->left;
 	if (!next) {
 		//printf("3");
-		output.push_back(boxvec);
+		insert_box(output, boxvec);
 	}
 	else {
 		boundingboxcopy[axis * 2]	  = (*boundingbox)[axis * 2];//retrive the last value
@@ -238,60 +258,79 @@ std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, s
 	return output;
 }
 
+IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> intesect_box){
+	Vertex vertices[] =
+	{
+		Vertex(intesect_box[1], glm::vec2(1, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(intesect_box[5], glm::vec2(0, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(intesect_box[6], glm::vec2(0, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(intesect_box[2], glm::vec2(1, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+
+		Vertex(intesect_box[0], glm::vec2(1, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+		Vertex(intesect_box[4], glm::vec2(0, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+		Vertex(intesect_box[7], glm::vec2(0, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+		Vertex(intesect_box[3], glm::vec2(1, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
+
+		Vertex(intesect_box[1], glm::vec2(0, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+		Vertex(intesect_box[0], glm::vec2(1, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+		Vertex(intesect_box[3], glm::vec2(1, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+		Vertex(intesect_box[2], glm::vec2(0, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
+
+		Vertex(intesect_box[5], glm::vec2(0, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+		Vertex(intesect_box[4], glm::vec2(1, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+		Vertex(intesect_box[7], glm::vec2(1, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+		Vertex(intesect_box[6], glm::vec2(0, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
+
+		Vertex(intesect_box[1], glm::vec2(1, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+		Vertex(intesect_box[0], glm::vec2(1, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+		Vertex(intesect_box[4], glm::vec2(0, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+		Vertex(intesect_box[5], glm::vec2(0, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
+
+		Vertex(intesect_box[2], glm::vec2(1, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
+		Vertex(intesect_box[3], glm::vec2(1, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
+		Vertex(intesect_box[7], glm::vec2(0, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
+		Vertex(intesect_box[6], glm::vec2(0, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1))
+	};
+
+	unsigned int indices[] = { 
+		0, 1, 2,
+		0, 2, 3,
+
+		6, 5, 4,
+		7, 6, 4,
+
+		10, 9, 8,
+		11, 10, 8,
+
+		12, 13, 14,
+		12, 14, 15,
+
+		16, 17, 18,
+		16, 18, 19,
+
+		22, 21, 20,
+		23, 22, 20
+	};
+
+	IndexedModel model;
+
+	for (unsigned int i = 0; i < 24; i++)
+	{
+		model.positions.push_back(*vertices[i].GetPos());
+		model.colors.push_back(*vertices[i].GetColor());
+		model.normals.push_back(*vertices[i].GetNormal());
+		model.texCoords.push_back(*vertices[i].GetTexCoord());
+	}
+	for (unsigned int i = 0; i < 36; i++)
+		model.indices.push_back(indices[i]);
+
+	return model;
+}
+
 std::vector<IndexedModel> intersect::makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> intersect_boxes) {
 	std::vector<IndexedModel> models;
-	for (int i = 0; i < intersect_boxes.size(); i++) {
-		IndexedModel model;
-
-		for (unsigned int j = 0; j<intersect_boxes[i].size(); j++) {
-			model.positions.push_back(intersect_boxes[i][j]);
-			model.colors.push_back(vec3(0.5,0.5,0.5));			
-		}
-
-		model.indices.push_back(0);
-		model.indices.push_back(1);
-		model.indices.push_back(2);
-		model.indices.push_back(2);
-		model.indices.push_back(3);
-		model.indices.push_back(0);
-
-		model.indices.push_back(4);
-		model.indices.push_back(5);
-		model.indices.push_back(6);
-		model.indices.push_back(6);
-		model.indices.push_back(7);
-		model.indices.push_back(4);
-
-
-		model.indices.push_back(0);
-		model.indices.push_back(1);
-		model.indices.push_back(4);
-		model.indices.push_back(4);
-		model.indices.push_back(5);
-		model.indices.push_back(1);
-
-		model.indices.push_back(1);
-		model.indices.push_back(2);
-		model.indices.push_back(5);
-		model.indices.push_back(5);
-		model.indices.push_back(6);
-		model.indices.push_back(2);
-
-		model.indices.push_back(3);
-		model.indices.push_back(4);
-		model.indices.push_back(6);
-		model.indices.push_back(6);
-		model.indices.push_back(7);
-		model.indices.push_back(4);
-
-		model.indices.push_back(0);
-		model.indices.push_back(3);
-		model.indices.push_back(4);
-		model.indices.push_back(4);
-		model.indices.push_back(7);
-		model.indices.push_back(3);
-
-		models.push_back(model);
+	for (std::vector<glm::vec3> intesect_box : intersect_boxes) {
+		models.push_back(boxVertexesToIndexModel(intesect_box));
 	}
 	return models;
 }

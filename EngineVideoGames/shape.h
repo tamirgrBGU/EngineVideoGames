@@ -18,6 +18,8 @@ private:
 
 public:
 
+	Shape(const IndexedModel& model, unsigned int mode);
+
 	Shape(const Shape& shape,unsigned int mode);
 
 	Shape(const std::string& fileName,unsigned int mode);

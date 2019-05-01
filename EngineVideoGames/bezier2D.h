@@ -137,7 +137,7 @@ private:
 		return Axis.x * rotateBy.x + Axis.y * rotateBy.y + Axis.z * rotateBy.z;
 	}
 
-	float nan = std::sqrt(-1);
+	float nan = float(std::sqrt(-1));
 	float angle_mine_rad(vec3 v1, vec3 v2) {
 		if (std::isnan(v1.x) || std::isnan(v2.x))
 			return nan;
@@ -176,6 +176,20 @@ private:
 		}
 	}
 
+	void rotateByRelativeVec(vec3 normal1, vec3 normal2, mat4 *toRotate) {
+		float angleToRotate = angle_mine_deg(normal1, normal2);
+		if (angleToRotate != 0) {
+			mat4 rotator = glm::rotate(angleToRotate, glm::cross(normal1, normal2));
+			mat4 relatives;
+			for(int i = 0; i < 4; i++)
+				relatives[i] = (*toRotate)[i] - Bezier1D::v3to4(normal1);
+			rotateMat(&relatives, &rotator);
+			for (int i = 0; i < 4; i++)
+				(*toRotate)[i] = Bezier1D::v3to4(normal2) + relatives[i];
+		}
+
+	}
+
 	mat4 angleRotator;
 	vec3 xAxis = vec3(1, 0, 0);
 	vec3 yAxis = vec3(0, 1, 0);
@@ -186,6 +200,7 @@ private:
 		//rotataByAxis(yAxis, axis, &parts[0]);
 		//rotataByVecs(yAxis, xAxis, vec3(axis.x, 0, axis.z), &parts[0]);
 		rotataByAxis(zAxis, axis, &parts[0]);
+		//rotateByRelativeVec(zAxis, axis, &parts[0]);
 		//rotataByVecAngle(glm::cross(axis,zAxis), float(90), &parts[0]);
 		
 		float angle = float(360.0 / circularSubdivision);

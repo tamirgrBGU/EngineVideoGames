@@ -7,8 +7,10 @@
 #include "kdtree.h"
 
 
+static std::vector<glm::vec3> lastInitMeshPositions;
 class MeshConstructor
 {
+
 	VertexArray vao;
 	IndexBuffer *ib;
 	//TO DO: add bounding box data base and build it in the constructor 
@@ -17,12 +19,14 @@ class MeshConstructor
 	int unsigned indicesNum;
 	
 	void InitLine(IndexedModel &model);
-	void InitMesh(IndexedModel &model);
+	void InitMesh(const IndexedModel &model);
 	void CopyMesh(const MeshConstructor &mesh);
 	void CopyLine(const MeshConstructor &mesh);
 	
-	
+
 public:
+	static std::vector<glm::vec3> getlastInitMeshPositions();
+
 	//TO DO: add collision detection function which get other MeshConstructor and Mat4 of related transformasions. The function may return a pointer to the relevant Bounding Box when collide
 	enum SimpleShapes
 	{
@@ -35,6 +39,7 @@ public:
 	};
 	MeshConstructor(const int type);
 	MeshConstructor(Bezier1D *curve,bool isSurface,unsigned int resT,unsigned int resS);
+	MeshConstructor(const IndexedModel &model);
 	MeshConstructor(const MeshConstructor &mesh);
 	MeshConstructor(const std::string& fileName);
 

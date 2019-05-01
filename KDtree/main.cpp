@@ -92,6 +92,7 @@ void printVector(Node::vecType pt)
 	
 }
 
+glm::mat4 I;
 int main(int argc, char ** argv)
 {
 	std::vector<glm::vec3> point_list;
@@ -104,30 +105,19 @@ int main(int argc, char ** argv)
 	{
 		point_list2.push_back(vec3(box[i][0]+1.1, box[i][1], box[i][2]));
 	}
-	std::vector<std::vector<glm::vec3>> sol;// = areIntersecting(point_list, point_list2);
+	intersect a(point_list);
+	intersect b(point_list2);
+	std::vector<IndexedModel> sol = a.isIntersect(I, I, b);
 
 	int i = 0;
-	for (std::vector<glm::vec3> stdvec : sol) {
+	for (IndexedModel model : sol) {
 		printf("\n\n box %d", ++i);
-		for (unsigned int i = 0; i<stdvec.size(); i++) {
+		for (unsigned int i = 0; i<model.positions.size(); i++) {
 			if (i % 2 == 0) printf("\n");
-			printf("%f %f %f\t\t", stdvec[i][0], stdvec[i][1], stdvec[i][2]);
+			printf("%f %f %f\t\t", model.positions[i][0], model.positions[i][1], model.positions[i][2]);
 		}
 	}
+
 	printf("\n done");
-	int a;	std::cin >> a;
-	
-	//make a list of vectors out of the testpoints array
-	/*std::list<Node::vecType> point_list;
-	for(auto i = 0; i < _numpts; i++ )//testpoints2.size()
-	{	
-		point_list.push_back(Bezier1D::v3to4(testpoints2[i]));
-	}
-	
-	Kdtree kd;
-	kd.makeTree(point_list);
-	kd.printTree(kd.getRoot());
- 	
-	std::cout<<"\n\n";
-	int a;	std::cin>>a;*/
+	int input;	std::cin >> input;
 }

@@ -48,6 +48,10 @@ MeshConstructor::MeshConstructor(Bezier1D *curve, bool isSurface, unsigned int r
 	}
 }
 
+MeshConstructor::MeshConstructor(const IndexedModel &model){
+	InitMesh(model);
+}
+
 MeshConstructor::MeshConstructor(const MeshConstructor &mesh)
 {
 	indicesNum = mesh.indicesNum;
@@ -88,7 +92,13 @@ void MeshConstructor::InitLine(IndexedModel &model){
 	
 }
 
-void MeshConstructor::InitMesh( IndexedModel &model){
+std::vector<glm::vec3> MeshConstructor::getlastInitMeshPositions() {
+	//printf("%d meakss!\n", lastInitMeshPositions.size());
+	return lastInitMeshPositions;
+}
+
+void MeshConstructor::InitMesh(const IndexedModel &model){
+	lastInitMeshPositions = model.positions;
 
 	int verticesNum = model.positions.size();
 	indicesNum = model.indices.size();

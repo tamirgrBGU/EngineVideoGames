@@ -45,13 +45,13 @@
 					if(scn->IsActive())
 						scn->Deactivate();
 					else
-						scn->Deactivate();
+						scn->Activate();
 				break;
 				case GLFW_KEY_A:
-					scn->change_movement(-0.001);
+					scn->change_movement(-0.001f);
 					break;
 				case GLFW_KEY_D:
-					scn->change_movement(0.001);
+					scn->change_movement(0.001f);
 					break;
 				case GLFW_KEY_RIGHT:
 					//scn->shapeTransformation(scn->zGlobalRotate,-20.1f);

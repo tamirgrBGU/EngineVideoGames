@@ -1,4 +1,6 @@
 #include "game.h"
+#include "../KDtree/intersect.cpp"
+#include "../EngineVideoGames/MeshConstructor.h"
 
 #include <iostream>
 
@@ -25,19 +27,25 @@ Bezier1D *Game::getBezier1D() {
 	return curve;
 };
 
+void Game::addShape(IndexedModel model, int parent, unsigned int mode)
+{
+	chainParents.push_back(parent);
+	shapes.push_back(new Shape(model, mode));	
+}
+
 void Game::addShape(int type,int parent,unsigned int mode)
 {
-		chainParents.push_back(parent);
-		if(type!=BezierLine && type!=BezierSurface)
-			shapes.push_back(new Shape(type,mode));
+	chainParents.push_back(parent);
+	if(type!=BezierLine && type!=BezierSurface)
+		shapes.push_back(new Shape(type,mode));
+	else
+	{
+		projMode = mode;
+		if(type == BezierLine)
+			shapes.push_back(new Shape(curve, xResolution, yResolution, false, mode));
 		else
-		{
-			projMode = mode;
-			if(type == BezierLine)
-				shapes.push_back(new Shape(curve, xResolution, yResolution, false, mode));
-			else
-				shapes.push_back(new Shape(curve, xResolution, yResolution, true, mode));
-		}
+			shapes.push_back(new Shape(curve, xResolution, yResolution, true, mode));
+	}
 }
 
 void Game::updateBezier(int BezierShapeId, bool is2D, unsigned int mode)
@@ -45,6 +53,8 @@ void Game::updateBezier(int BezierShapeId, bool is2D, unsigned int mode)
 	shapes[BezierShapeId] = new Shape(curve, xResolution, yResolution, is2D, mode);	
 }
 
+intersect *a;
+intersect *b;
 void Game::Init()
 {
 	//addShape(Axis,-1,LINES);
@@ -83,14 +93,24 @@ void Game::Init()
 	//shapeTransformation(zScale,10);
 
 	addShape(Axis, -1, LINES);
-	//addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
+	MeshConstructor meshelper(100);
+	/*addShape(Octahedron, -1, TRIANGLES);
+	a = new intersect(meshelper.getlastInitMeshPositions());
 	addShape(Octahedron, -1, TRIANGLES);
-	addShape(Octahedron, -1, TRIANGLES);
-	shapes_models[1] = OctahedronGenerator();
-	shapes_models[2] = OctahedronGenerator();
+	b = new intersect(meshelper.getlastInitMeshPositions());*/
+
+	addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
+	a = new intersect(meshelper.getlastInitMeshPositions());
+	addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
+	b = new intersect(meshelper.getlastInitMeshPositions());
+
+	addShape(a->getBoundingBox(), 1, LINES);
+	addShape(b->getBoundingBox(), 2, LINES);
 
 	myTranslate(glm::vec3(0, 0, -40), 0);
 	pickedShape = 0;
+
+	Activate();
 
 	shapeTransformation(yScale,10);
 	shapeTransformation(xScale,10);
@@ -98,8 +118,9 @@ void Game::Init()
 
 	pickedShape = 1;
 
-	shapeTransformation(xGlobalTranslate,-20);
-	//shapeTransformation(yGlobalTranslate, tmp.y);
+	//shapeTransformation(xGlobalTranslate, -10);
+	shapeTransformation(xGlobalTranslate, -80);
+	shapeTransformation(yGlobalTranslate, -40);
 	//shapeTransformation(zGlobalTranslate, tmp.z);
 
 	ReadPixel();
@@ -181,19 +202,23 @@ void Game::updateControlShapes(int controlPoint, Bezier1D *bez) {
 
 void Game::Motion()
 {
-	//if(isActive)
-	//{
-	std::cout << " here:" << std::endl;
+	if(isActive)
+	{
 		int p = pickedShape;
 		pickedShape = 1;
-		shapeTransformation(xGlobalTranslate,movement_);
+		shapeTransformation(xGlobalTranslate, movement_);
 		glm::mat4 pos1 = GetShapeTransformation();
-		//sendToRoy(shapes_models[pickedShape], pos1);
 		pickedShape = 2;
 		glm::mat4 pos2 = GetShapeTransformation();
-		//sendToRoy(shapes_models[pickedShape], pos2);
+		std::vector<IndexedModel> sol = a->intersect::isIntersect(pos1, pos2, *b);
+		if (sol.size() > 0) {
+			isActive = false;
+			printf("\nsol! %d\n", sol.size());
+			for(const IndexedModel model : sol)
+				addShape(model, -1, LINES);
+		}
 		pickedShape = p;
-
+	}
 }
 
 Game::~Game(void)
