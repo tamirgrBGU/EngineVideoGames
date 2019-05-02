@@ -15,7 +15,7 @@ public:
 	* will prepare minimal bounding box of intersection, if one exist. 
 	* iterative function
 	*/
-	std::vector<IndexedModel> isIntersect(glm::mat4 transMe, glm::mat4 transOther, intersect other);
+	std::vector<IndexedModel> isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect other);
 
 	/*
 	* the model bounding box
@@ -42,7 +42,7 @@ private:
 	void insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vector<glm::vec3> boxvec);
 
 	//will minimize the boxes that is not intesect with others
-	void checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2, glm::mat4 transMe, glm::mat4 transOther);
+	void checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2, glm::mat4 *transMe, glm::mat4 *transOther);
 	void finilizeBoxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2);
 
 	//will be use to find the first bounding box

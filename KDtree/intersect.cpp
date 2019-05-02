@@ -24,33 +24,29 @@ void intersect::finilizeBoxes(std::vector<std::vector<glm::vec3>> &intersect_box
 			flag &= intersect::isThereSeparatingPanel(intersect_boxes1[k], intersect_boxes2[i]) > 0;
 		}
 		if (flag) {
-			printf("fuck %d \n", k);
 			intersect_boxes1.erase(intersect_boxes1.begin() + k--);
 			flag = 1;
 		}
 	}
 } 
 
-glm::mat4 currentTransMe, currentTransOther;
+glm::mat4 *currentTransMe;
+glm::mat4 *currentTransOther;
 void intersect::checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, 
 							   std::vector<std::vector<glm::vec3>> &intersect_boxes2,
-							   glm::mat4 transMe, glm::mat4 transOther) {
+							   glm::mat4 *transMe, glm::mat4 *transOther) {
 
 	int flag = 1, size1 = -1, size2 = -1;
-	printf("sizes %d_%d \n", size1, size2);
 	while (size1 != intersect_boxes1.size() || size2 != intersect_boxes2.size()){
 		size1 = intersect_boxes1.size(); size2 = intersect_boxes2.size();
 		if (size1 == 0) {
-			printf("god2\n");
 			intersect_boxes2.clear();
 			return;
 		}
 		if (size2 == 0) {
-			printf("god1\n");
 			intersect_boxes1.clear();
 			return;
 		}
-		printf("sizes %d %d \n", size1, size2);
 		currentTransMe    = transMe;
 		currentTransOther = transOther;
 		finilizeBoxes(intersect_boxes1, intersect_boxes2);
@@ -65,7 +61,7 @@ void intersect::checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_bo
 /*
 *   Return the tree root node
 */
-std::vector<IndexedModel> intersect::isIntersect(glm::mat4 transMe, glm::mat4 transOther, intersect other) {
+std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect other) {
 
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox);
 	std::vector<glm::vec3> boundboxvec2 = bound_vec_to_boundbox(other.boundbox);
@@ -78,13 +74,8 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 transMe, glm::mat4 tr
 	if (res > 0)
 		return std::vector<IndexedModel>();
 
-	std::vector<std::vector<glm::vec3>> intersect_boxes1 = rec_is_intersect(kd.getRoot(), &boundbox, &boundboxvec2, 0);
-	currentTransMe    = transOther;
-	currentTransOther = transMe;
-	std::vector<std::vector<glm::vec3>> intersect_boxes2 = rec_is_intersect(other.kd.getRoot(), &other.boundbox, &boundboxvec1, 0);
-
-	checkminiboxes(intersect_boxes1, intersect_boxes2, transMe, transOther);
-	merge(&intersect_boxes1, &intersect_boxes2);
+	std::vector<std::vector<glm::vec3>> intersect_boxes1 = rec_is_intersect(kd.getRoot(), other.kd.getRoot(), &boundbox, &boundboxvec2, 0);
+	
 	return makeBoxesIndexModels(intersect_boxes1);
 }
 
@@ -113,11 +104,11 @@ std::vector<float> intersect::findthightbox(std::vector<glm::vec3> positions) {
 }
 
 int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2) {
-	glm::vec3 frontleftdown = v4to3(currentTransMe * v3to4(box1[0]));
-	glm::vec3 backleftdown  = v4to3(currentTransMe * v3to4(box1[1]));
-	glm::vec3 backrightdown = v4to3(currentTransMe * v3to4(box1[2]));
-	glm::vec3 backleftup    = v4to3(currentTransMe * v3to4(box1[5]));
-	glm::vec3 frontupright  = v4to3(currentTransMe * v3to4(box1[7]));
+	glm::vec3 frontleftdown = v4to3(*currentTransMe * v3to4(box1[0]));
+	glm::vec3 backleftdown  = v4to3(*currentTransMe * v3to4(box1[1]));
+	glm::vec3 backrightdown = v4to3(*currentTransMe * v3to4(box1[2]));
+	glm::vec3 backleftup    = v4to3(*currentTransMe * v3to4(box1[5]));
+	glm::vec3 frontupright  = v4to3(*currentTransMe * v3to4(box1[7]));
 	glm::vec3 PA = (backleftdown + frontupright) / 2.0f;//coordinate position of the center of A
 	glm::vec3 Ax = backrightdown - backleftdown;//unit vector representing the x - axis of A
 	glm::vec3 Ay = backleftup    - backleftdown;// unit vector representing the y - axis of A
@@ -132,11 +123,11 @@ int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<g
 	Az = Az / DA;
 	DA /= 2.0f;
 
-	frontleftdown= v4to3(currentTransOther * v3to4(box2[0]));
-	backleftdown = v4to3(currentTransOther * v3to4(box2[1]));
-	backrightdown= v4to3(currentTransOther * v3to4(box2[2]));
-	backleftup   = v4to3(currentTransOther * v3to4(box2[5]));
-	frontupright = v4to3(currentTransOther * v3to4(box2[7]));
+	frontleftdown= v4to3(*currentTransOther * v3to4(box2[0]));
+	backleftdown = v4to3(*currentTransOther * v3to4(box2[1]));
+	backrightdown= v4to3(*currentTransOther * v3to4(box2[2]));
+	backleftup   = v4to3(*currentTransOther * v3to4(box2[5]));
+	frontupright = v4to3(*currentTransOther * v3to4(box2[7]));
 	glm::vec3 PB = (backleftdown + frontupright) / 2.0f;//coordinate position of the center of B
 	glm::vec3 Bx = backrightdown - backleftdown;//unit vector representing the x - axis of B
 	glm::vec3 By = backleftup - backleftdown;//unit vector representing the y - axis of B
@@ -235,11 +226,11 @@ void intersect::insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vect
 		if(intersect::isEqual(box, boxvec)) return;
 
 	for (unsigned int i = 0; i < boxvec.size(); i++)
-		boxvec[i] = v4to3(currentTransMe * v3to4(boxvec[i]));
+		boxvec[i] = v4to3(*currentTransMe * v3to4(boxvec[i]));
 	boxes.push_back(boxvec);
 }
 
-std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, std::vector<float> *boundingbox, std::vector<glm::vec3> *intersectwith, int depth) {
+std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, Node *other, std::vector<float> *boundingbox, std::vector<glm::vec3> *intersectwith, int depth) {
 	std::vector<std::vector<glm::vec3>> output;
 	//printf("depth %d\n", depth);
 
