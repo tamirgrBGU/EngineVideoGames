@@ -94,15 +94,21 @@ void Game::Init()
 
 	addShape(Axis, -1, LINES);
 	MeshConstructor meshelper(100);
+
 	/*addShape(Octahedron, -1, TRIANGLES);
 	a = new intersect(meshelper.getlastInitMeshPositions());
 	addShape(Octahedron, -1, TRIANGLES);
-	b = new intersect(meshelper.getlastInitMeshPositions());*/
+	b = new intersect(meshelper.getlastInitMeshPositions());
+	*/
 
 	addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
+	printf("load obj");
 	a = new intersect(meshelper.getlastInitMeshPositions());
+	printf(", load tree");
 	addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
+	printf(", load obj2");
 	b = new intersect(meshelper.getlastInitMeshPositions());
+	printf(", load tree 2");
 
 	addShape(a->getBoundingBox(), 1, LINES);
 	addShape(b->getBoundingBox(), 2, LINES);

@@ -37,9 +37,13 @@ protected:
 private:
 	std::vector<IndexedModel> makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> intersect_boxes);
 
-	bool intersect::isEqual(std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
+	bool isEqual(std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
 	//will not add duplicates
-	void intersect::insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vector<glm::vec3> boxvec);
+	void insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vector<glm::vec3> boxvec);
+
+	//will minimize the boxes that is not intesect with others
+	void checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2, glm::mat4 transMe, glm::mat4 transOther);
+	void finilizeBoxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2);
 
 	//will be use to find the first bounding box
 	std::vector<float> findthightbox(std::vector<glm::vec3> positions);

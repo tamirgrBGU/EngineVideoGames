@@ -25,6 +25,7 @@ class Node
 {
  public:
 	 typedef glm::vec4 vecType;
+	 float max, min;
 	 Node* left ;// = std::unique_ptr<Node>( new Node(3) );
 	 Node* right; //( new Node(3));
 	vecType data; 
@@ -77,8 +78,9 @@ class Kdtree
 	void makeTree( std::list<vecType> &plist );
 	void makeTree(std::vector<glm::vec3> &pvec );
  private:
+	unsigned int max_depth;
 	//helper for makeTree 
-	void _makeTree( Node* head, std::list<vecType> &plist, int depth );
+	void _makeTree( Node* head, std::list<vecType> &plist, unsigned int depth );
 	
 	Node* root;
 };

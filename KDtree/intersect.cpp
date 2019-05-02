@@ -15,7 +15,53 @@ IndexedModel intersect::getBoundingBox() {
 	return boxVertexesToIndexModel(boundboxvec);
 }
 
+void intersect::finilizeBoxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1,
+							  std::vector<std::vector<glm::vec3>> &intersect_boxes2) {
+
+	bool flag = true;
+	for (unsigned int k = 0; k < intersect_boxes1.size(); k++) {
+		for (unsigned int i = 0; flag & (i < intersect_boxes2.size()); i++) {
+			flag &= intersect::isThereSeparatingPanel(intersect_boxes1[k], intersect_boxes2[i]) > 0;
+		}
+		if (flag) {
+			printf("fuck %d \n", k);
+			intersect_boxes1.erase(intersect_boxes1.begin() + k--);
+			flag = 1;
+		}
+	}
+} 
+
 glm::mat4 currentTransMe, currentTransOther;
+void intersect::checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, 
+							   std::vector<std::vector<glm::vec3>> &intersect_boxes2,
+							   glm::mat4 transMe, glm::mat4 transOther) {
+
+	int flag = 1, size1 = -1, size2 = -1;
+	printf("sizes %d_%d \n", size1, size2);
+	while (size1 != intersect_boxes1.size() || size2 != intersect_boxes2.size()){
+		size1 = intersect_boxes1.size(); size2 = intersect_boxes2.size();
+		if (size1 == 0) {
+			printf("god2\n");
+			intersect_boxes2.clear();
+			return;
+		}
+		if (size2 == 0) {
+			printf("god1\n");
+			intersect_boxes1.clear();
+			return;
+		}
+		printf("sizes %d %d \n", size1, size2);
+		currentTransMe    = transMe;
+		currentTransOther = transOther;
+		finilizeBoxes(intersect_boxes1, intersect_boxes2);
+		currentTransMe    = transOther;
+		currentTransOther = transMe;
+		finilizeBoxes(intersect_boxes2, intersect_boxes1);
+		printf("sizes after %d %d \n", size1, size2);
+	}
+	printf("done finilize\n");
+}
+
 /*
 *   Return the tree root node
 */
@@ -24,7 +70,7 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 transMe, glm::mat4 tr
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox);
 	std::vector<glm::vec3> boundboxvec2 = bound_vec_to_boundbox(other.boundbox);
 
-	currentTransMe = transMe;
+	currentTransMe    = transMe;
 	currentTransOther = transOther;
 
 	int res = isThereSeparatingPanel(boundboxvec1, boundboxvec2);
@@ -37,8 +83,7 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 transMe, glm::mat4 tr
 	currentTransOther = transMe;
 	std::vector<std::vector<glm::vec3>> intersect_boxes2 = rec_is_intersect(other.kd.getRoot(), &other.boundbox, &boundboxvec1, 0);
 
-	//delete_duplicate()
-	//minimize_both();
+	checkminiboxes(intersect_boxes1, intersect_boxes2, transMe, transOther);
 	merge(&intersect_boxes1, &intersect_boxes2);
 	return makeBoxesIndexModels(intersect_boxes1);
 }
@@ -189,7 +234,7 @@ void intersect::insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vect
 	for (std::vector<glm::vec3> box : boxes)
 		if(intersect::isEqual(box, boxvec)) return;
 
-	for (int i = 0; i < boxvec.size(); i++)
+	for (unsigned int i = 0; i < boxvec.size(); i++)
 		boxvec[i] = v4to3(currentTransMe * v3to4(boxvec[i]));
 	boxes.push_back(boxvec);
 }
@@ -212,6 +257,7 @@ std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, s
 	}
 	else {
 		boundingboxcopy[axis * 2] = current->data[axis];
+		boundingboxcopy[axis * 2 + 1] = current->max;
 		int res = isThereSeparatingPanel(bound_vec_to_boundbox(boundingboxcopy), *intersectwith);
 		//printf("resa %d\n", res);
 		if (res == 0) {
@@ -236,8 +282,10 @@ std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, s
 		insert_box(output, boxvec);
 	}
 	else {
-		boundingboxcopy[axis * 2]	  = (*boundingbox)[axis * 2];//retrive the last value
+		boundingboxcopy[axis * 2]     = (*boundingbox)[axis * 2];//retrive the last value
+		boundingboxcopy[axis * 2 + 1] = (*boundingbox)[axis * 2 + 1];//retrive the last value
 		boundingboxcopy[axis * 2 + 1] = current->data[axis];
+		boundingboxcopy[axis * 2] = current->min;
 		int res = isThereSeparatingPanel(bound_vec_to_boundbox(boundingboxcopy), *intersectwith);
 		//printf("resb %d\n", res);
 		if (res == 0) {
@@ -261,67 +309,51 @@ std::vector<std::vector<glm::vec3>> intersect::rec_is_intersect(Node *current, s
 IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> intesect_box){
 	Vertex vertices[] =
 	{
-		Vertex(intesect_box[1], glm::vec2(1, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-		Vertex(intesect_box[5], glm::vec2(0, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-		Vertex(intesect_box[6], glm::vec2(0, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-		Vertex(intesect_box[2], glm::vec2(1, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
-
-		Vertex(intesect_box[0], glm::vec2(1, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-		Vertex(intesect_box[4], glm::vec2(0, 0), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-		Vertex(intesect_box[7], glm::vec2(0, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-		Vertex(intesect_box[3], glm::vec2(1, 1), glm::vec3(0, 0, 1),glm::vec3(0, 1, 1)),
-
-		Vertex(intesect_box[1], glm::vec2(0, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-		Vertex(intesect_box[0], glm::vec2(1, 1), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-		Vertex(intesect_box[3], glm::vec2(1, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-		Vertex(intesect_box[2], glm::vec2(0, 0), glm::vec3(0, -1, 0),glm::vec3(0, 1, 0)),
-
-		Vertex(intesect_box[5], glm::vec2(0, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-		Vertex(intesect_box[4], glm::vec2(1, 1), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-		Vertex(intesect_box[7], glm::vec2(1, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-		Vertex(intesect_box[6], glm::vec2(0, 0), glm::vec3(0, 1, 0),glm::vec3(1, 1, 0)),
-
-		Vertex(intesect_box[1], glm::vec2(1, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-		Vertex(intesect_box[0], glm::vec2(1, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-		Vertex(intesect_box[4], glm::vec2(0, 0), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-		Vertex(intesect_box[5], glm::vec2(0, 1), glm::vec3(-1, 0, 0),glm::vec3(1, 0, 0)),
-
-		Vertex(intesect_box[2], glm::vec2(1, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
-		Vertex(intesect_box[3], glm::vec2(1, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
-		Vertex(intesect_box[7], glm::vec2(0, 0), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1)),
-		Vertex(intesect_box[6], glm::vec2(0, 1), glm::vec3(1, 0, 0),glm::vec3(1, 0, 1))
+		Vertex(intesect_box[0], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[1], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[2], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[3], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[4], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[5], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[6], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0)),
+		Vertex(intesect_box[7], glm::vec2(0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 0))
 	};
+	
+	/*for (unsigned int i = 0; i<intesect_box.size(); i++) {
+		if (i % 2 == 0) printf("\n");
+		printf("%f %f %f\t\t", intesect_box[i][0], intesect_box[i][1], intesect_box[i][2]);
+	}*/
 
 	unsigned int indices[] = { 
 		0, 1, 2,
-		0, 2, 3,
+		0, 3, 2,
 
-		6, 5, 4,
-		7, 6, 4,
+		4, 5, 6,
+		4, 7, 6,
 
-		10, 9, 8,
-		11, 10, 8,
+		0, 4, 5,
+		0, 1, 5,
 
-		12, 13, 14,
-		12, 14, 15,
+		1, 2, 6,
+		1, 5, 6,
 
-		16, 17, 18,
-		16, 18, 19,
+		2, 3, 7,
+		2, 6, 7,
 
-		22, 21, 20,
-		23, 22, 20
+		3, 0, 4,
+		3, 7, 4,
 	};
 
 	IndexedModel model;
 
-	for (unsigned int i = 0; i < 24; i++)
+	for (unsigned int i = 0; i < 8; i++)
 	{
 		model.positions.push_back(*vertices[i].GetPos());
 		model.colors.push_back(*vertices[i].GetColor());
 		model.normals.push_back(*vertices[i].GetNormal());
 		model.texCoords.push_back(*vertices[i].GetTexCoord());
 	}
-	for (unsigned int i = 0; i < 36; i++)
+	for (unsigned int i = 0; i < 6*2*3; i++)
 		model.indices.push_back(indices[i]);
 
 	return model;

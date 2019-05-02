@@ -103,7 +103,6 @@ void Kdtree::printTree( Node* head )
 */
 void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
 {
-	Node* head = new Node(3);
 	std::list<Kdtree::vecType> point_list;
 	glm::vec3 v;
 	vecType v4;
@@ -113,35 +112,41 @@ void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
 		v4 = glm::vec4(v.x, v.y, v.z, 1);
 		point_list.push_back(v4);
 	}
-	Kdtree::_makeTree(head, point_list, 0);
-	Kdtree::root = head;
+	Kdtree::makeTree(point_list);
 }
 
 void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 {
 	Node* head = new Node(3);
+	max_depth = 100;// (unsigned int)log2((plist.size() >> 4));
+	printf("\nsize %d max depth %d\n", plist.size(), max_depth);
 	Kdtree::_makeTree( head, plist, 0 );
 	Kdtree::root = head;
 }
 
-void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType>& plist, int depth )
+void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType>& plist, unsigned int depth )
 {	
-	if( !plist.empty() ) 
+	if( !plist.empty())
 	{
 		int axis = depth % N;
-		
+
 		std::list<Kdtree::vecType> left_list;
 		std::list<Kdtree::vecType> right_list;
-		Kdtree::vecType median = Kdtree::findMedian(axis, plist, left_list, right_list); 
+		Kdtree::vecType median = Kdtree::findMedian(axis, plist, left_list, right_list);
 		head->data = median;
-		
+		head->max  = plist.back ()[axis];
+		head->min  = plist.front()[axis];
+
+
 		Node* left_node = new Node(N);
 		Node* right_node = new Node(N);
-		
-		Kdtree::_makeTree( left_node, left_list, depth+1);
-		if (!left_list.empty()) head->left = left_node;
-		
-		Kdtree::_makeTree( right_node, right_list, depth+1);
-		if (!right_list.empty()) head->right = right_node;
+
+		if (depth < max_depth) {
+			Kdtree::_makeTree(left_node, left_list, depth + 1);
+			if (!left_list.empty()) head->left = left_node;
+
+			Kdtree::_makeTree(right_node, right_list, depth + 1);
+			if (!right_list.empty()) head->right = right_node;
+		}		
 	}
 } 
