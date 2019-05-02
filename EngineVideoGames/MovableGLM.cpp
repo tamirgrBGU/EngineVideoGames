@@ -189,6 +189,19 @@ glm::vec3 MovableGLM::getVectorInSystem(glm::mat4 &prevTransformations,glm::vec3
 	return vec3(makeTrans(prevTransformations) * vec4(vec,0));
 }
 
+	void MovableGLM::SetRotMatrix(glm::mat4 &mat)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				rotateMat[i][j] = mat[i][j];
+			}
+			
+		}
+		
+	}
+
 void MovableGLM::printRot(bool generalRot)
 {
 	if(generalRot)

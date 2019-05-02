@@ -30,6 +30,7 @@ public:
 	glm::mat4 makeTrans(glm::mat4 &prevTransformations) const;
 	glm::mat4 makeTrans() const;
 	glm::mat4 GetRot() const;
+	void SetRotMatrix(glm::mat4 &mat);
 	void myRotate(float ang, glm::vec3 &vec, int indx);
 	void myTranslate(glm::vec3 &vec, int indx);
 	void myScale(glm::vec3 &vec);

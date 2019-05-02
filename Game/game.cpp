@@ -75,16 +75,21 @@ void Game::Init()
 	Activate();
 }
 
-void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s)
+	void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx)
 {
+	Shader *s = shaders[shaderIndx];
 	int r = ((pickedShape+1) & 0x000000FF) >>  0;
 	int g = ((pickedShape+1) & 0x0000FF00) >>  8;
 	int b = ((pickedShape+1) & 0x00FF0000) >> 16;
 	s->Bind();
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
-	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 1.0f);
-	s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);		
+	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 0.0f);
+	if(shaderIndx == 0)
+		s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
+	else 
+		s->SetUniform4f("lightColor",0.1f,0.8f,0.7f,1.0f);
+	s->Unbind();
 }
 
 void Game::WhenRotate()
@@ -108,7 +113,7 @@ void Game::Motion()
 	{
 		int p = pickedShape;
 		pickedShape = 2;
-		shapeTransformation(zLocalRotate,0.45);
+		shapeTransformation(zLocalRotate,0.75);
 		pickedShape = p;
 	}
 }

@@ -131,11 +131,13 @@ void MeshConstructor::CopyMesh(const MeshConstructor &mesh){
 
 	vao.Bind();
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		vbs.push_back(new VertexBuffer(*(mesh.vbs[i])));	
 		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
 	}
+	vbs.push_back(new VertexBuffer(*(mesh.vbs[3])));	
+	vao.AddBuffer(*vbs.back(),3,2,GL_FLOAT);
 	
 	
 	ib = new IndexBuffer(*mesh.ib);

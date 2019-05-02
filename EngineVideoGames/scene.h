@@ -33,11 +33,12 @@ public:
 	void addShapeCopy(int indx,int parent,unsigned int mode);
 	
 	void addShader(const std::string& fileName);
+	void AddTexture(const std::string& textureFileName);
 	void ZeroShapesTrans();
 
 	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//
 
-	virtual void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s) = 0;
+	virtual void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx) = 0;
 	virtual void WhenTranslate(){};
 	virtual void WhenRotate(){};
 	virtual void Motion(){};
@@ -72,7 +73,11 @@ public:
 	inline int GetDirection() {return direction;}
 	glm::vec3 GetTipPositionInSystem(int indx);
 	glm::vec3 GetVectorInSystem(int indx,glm::vec3 vec);
-	void Scene::OpositeDirectionRot(glm::vec3 vec,float angle);
+	void OpositeDirectionRot(glm::vec3 vec,float angle);
+	inline void PrintShapeRotations(int indx){shapes[indx]->printRot(true);}
+	inline void SetShapeTex(int shpIndx,int texIndx){shapes[shpIndx]->SetTexture(texIndx);} 
+	inline void SetShapeShader(int shpIndx,int shdrIndx){shapes[shpIndx]->SetShader(shdrIndx);} 
+	
 private:	
 
 	std::vector<Camera*> cameras; //light will have the properties of camera
@@ -89,6 +94,8 @@ protected:
 	std::vector<Shape*> shapes;
 	std::vector<Shader*> shaders;
 	std::vector<int> chainParents;
+	std::vector<Texture*> textures;
+
 	int pickedShape;
 	int direction;
 	static const int scaleFactor =2;
