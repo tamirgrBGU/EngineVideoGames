@@ -216,7 +216,7 @@ void Game::Motion()
 		glm::mat4 pos1 = GetShapeTransformation();
 		pickedShape = 2;
 		glm::mat4 pos2 = GetShapeTransformation();
-		std::vector<IndexedModel> sol = a->intersect::isIntersect(pos1, pos2, *b);
+		std::vector<IndexedModel> sol = a->intersect::isIntersect(&pos1, &pos2, *b);
 		if (sol.size() > 0) {
 			isActive = false;
 			printf("\nsol! %d\n", sol.size());

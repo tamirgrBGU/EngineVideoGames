@@ -118,7 +118,7 @@ void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
 void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 {
 	Node* head = new Node(3);
-	max_depth = 100;// (unsigned int)log2((plist.size() >> 4));
+	max_depth = (unsigned int)log2((plist.size() >> 4));
 	printf("\nsize %d max depth %d\n", plist.size(), max_depth);
 	Kdtree::_makeTree( head, plist, 0 );
 	Kdtree::root = head;

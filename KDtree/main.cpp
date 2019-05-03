@@ -107,7 +107,7 @@ int main(int argc, char ** argv)
 	}
 	intersect a(point_list);
 	intersect b(point_list2);
-	std::vector<IndexedModel> sol = a.isIntersect(I, I, b);
+	std::vector<IndexedModel> sol = a.isIntersect(&I, &I, b);
 
 	int i = 0;
 	for (IndexedModel model : sol) {

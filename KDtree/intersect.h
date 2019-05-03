@@ -39,11 +39,7 @@ private:
 
 	bool isEqual(std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
 	//will not add duplicates
-	void insert_box(std::vector<std::vector<glm::vec3>> &boxes, std::vector<glm::vec3> boxvec);
-
-	//will minimize the boxes that is not intesect with others
-	void checkminiboxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2, glm::mat4 *transMe, glm::mat4 *transOther);
-	void finilizeBoxes(std::vector<std::vector<glm::vec3>> &intersect_boxes1, std::vector<std::vector<glm::vec3>> &intersect_boxes2);
+	void insert_box(std::vector<std::vector<glm::vec3>> *boxes, std::vector<glm::vec3> boxvec, glm::mat4 *transmat);
 
 	//will be use to find the first bounding box
 	std::vector<float> findthightbox(std::vector<glm::vec3> positions);
@@ -53,7 +49,13 @@ private:
 
 	void merge(std::vector<std::vector<glm::vec3>> *a, std::vector<std::vector<glm::vec3>> *b);
 
-	std::vector<std::vector<glm::vec3>> rec_is_intersect(Node *current, std::vector<float> *boundingbox, std::vector<glm::vec3> *intersectwith, int depth);
+	int intersect::intersectWithOther(Node * nextother, std::vector<float> &boundingboxcopyother, int axis, std::vector<float> &boundingboxcopy);
+
+	void nodesIntersectValitate(Node * next, std::vector<float> &boundingboxcopy, int axis, Node * other, std::vector<float> &boundingboxcopyother, int depth, std::vector<std::vector<glm::vec3>> * output, std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
+
+	void intersect::rec_is_intersect(Node *current, Node *other,
+		std::vector<float> *boundingbox, std::vector<float> *boundingboxother,
+		int depth, std::vector<std::vector<glm::vec3>> *output);
 
 	std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox);
 

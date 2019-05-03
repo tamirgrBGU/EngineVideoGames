@@ -77,8 +77,8 @@ class Kdtree
 	//function for making the tree
 	void makeTree( std::list<vecType> &plist );
 	void makeTree(std::vector<glm::vec3> &pvec );
- private:
 	unsigned int max_depth;
+ private:
 	//helper for makeTree 
 	void _makeTree( Node* head, std::list<vecType> &plist, unsigned int depth );
 	
