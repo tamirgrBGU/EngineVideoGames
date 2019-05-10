@@ -13,10 +13,10 @@ private:
 	MeshConstructor *mesh;
 	Texture *tex;
 	bool isCopy;
-	unsigned int mode;
 	bool toRender;
 
 public:
+	unsigned int mode;
 
 	Shape(const IndexedModel& model, unsigned int mode);
 

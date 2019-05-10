@@ -39,7 +39,7 @@ private:
 
 	bool isEqual(std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
 	//will not add duplicates
-	void insert_box(std::vector<std::vector<glm::vec3>> *boxes, std::vector<glm::vec3> boxvec, glm::mat4 *transmat);
+	void insert_box(std::vector<std::vector<glm::vec3>> *boxes, std::vector<glm::vec3> boxvec, glm::mat4 *transmat, glm::vec3 color);
 
 	//will be use to find the first bounding box
 	std::vector<float> findthightbox(std::vector<glm::vec3> positions);
@@ -59,5 +59,5 @@ private:
 
 	std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox);
 
-	IndexedModel intersect::boxVertexesToIndexModel(std::vector<glm::vec3> intesect_box);
+	IndexedModel intersect::boxVertexesToIndexModel(std::vector<glm::vec3> intesect_box, glm::vec3 color);
 };

@@ -31,15 +31,9 @@
 				case GLFW_KEY_ESCAPE:			
 					glfwSetWindowShouldClose(window,GLFW_TRUE);
 				break;
-				case GLFW_KEY_SPACE:
-					scn->changeSurfaceLineSpace();
-				break;
 				case GLFW_KEY_P:
 					scn->changeMode();
 				break;
-				case GLFW_KEY_I:
-					scn->changeSurfaceLine();
-					break;
 				case GLFW_KEY_O:
 					scn->HideShape(0);
 					if(scn->IsActive())

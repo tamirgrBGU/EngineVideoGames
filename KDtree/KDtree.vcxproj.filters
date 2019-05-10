@@ -21,7 +21,7 @@
     <ClCompile Include="..\EngineVideoGames\kdtree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\EngineVideoGames\intersect.cpp">
+    <ClCompile Include="intersect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="..\EngineVideoGames\kdtree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\EngineVideoGames\intersect.h">
+    <ClInclude Include="intersect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

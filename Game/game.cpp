@@ -48,9 +48,9 @@ void Game::addShape(int type,int parent,unsigned int mode)
 	}
 }
 
-void Game::updateBezier(int BezierShapeId, bool is2D, unsigned int mode)
+void Game::updateIntersectors(int BezierShapeId, unsigned int mode)
 {
-	shapes[BezierShapeId] = new Shape(curve, xResolution, yResolution, is2D, mode);	
+	shapes[BezierShapeId]->mode= mode;
 }
 
 intersect *a;
@@ -219,9 +219,15 @@ void Game::Motion()
 		std::vector<IndexedModel> sol = a->intersect::isIntersect(&pos1, &pos2, *b);
 		if (sol.size() > 0) {
 			isActive = false;
-			printf("\nsol! %d\n", sol.size());
+			printf("\n#sol! %d\n", sol.size());
 			for(const IndexedModel model : sol)
-				addShape(model, -1, LINES);
+				addShape(model, -1, TRIANGLES);
+			/*printf("\n");
+			for (const IndexedModel model : sol) {
+				for (const glm::vec3 pos : model.positions)
+					printf("<%f %f %f>\n", pos[0], pos[1], pos[2]);
+				printf("\n");
+			}*/
 		}
 		pickedShape = p;
 	}

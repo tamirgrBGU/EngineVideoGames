@@ -17,10 +17,9 @@ public:
 	void Init();
 	void addShape(int type,int parent,unsigned int mode);
 	void addShape(IndexedModel model, int parent, unsigned int mode);
-	void updateBezier(int BezierShapeId, bool is2D, unsigned int mode);
+	void updateIntersectors(int BezierShapeId, unsigned int mode);
 //	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
 	void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s);
-	void ControlPointUpdate();
 	void WhenRotate();
 	void WhenTranslate();
 	Bezier1D *getBezier1D();
@@ -30,26 +29,10 @@ public:
 	
 	void Game::changeMode() {
 		projMode = (projMode + 1) % 6;
-		updateBezier(1, proj2D, projMode);
+		updateIntersectors(1, projMode);
+		updateIntersectors(2, projMode);
 	}
-
-	//CHANGE FROM BEZIER Line TO SURFACE without changing mode
-	void Game::changeSurfaceLine() {
-		proj2D = proj2D ^ 1;
-		updateBezier(1, proj2D, projMode);
-	}
-
-	//CHANGE FROM BEZIER Line TO SURFACE and changing plotting mode
-	void Game::changeSurfaceLineSpace() {
-		if (proj2D) {
-			projMode = Scene::LINES;
-		}
-		else {
-			projMode = Scene::QUADS;
-		}
-		proj2D = proj2D ^ 1;
-		updateBezier(1, proj2D, projMode);
-	}
+	
 	void Game::change_movement(float num) {
 		movement_ += num;
 	}
