@@ -5,9 +5,9 @@
 
 //default constructor
 intersect::intersect(std::vector<glm::vec3> shape) {
-	boundbox = findthightbox(shape);
-	boundboxvec = bound_vec_to_boundbox(boundbox);
 	kd.makeTree(shape);
+	boundbox = kd.getRoot()->boundbox;
+	boundboxvec = bound_vec_to_boundbox(boundbox);
 }
 
 //default constructor
@@ -37,33 +37,9 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *
 
 	std::vector<std::vector<glm::vec3>> intersect_boxes;
 	coloredBoxesOutput.clear();
-	rec_is_intersect(kd.getRoot(), other.kd.getRoot(), &boundbox, &other.boundbox, 0, &intersect_boxes);
+	rec_is_intersect(kd.getRoot(), other.kd.getRoot(), 0, &intersect_boxes);
 	//intersect_boxes.pop_back(); intersect_boxes.pop_back();
 	return coloredBoxesOutput;
-}
-
-std::vector<float> intersect::findthightbox(std::vector<glm::vec3> positions) {
-	std::vector<float> critical_point;
-	critical_point.push_back(positions[0].x);	critical_point.push_back(positions[0].x);
-	critical_point.push_back(positions[0].y);	critical_point.push_back(positions[0].y);
-	critical_point.push_back(positions[0].z);	critical_point.push_back(positions[0].z);
-
-	for (unsigned int i = 1; i < positions.size(); i++) {
-		if (critical_point[0] > positions[i].x)
-			critical_point[0] = positions[i].x;
-		if (critical_point[1] < positions[i].x)
-			critical_point[1] = positions[i].x;
-		if (critical_point[2] > positions[i].y)
-			critical_point[2] = positions[i].y;
-		if (critical_point[3] < positions[i].y)
-			critical_point[3] = positions[i].y;
-		if (critical_point[4] > positions[i].z)
-			critical_point[4] = positions[i].z;
-		if (critical_point[5] < positions[i].z)
-			critical_point[5] = positions[i].z;
-	}
-
-	return critical_point;
 }
 
 int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2) {
@@ -242,9 +218,10 @@ void intersect::insert_box(std::vector<std::vector<glm::vec3>> *boxes, std::vect
 	boxes->push_back(boxvec);
 }
 
-int intersect::intersectWithOther(Node * nextother, std::vector<float> &boundingboxcopyother, int axis, std::vector<float> &boundingboxcopy)
+int intersect::intersectWithOther(Node * nextother, int axis, std::vector<float> &boundingboxcopy)
 {
 	if (nextother) {
+		std::vector<float> &boundingboxcopyother = nextother->boundbox;
 		int res = isThereSeparatingPanel(bound_vec_to_boundbox(boundingboxcopy), bound_vec_to_boundbox(boundingboxcopyother));
 		if (res == 0) {
 			if (boundingboxcopyother[axis * 2] == boundingboxcopyother[axis * 2 + 1])
@@ -255,24 +232,20 @@ int intersect::intersectWithOther(Node * nextother, std::vector<float> &bounding
 	return 65;
 }
 
-void intersect::nodesIntersectValitate(Node * next, std::vector<float> &boundingboxcopy, int axis, Node * other, std::vector<float> &boundingboxcopyother,
+void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 	int depth, std::vector<std::vector<glm::vec3>> * output, std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2)
 {
 	bool intersect_with = 0;// 1;
 	if (next) {
-		if (boundingboxcopy[axis * 2] == boundingboxcopy[axis * 2 + 1])
+		if (next->boundbox[axis * 2] == next->boundbox[axis * 2 + 1])
 			intersect_with = 1;//we do not want to keep recursion on a plane	
 		else {
-			boundingboxcopyother[axis * 2    ] = other->min;
-			boundingboxcopyother[axis * 2 + 1] = other->data[axis];
-			int res1 = intersectWithOther(other->left, boundingboxcopyother, axis, boundingboxcopy);
+			int res1 = intersectWithOther(other->left, axis, next->boundbox);
 			if (res1 == 0)
-				rec_is_intersect(next, other->left, &boundingboxcopy, &boundingboxcopyother, depth + 1, output);
-			boundingboxcopyother[axis * 2    ] = other->data[axis];
-			boundingboxcopyother[axis * 2 + 1] = other->max;
-			int res2 = intersectWithOther(other->right, boundingboxcopyother, axis, boundingboxcopy);
+				rec_is_intersect(next, other->left, depth + 1, output);
+			int res2 = intersectWithOther(other->right, axis, next->boundbox);
 			if (res2 == 0)
-				rec_is_intersect(next, other->right, &boundingboxcopy, &boundingboxcopyother, depth + 1, output);
+				rec_is_intersect(next, other->right, depth + 1, output);
 			intersect_with = (res1 & res2) > 0;
 		}
 	}
@@ -284,21 +257,15 @@ void intersect::nodesIntersectValitate(Node * next, std::vector<float> &bounding
 
 //in iteration level the boxes are intersecting we will assure it happen in the children too
 void intersect::rec_is_intersect(Node *current, Node *other,
-			std::vector<float> *boundingbox, std::vector<float> *boundingboxother,
 			int depth, std::vector<std::vector<glm::vec3>> *output) {
 	int axis = depth % 3;
-	std::vector<glm::vec3> boxvec  = bound_vec_to_boundbox(*boundingbox);
-	std::vector<glm::vec3> boxvec2 = bound_vec_to_boundbox(*boundingboxother);
-	std::vector<float> boundingboxcopy      = *boundingbox;
-	std::vector<float> boundingboxcopyother = *boundingboxother;
+	std::vector<glm::vec3> boxvec  = bound_vec_to_boundbox(current->boundbox);
+	std::vector<glm::vec3> boxvec2 = bound_vec_to_boundbox(  other->boundbox);
+	std::vector<float> boundingboxcopy      = current->boundbox;
+	std::vector<float> boundingboxcopyother =   other->boundbox;
 
-	boundingboxcopy[axis * 2    ] = current->min;
-	boundingboxcopy[axis * 2 + 1] = current->data[axis];
-	nodesIntersectValitate(current->left,  boundingboxcopy, axis, other, boundingboxcopyother, depth, output, boxvec, boxvec2);
-
-	boundingboxcopy[axis * 2    ] = current->data[axis];
-	boundingboxcopy[axis * 2 + 1] = current->max;
-	nodesIntersectValitate(current->right, boundingboxcopy, axis, other, boundingboxcopyother, depth, output, boxvec, boxvec2);
+	nodesIntersectValitate(current->left,  axis, other, depth, output, boxvec, boxvec2);
+	nodesIntersectValitate(current->right, axis, other, depth, output, boxvec, boxvec2);
 }
 
 IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> intesect_box, glm::vec3 color){	

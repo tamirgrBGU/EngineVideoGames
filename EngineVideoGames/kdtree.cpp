@@ -27,7 +27,7 @@ Kdtree::~Kdtree(){}
 *
 *
 */
-Kdtree::vecType Kdtree::findMedian(int axis, std::list<Kdtree::vecType> &plist, std::list<Kdtree::vecType> &left, 
+Kdtree::vecType Kdtree::findMedian(std::list<Kdtree::vecType> &plist, std::list<Kdtree::vecType> &left, 
 							std::list<Kdtree::vecType> &right )
 {
 	Kdtree::vecType median;
@@ -39,7 +39,7 @@ Kdtree::vecType Kdtree::findMedian(int axis, std::list<Kdtree::vecType> &plist, 
 		return plist.front();
 	
 	// Using lambda function here, to define comparison function--parametrized by 'axis'
-	plist.sort( [&](Kdtree::vecType& a, Kdtree::vecType& b){return a[axis] < b[axis];});
+	//plist.sort( [&](Kdtree::vecType& a, Kdtree::vecType& b){return a[axis] < b[axis];});
 	
 	for ( auto& x : plist )
 	{
@@ -49,8 +49,7 @@ Kdtree::vecType Kdtree::findMedian(int axis, std::list<Kdtree::vecType> &plist, 
 			right.push_back(x);
 		++count;
 	}
-	median = left.back();
-	left.pop_back();
+	median = left.back();	//left.pop_back();
 	return median;
 }
 
@@ -115,38 +114,73 @@ void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
 	Kdtree::makeTree(point_list);
 }
 
+void cloneList(std::list<Kdtree::vecType>& plist, std::list<Kdtree::vecType>& writeon) {
+	for (Kdtree::vecType& x : plist)
+		writeon.push_back(x);
+}
+
+void cloneByMed(int axis, float med, std::list<Kdtree::vecType> &plist,
+	std::list<Kdtree::vecType> &left,	std::list<Kdtree::vecType> &right)
+{
+	for (Kdtree::vecType x : plist)
+	{
+		if (x[axis] < med)
+			left.push_back(x);
+		else
+			right.push_back(x);
+	}
+}
+
 void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 {
 	Node* head = new Node(3);
 	max_depth = (unsigned int)log2((plist.size() >> 4));
+
 	printf("\nsize %d max depth %d\n", plist.size(), max_depth);
-	Kdtree::_makeTree( head, plist, 0 );
+
+	std::list<Kdtree::vecType> xlist, ylist, zlist;
+	cloneList(plist, xlist);		
+
+	xlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[0] < b[0]; }); cloneList(xlist, ylist);
+	ylist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[1] < b[1]; }); cloneList(xlist, zlist);
+	zlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[2] < b[2]; });
+
+	std::list<Kdtree::vecType> lists[3] = {xlist, ylist, zlist};
+	printf(", sorted");
+	Kdtree::_makeTree( head, lists, 0);
 	Kdtree::root = head;
 }
 
-void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType>& plist, unsigned int depth )
+void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType> plist[], unsigned int depth )
 {	
-	if( !plist.empty())
+	int axis = depth % N;
+	if( !plist[axis].empty())
 	{
-		int axis = depth % N;
-
-		std::list<Kdtree::vecType> left_list;
-		std::list<Kdtree::vecType> right_list;
-		Kdtree::vecType median = Kdtree::findMedian(axis, plist, left_list, right_list);
+		std::list<Kdtree::vecType> plistNEXT[2][3];
+		std::list<Kdtree::vecType> l1, l2, l3, l4, l5, l6;
+		plistNEXT[0][0] = l1;		plistNEXT[0][1] = l2;		plistNEXT[0][2] = l3;
+		plistNEXT[1][0] = l4;		plistNEXT[1][1] = l5;		plistNEXT[1][2] = l6;
+		Kdtree::vecType median =Kdtree::findMedian(plist[axis], plistNEXT[0][axis], plistNEXT[1][axis]);
 		head->data = median;
-		head->max  = plist.back ()[axis];
-		head->min  = plist.front()[axis];
-
+		head->boundbox.push_back(plist[0].back() [0]);
+		head->boundbox.push_back(plist[0].front()[0]);
+		head->boundbox.push_back(plist[1].back() [1]);
+		head->boundbox.push_back(plist[1].front()[1]);
+		head->boundbox.push_back(plist[2].back() [2]);
+		head->boundbox.push_back(plist[2].front()[2]);
+			int axis2 = (axis + 1) % N, axis3 = (axis + 2) % N;
+		cloneByMed(axis, median[axis], plist[axis2], plistNEXT[0][axis2], plistNEXT[1][axis2]);
+		cloneByMed(axis, median[axis], plist[axis3], plistNEXT[0][axis3], plistNEXT[1][axis3]);
 
 		Node* left_node = new Node(N);
 		Node* right_node = new Node(N);
 
 		if (depth < max_depth) {
-			Kdtree::_makeTree(left_node, left_list, depth + 1);
-			if (!left_list.empty()) head->left = left_node;
+			Kdtree::_makeTree(left_node, plistNEXT[0], depth + 1);
+			if (!plistNEXT[0][axis].empty()) head->left = left_node;
 
-			Kdtree::_makeTree(right_node, right_list, depth + 1);
-			if (!right_list.empty()) head->right = right_node;
+			Kdtree::_makeTree(right_node, plistNEXT[1], depth + 1);
+			if (!plistNEXT[1][axis].empty()) head->right = right_node;
 		}		
 	}
 } 

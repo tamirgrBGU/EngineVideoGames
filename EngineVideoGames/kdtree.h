@@ -25,7 +25,7 @@ class Node
 {
  public:
 	 typedef glm::vec4 vecType;
-	 float max, min;
+	 std::vector<float> boundbox;
 	 Node* left ;// = std::unique_ptr<Node>( new Node(3) );
 	 Node* right; //( new Node(3));
 	vecType data; 
@@ -72,7 +72,7 @@ class Kdtree
 	void printTree( Node* head );
 	
 	//function for finding the median of a list of points
-	vecType findMedian(int axis, std::list<vecType> &plist, std::list<vecType> &left, 
+	vecType findMedian(std::list<vecType> &plist, std::list<vecType> &left, 
 								std::list<vecType> &right );
 	//function for making the tree
 	void makeTree( std::list<vecType> &plist );
@@ -80,7 +80,7 @@ class Kdtree
 	unsigned int max_depth;
  private:
 	//helper for makeTree 
-	void _makeTree( Node* head, std::list<vecType> &plist, unsigned int depth );
+	void Kdtree::_makeTree(Node* head, std::list<Kdtree::vecType> plist[], unsigned int depth);
 	
 	Node* root;
 };

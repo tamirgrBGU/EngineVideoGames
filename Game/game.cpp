@@ -121,7 +121,7 @@ void Game::WhenTranslate()
 {	}
 
 void Game::savePastPositions(int controlPoint) {
-	 int indx = 0;
+	int indx = 0;
 	for ( int i = -1; i < 2; i=i+2) {
 		if (controlPoint+i > -1 && controlPoint + i < (signed)controlPointsShapesIds.size()) {
 			if (controlPoint + i == controlPointsShapesIds.size()-1) {

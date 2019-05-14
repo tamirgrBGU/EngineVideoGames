@@ -41,20 +41,16 @@ private:
 	//will not add duplicates
 	void insert_box(std::vector<std::vector<glm::vec3>> *boxes, std::vector<glm::vec3> boxvec, glm::mat4 *transmat, glm::vec3 color);
 
-	//will be use to find the first bounding box
-	std::vector<float> findthightbox(std::vector<glm::vec3> positions);
-
 	//will be used to find if separating panel is exist
 	int isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2);
 
 	void merge(std::vector<std::vector<glm::vec3>> *a, std::vector<std::vector<glm::vec3>> *b);
 
-	int intersect::intersectWithOther(Node * nextother, std::vector<float> &boundingboxcopyother, int axis, std::vector<float> &boundingboxcopy);
+	int intersect::intersectWithOther(Node * nextother, int axis, std::vector<float> &boundingboxcopy);
 
-	void nodesIntersectValitate(Node * next, std::vector<float> &boundingboxcopy, int axis, Node * other, std::vector<float> &boundingboxcopyother, int depth, std::vector<std::vector<glm::vec3>> * output, std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
+	void nodesIntersectValitate(Node * next, int axis, Node * other, int depth, std::vector<std::vector<glm::vec3>> * output, std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
 
 	void intersect::rec_is_intersect(Node *current, Node *other,
-		std::vector<float> *boundingbox, std::vector<float> *boundingboxother,
 		int depth, std::vector<std::vector<glm::vec3>> *output);
 
 	std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox);
