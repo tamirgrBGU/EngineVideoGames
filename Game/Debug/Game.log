@@ -1,6 +1,3 @@
 ﻿  game.cpp
-  main.cpp
-f:\documents\visual studio 2017\projects\enginevideogames\game\inputmanager.h(51): warning C4305: 'argument': truncation from 'double' to 'float'
-f:\documents\visual studio 2017\projects\enginevideogames\game\inputmanager.h(54): warning C4305: 'argument': truncation from 'double' to 'float'
-  Generating Code...
-  Game.vcxproj -> F:\documents\Visual Studio 2017\Projects\EngineVideoGames\Debug\Game.exe
+  Game.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\EngineVideoGames\Debug\Game.exe
+  Game.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\EngineVideoGames\Debug\Game.pdb (Full PDB)
