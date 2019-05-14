@@ -19,7 +19,7 @@ public:
 	void addShape(IndexedModel model, int parent, unsigned int mode);
 	void updateIntersectors(int BezierShapeId, unsigned int mode);
 //	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
-	void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,Shader *s);
+	void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx);
 	void WhenRotate();
 	void WhenTranslate();
 	Bezier1D *getBezier1D();

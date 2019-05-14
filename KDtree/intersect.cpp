@@ -273,7 +273,7 @@ void intersect::nodesIntersectValitate(Node * next, std::vector<float> &bounding
 			int res2 = intersectWithOther(other->right, boundingboxcopyother, axis, boundingboxcopy);
 			if (res2 == 0)
 				rec_is_intersect(next, other->right, &boundingboxcopy, &boundingboxcopyother, depth + 1, output);
-			intersect_with = res1 & res2;
+			intersect_with = (res1 & res2) > 0;
 		}
 	}
 	if (intersect_with && ((unsigned)depth == kd.max_depth-1)) {//none of the children are intersecting - add perants
