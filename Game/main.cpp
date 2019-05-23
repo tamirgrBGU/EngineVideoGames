@@ -18,9 +18,11 @@ int main(int argc,char *argv[])
 	
 	scn->Init();
 
-	scn->addShader("../res/shaders/pickingShader");	
-	scn->addShader("../res/shaders/basicShader");
+	scn->addShader("../res/shaders/pickingShader");
+	scn->addShader("../res/shaders/weightsShader");
 	scn->addShader("../res/shaders/basicShadertex");
+	//scn->addShader("../res/shaders/basicShader");
+	//scn->addShader("../res/shaders/basicShadertex");
 	scn->AddTexture("../res/textures/snake1.png");
 
 	display.setScene(scn);

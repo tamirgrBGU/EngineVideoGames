@@ -22,8 +22,9 @@ class MeshConstructor
 	void InitMesh(const IndexedModel &model);
 	void CopyMesh(const MeshConstructor &mesh);
 	void CopyLine(const MeshConstructor &mesh);
+	static const unsigned int VEC3_ATTRIB_NUM = 4;
+	static const unsigned int VEC2_ATTRIB_NUM = 1;
 	
-
 public:
 	static std::vector<glm::vec3> getlastInitMeshPositions();
 

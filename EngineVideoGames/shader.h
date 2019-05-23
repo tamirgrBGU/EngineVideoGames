@@ -30,9 +30,10 @@ private:
 		POSITION_VB,
 		COLOR_VB,
 		NORMAL_VB,
+		WEIGHT_VB,
 		TEXCOORD_VB,
 		INDEX_VB,
-		WEIGHT_VB,
+		
 		JOINT_INDEX_VB
 	};
 	static const unsigned int NUM_SHADERS = 2;

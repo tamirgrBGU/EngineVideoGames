@@ -5,6 +5,14 @@ Bezier2D::Bezier2D(void)
 {
 }
 
+Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision, vec3 axis) {
+	this->b = b;
+	this->axis = axis;	axismode = true;
+	this->circularSubdivision = circularSubdivision;
+	segmentCircleParts = new mat4[circularSubdivision];
+	initParts(segmentCircleParts);
+}
+
 Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision) {
 	this->b = b;
 	updateAxis();
@@ -43,6 +51,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], tPart, sPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
 					model.positions.push_back(pos3);
+					model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
 					model.colors.push_back(color);
 					vec3 normal = calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart);
 					model.normals.push_back(normal);
@@ -58,6 +67,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, sPart);
 			vec3 pos3(pos.x, pos.y, pos.z);
 			model.positions.push_back(pos3);
+			model.weights.push_back(calcWeight(b.segNo() - 1, segmentSindx, 1, sPart));
 			model.colors.push_back(color);
 			model.normals.push_back(calc_bezier_point2D_get_normal(b.segNo()-1, pos3, 1));
 			model.texCoords.push_back(vec2(1, sPart));
@@ -92,6 +102,17 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	}
 
 	return model;
+}
+
+glm::vec3 Bezier2D::calcWeight(int segmentT, int segmentS, float t, float s)
+{
+	float f1 = 0, f3 = 0;
+	if (t>0.5)
+		f3 = (1.0f - 4.0f*(1.0f - t)*t)*(1.0f - t) / 2.0f + (1.0f - 4.0f*(1.0f - t)*t)*t / 2.0f;
+	else
+		f1 = (1.0f - 4.0f*(1.0f - t)*t)*(1.0f - t) / 2.0f + (1.0f - 4.0f*(1.0f - t)*t)*t / 2.0f;
+	float f2 = (2.0f*(1.0f - t)*(t + 0.0f) + 0.5f);
+	return glm::vec3(f1, f2, f3);
 }
 
 Vertex Bezier2D::GetVertex(int segmentT, int segmentS, float t, float s) {

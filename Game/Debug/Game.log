@@ -1,4 +1,2 @@
-﻿  game.cpp
-c:\users\user\documents\visual studio 2015\projects\enginevideogames\game\game.cpp(93): warning C4305: 'initializing': truncation from 'double' to 'float'
-  Game.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\EngineVideoGames\Debug\Game.exe
+﻿  Game.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\EngineVideoGames\Debug\Game.exe
   Game.vcxproj -> C:\Users\user\Documents\Visual Studio 2015\Projects\EngineVideoGames\Debug\Game.pdb (Full PDB)

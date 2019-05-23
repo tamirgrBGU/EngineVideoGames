@@ -343,10 +343,12 @@ using namespace glm;
 
 	void Scene::OpositeDirectionRot(glm::vec3 vec,float angle)
 	{
-		
+		if (pickedShape < 0) return;//work on snake part not on the scence
+
 		int i=pickedShape;
-		glm::mat4 globalMat = glm::mat4(1)*shapes[pickedShape+2]->GetRot();
-		glm::mat4 localMat = glm::mat4(1)*shapes[pickedShape+2]->GetRot();
+		
+		glm::mat4 globalMat = glm::mat4(1)*shapes[pickedShape+1]->GetRot();
+		glm::mat4 localMat = glm::mat4(1)*shapes[pickedShape+1]->GetRot();
 		for (; chainParents[i] >= 0; i = chainParents[i])
 			localMat =  shapes[i]->GetRot() * localMat;
 		i=1;
@@ -363,12 +365,12 @@ using namespace glm;
 		//shapes[i]->SetRotMatrix(rotMat);
 		
 		rotMat = globalMat*glm::rotate(glm::mat4(1),-angle,vec)*glm::transpose(globalMat);
-		rotMat = rotMat*shapes[pickedShape+2]->GetRot();
-		shapes[pickedShape+2]->buildAngMatrices(rotMat);
+		rotMat = rotMat*shapes[pickedShape+1]->GetRot();
+		shapes[pickedShape+1]->buildAngMatrices(rotMat);
 		//if(vec.x>0.99)
-		//	shapes[pickedShape+2]->myRotate(-angle,vec,xAxis1);
+		//	shapes[pickedShape+1]->myRotate(-angle,vec,xAxis1);
 		//else
-		//	shapes[pickedShape+2]->myRotate(-angle,vec,zAxis2);
+		//	shapes[pickedShape+1]->myRotate(-angle,vec,zAxis2);
 		
 		glm::vec3 posEnd = GetTipPositionInSystem(pickedShape);
 		std::cout<<"end ("<<posEnd.x <<", "<<posEnd.y<<", "<<posEnd.z<<")"<<std::endl;

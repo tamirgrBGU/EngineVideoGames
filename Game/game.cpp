@@ -90,7 +90,7 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 intersect *a = nullptr;
 intersect *b = nullptr;
 std::vector<Bezier1D> b1vec;
-float jumpy = 0.016, jumpx = 0.005;
+float jumpy = 0.016f, jumpx = 0.005f;
 int snakeLength = 4;
 void Game::Init()
 {

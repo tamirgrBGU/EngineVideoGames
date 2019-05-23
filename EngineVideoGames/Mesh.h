@@ -20,7 +20,17 @@ public:
     std::vector<unsigned int> indices;
     
     void CalcNormals();
-	inline void* GetData(int indx) const {switch(indx){case 0: return (void*)&positions[0]; case 1: return (void*)&colors[0]; case 2: return (void*)&normals[0]; case 3: return (void*)&texCoords[0]; case 4: return (void*)&indices[0]; default: return (void*)0;}}
+	inline void* GetData(int indx) const {
+		switch(indx)
+		{case 0: return (void*)&positions[0];
+					 case 1: return (void*)&colors[0]; 
+					 case 2: return (void*)&normals[0];
+					 case 3: return (void*)&weights[0];	
+					 case 4: return (void*)&texCoords[0]; 
+					 case 5: return (void*)&indices[0]; 
+					 default: return (void*)0;
+		}
+	}
 
 };
 
@@ -33,13 +43,14 @@ struct Vertex
 			this->texCoord = texCoord;
 			this->normal = normal;
 			this->color = color;
+			this->weight = glm::vec3(0,1,0);
 		}
 
 		glm::vec3* GetPos() { return &pos; }
 		glm::vec2* GetTexCoord() { return &texCoord; }
 		glm::vec3* GetNormal() { return &normal; }
 		glm::vec3* GetColor() { return &color; }
-	
+		glm::vec3* GetWeight() {return &weight;}
 	private:
 		glm::vec3 pos;
 		glm::vec2 texCoord;

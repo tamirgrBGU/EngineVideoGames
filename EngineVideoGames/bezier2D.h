@@ -11,12 +11,14 @@ class Bezier2D
 	int circularSubdivision; //(usualy 4) how many subdivision in circular direction
 	Bezier1D b;
 	vec3 axis;
+	bool axismode = false;
 	vec3 first;
 	vec3 last;
 	mat4 *segmentCircleParts = nullptr;
 
 public:
 	Bezier2D(void);
+	Bezier2D(Bezier1D &b, int circularSubdivision, vec3 axis);
 	Bezier2D(Bezier1D &b, int circularSubdivision);
 
 	IndexedModel GetSurface(int resT, int resS);						//generates model for rendering using MeshConstructor::initMeshs
@@ -24,6 +26,7 @@ public:
 	glm::vec3 GetNormal(int segmentT, int segmentS, float t, float s);		//returns point on surface in the requested segments for value of t and s
 	
 	void updateAxis() {
+		if (axismode) return;
 		this->first = Bezier1D::v4to3(b.GetSegment(0)[0]);
 		this->last  = Bezier1D::v4to3(b.GetSegment(b.segNo() - 1)[3]);
 		this->axis  = glm::normalize(this->last - this->first);
@@ -32,6 +35,7 @@ public:
 	~Bezier2D(void);
 
 private:
+	glm::vec3 Bezier2D::calcWeight(int segmentT, int segmentS, float t, float s);
 
 	void dumpMat4(mat4 &a, int name) {
 		printf("%d\n", name);

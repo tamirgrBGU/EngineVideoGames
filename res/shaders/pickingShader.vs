@@ -3,6 +3,7 @@
 attribute vec3 position;
 attribute vec3 color;
 attribute vec3 normal;
+attribute vec3 weights;
 attribute vec2 texCoord;
 
 uniform mat4 MVP;
