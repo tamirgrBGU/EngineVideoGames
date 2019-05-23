@@ -80,7 +80,7 @@ void MeshConstructor::InitLine(IndexedModel &model){
 		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
 	}
 	
-	ib = new IndexBuffer((unsigned int*)model.GetData(4),indicesNum);
+	ib = new IndexBuffer((unsigned int*)model.GetData(5),indicesNum);
 	
 	vao.Unbind();
 	is2D = false;
@@ -93,16 +93,19 @@ void MeshConstructor::InitMesh( IndexedModel &model){
 	indicesNum = model.indices.size();
 	
 	vao.Bind();
-
-	for (int i = 0; i < 3; i++)
+	int i = 0;
+	for (; i < VEC3_ATTRIB_NUM; i++)
 	{
 		vbs.push_back(new VertexBuffer(model.GetData(i),verticesNum*sizeof(model.positions[0])));	
 		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
 	}
-	vbs.push_back(new VertexBuffer(model.GetData(3),verticesNum*sizeof(model.texCoords[0])));
-	vao.AddBuffer(*vbs.back(),vbs.size()-1,2,GL_FLOAT);
-	
-	ib = new IndexBuffer((unsigned int*)model.GetData(4),indicesNum);
+	for(;i < VEC2_ATTRIB_NUM + VEC3_ATTRIB_NUM;i++)
+	{
+		vbs.push_back(new VertexBuffer(model.GetData(i),verticesNum*sizeof(model.positions[0])));	
+		vao.AddBuffer(*vbs.back(),i,2,GL_FLOAT);
+	}
+
+	ib = new IndexBuffer((unsigned int*)model.GetData(5),indicesNum);
 	
 	vao.Unbind();
 	is2D = true;
@@ -130,15 +133,17 @@ void MeshConstructor::CopyLine(const MeshConstructor &mesh){
 void MeshConstructor::CopyMesh(const MeshConstructor &mesh){
 
 	vao.Bind();
-
-	for (int i = 0; i < 3; i++)
+	int i = 0;
+	for (; i < VEC3_ATTRIB_NUM; i++)
 	{
 		vbs.push_back(new VertexBuffer(*(mesh.vbs[i])));	
 		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
 	}
-	vbs.push_back(new VertexBuffer(*(mesh.vbs[3])));	
-	vao.AddBuffer(*vbs.back(),3,2,GL_FLOAT);
-	
+	for(;i < VEC2_ATTRIB_NUM + VEC3_ATTRIB_NUM;i++)
+	{
+		vbs.push_back(new VertexBuffer(*(mesh.vbs[i])));	
+		vao.AddBuffer(*vbs.back(),i,2,GL_FLOAT);
+	}
 	
 	ib = new IndexBuffer(*mesh.ib);
 	//ib = mesh.ib;

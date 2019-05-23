@@ -31,7 +31,7 @@ Shader::Shader(const std::string& fileName)
 	GLCall(glBindAttribLocation(m_program, NORMAL_VB, "normal"));
 	GLCall(glBindAttribLocation(m_program, COLOR_VB, "color"));
 	GLCall(glBindAttribLocation(m_program, WEIGHT_VB, "weights"));
-	GLCall(glBindAttribLocation(m_program, JOINT_INDEX_VB, "jointIndices"));
+	//GLCall(glBindAttribLocation(m_program, JOINT_INDEX_VB, "jointIndices"));
 
 	GLCall(glLinkProgram(m_program));
 	

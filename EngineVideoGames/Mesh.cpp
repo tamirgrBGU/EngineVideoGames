@@ -89,7 +89,9 @@ IndexedModel CubeTriangles()
 		model.positions.push_back(*vertices[i].GetPos());
 		model.colors.push_back(*vertices[i].GetColor());
 		model.normals.push_back(*vertices[i].GetNormal());
+		model.weights.push_back(*vertices[i].GetWeight());
 		model.texCoords.push_back(*vertices[i].GetTexCoord());
+	
 	}
 	for(unsigned int i = 0; i < 36; i++)
         model.indices.push_back(indices[i]);
@@ -170,7 +172,9 @@ IndexedModel TethrahedronGenerator()
 		model.positions.push_back(*vertices[i].GetPos());
 		model.colors.push_back(*vertices[i].GetColor());
 		model.normals.push_back(*vertices[i].GetNormal());
+	    model.weights.push_back(*vertices[i].GetWeight());
 		model.texCoords.push_back(*vertices[i].GetTexCoord());
+		//model.weights.push_back(glm::vec3(0,1,0));
 	}
 	for(unsigned int i = 0; i < 12; i++)
         model.indices.push_back(indices[i]);
@@ -236,7 +240,9 @@ IndexedModel OctahedronGenerator()
 		model.positions.push_back(*vertices[i].GetPos());
 		model.colors.push_back(*vertices[i].GetColor());
 		model.normals.push_back(*vertices[i].GetNormal());
+			model.weights.push_back(*vertices[i].GetWeight());
 		model.texCoords.push_back(*vertices[i].GetTexCoord());
+//		model.weights.push_back(glm::vec3(0,1,0));
 	}
 	for(unsigned int i = 0; i < 24; i++)
         model.indices.push_back(indices[i]);

@@ -5,7 +5,8 @@
 attribute vec3 position;
 attribute vec3 color;
 attribute vec3 normal;
-attribute vec2 texCoord;
+attribute vec3 weights;
+attribute vec2 texCoords;
 
 uniform mat4 MVP;
 uniform mat4 Normal;
@@ -34,7 +35,7 @@ void main()
 	}
 	//LightIntensity=color;
 	LightIntensity = clamp(vec3(lightColor)*vec3(0.3,0.3,0.3) + diffuse * color * vec3(lightColor) + spec * vec3(lightColor) *specularContribution,0.0,1.0);
-	TexCoord = texCoord;
+	TexCoord = texCoords;
 	gl_Position = MVP*vec4(position,1.0); //you must have gl_Position
 		
 }
