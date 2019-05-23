@@ -20,6 +20,8 @@
 		scn->shapeTransformation(scn->zCameraTranslate,(float) yoffset);		
 	}
 	
+	vec3 z(0, 0, 1);
+	vec3 x(1, 0, 0);
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		Game *scn = (Game*)glfwGetWindowUserPointer(window);
@@ -44,22 +46,39 @@
 				case GLFW_KEY_A:
 					scn->change_movement(-0.001f);
 					break;
-				case GLFW_KEY_D:
+				case GLFW_KEY_S:
 					scn->change_movement(0.001f);
 					break;
-				case GLFW_KEY_RIGHT:
-					//scn->shapeTransformation(scn->zGlobalRotate,-20.1f);
-					scn->shapeTransformation(scn->zLocalRotate,5.1f);
+
+				case GLFW_KEY_D:
+					scn->SetDirection();
+					break;
+				case GLFW_KEY_C:
+					scn->cameramode = !scn->cameramode;
+					break;
+				case GLFW_KEY_RIGHT: 
+					if (scn->cameramode)
+						scn->shapeTransformation(scn->zLocalRotate, 5.1f);
+					else
+						scn->OpositeDirectionRot(z, 10.f);
 					break;
 				case GLFW_KEY_LEFT:
-					//scn->shapeTransformation(scn->zGlobalRotate,20.1f);
-					scn->shapeTransformation(scn->zLocalRotate,-5.0f);
+					if (scn->cameramode)
+						scn->shapeTransformation(scn->zLocalRotate,-5.0f);
+					else
+						scn->OpositeDirectionRot(z, 10.f);
 					break;
 				case GLFW_KEY_UP:
-					scn->shapeTransformation(scn->xLocalRotate,5.f);
+					if (scn->cameramode)
+						scn->shapeTransformation(scn->xLocalRotate,5.f);
+					else
+						scn->OpositeDirectionRot(x, 5.f);
 					break;
 				case GLFW_KEY_DOWN:
-					scn->shapeTransformation(scn->xGlobalRotate,-5.f);
+					if (scn->cameramode)
+						scn->shapeTransformation(scn->xGlobalRotate,-5.f);
+					else
+						scn->OpositeDirectionRot(x, 5.f);
 					break;
 
 			default:

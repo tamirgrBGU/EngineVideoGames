@@ -5,7 +5,6 @@ Bezier2D::Bezier2D(void)
 {
 }
 
-mat4 *segmentCircleParts;
 Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision) {
 	this->b = b;
 	updateAxis();
@@ -16,9 +15,11 @@ Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision) {
 
 Bezier2D::~Bezier2D(void)
 {
-	b.~Bezier1D();
-	if (segmentCircleParts != nullptr)
-		free(segmentCircleParts);
+	if (segmentCircleParts != nullptr) {
+		b.~Bezier1D();
+		delete segmentCircleParts;
+		segmentCircleParts = nullptr;
+	}
 }
 
 glm::vec3 color(glm::vec3(0.2f, 0.1f, 0.90f));

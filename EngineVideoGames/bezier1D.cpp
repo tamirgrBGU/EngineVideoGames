@@ -1,5 +1,11 @@
 #include "bezier1D.h"
 
+Bezier1D::Bezier1D(std::vector<glm::mat4> segmentsinit)
+{
+	initBinomTree();
+	segments=segmentsinit;
+}
+
 Bezier1D::Bezier1D(void)
 {
 	initBinomTree();

@@ -13,6 +13,7 @@ class Bezier2D
 	vec3 axis;
 	vec3 first;
 	vec3 last;
+	mat4 *segmentCircleParts = nullptr;
 
 public:
 	Bezier2D(void);

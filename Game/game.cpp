@@ -1,6 +1,8 @@
 #include "game.h"
 #include "../KDtree/intersect.cpp"
 #include "../EngineVideoGames/MeshConstructor.h"
+#include "../EngineVideoGames/Bezier1D.h"
+#include "../EngineVideoGames/Bezier2D.h"
 
 #include <iostream>
 
@@ -48,51 +50,81 @@ void Game::addShape(int type,int parent,unsigned int mode)
 	}
 }
 
-void Game::updateIntersectors(int BezierShapeId, unsigned int mode)
-{
-	shapes[BezierShapeId]->mode= mode;
+void Game::updateIntersectors(unsigned int mode){
+	for(unsigned int i = 1; i < shapes.size(); i++)
+		shapes[i]->mode= mode;
 }
 
-intersect *a;
-intersect *b;
+static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
+	std::vector<glm::mat4> segments;
+	mat4 seg0 = mat4(0);
+
+	seg0[0] = vec4(0, *lastY, 0, 1);
+	seg0[1] = vec4(*lastX, *lastY, 0, 1);
+	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+	seg0[2] = vec4(*lastX, *lastY, 0, 1);
+	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+	seg0[3] = vec4(*lastX, *lastY, 0, 1);
+
+	segments.push_back(seg0);
+	for (int i = 0; i < segs - 1; i++) {
+		seg0[0] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+		seg0[1] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+		seg0[2] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+		seg0[3] = vec4(*lastX, *lastY, 0, 1);
+		segments.push_back(seg0);
+	}
+	seg0[0] = vec4(*lastX, *lastY, 0, 1);
+	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+	seg0[1] = vec4(*lastX, *lastY, 0, 1);
+	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+	seg0[2] = vec4(*lastX, *lastY, 0, 1);
+	seg0[3] = vec4(0, *lastY, 0, 1);
+	segments.push_back(seg0);
+	return segments;
+}
+
+intersect *a = nullptr;
+intersect *b = nullptr;
+std::vector<Bezier1D> b1vec;
+float jumpy = 0.016, jumpx = 0.005;
+int snakeLength = 4;
 void Game::Init()
 {
 	addShape(Axis, -1, LINES);
 	MeshConstructor meshelper(100);
 
-	/*addShape(Octahedron, -1, TRIANGLES);
-	a = new intersect(meshelper.getlastInitMeshPositions());
-	addShape(Octahedron, -1, TRIANGLES);
-	b = new intersect(meshelper.getlastInitMeshPositions());
-	*/
+	std::cout << "start snake" << std::endl;
+	float x = 0; float y = 0;
+	Bezier1D head(getBodySegs(&x, &y, jumpx, jumpy, 4));
+	b1vec.push_back(head);
+	for (int i = snakeLength - 2; i > 0; i--) {
+		y += jumpy;
+		Bezier1D body(getBodySegs(&x, &y, 0, jumpy, 4));
+		b1vec.push_back(body);
+	}
+	y += jumpy;
+	Bezier1D tail(getBodySegs(&x, &y, -jumpx, jumpy, 4));
+	b1vec.push_back(tail);
 
-	addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
-	printf("load obj");
-	a = new intersect(meshelper.getlastInitMeshPositions());
-	printf(", load tree");
-	addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);
-	printf(", load obj2");
-	b = new intersect(meshelper.getlastInitMeshPositions());
-	printf(", load tree 2");
+	Bezier2D b(b1vec[0], 5);
+	addShape(b.GetSurface(12, 12), -1, LINES);//QUADS
+	int lastPickedShape = 1;
+	for (int i = 1; i < snakeLength; i++) {
+		std::cout << i << std::endl;
+		Bezier2D b(b1vec[i], 5);
+		addShape(b.GetSurface(12, 12), lastPickedShape++, LINES);
+		b.~Bezier2D();
+		//TODO TRANSLATE and parent
+	}
+	std::cout << "done snake" << std::endl;
 
-	addShape(a->getBoundingBox(), 1, LINES);
-	addShape(b->getBoundingBox(), 2, LINES);
-
-	myTranslate(glm::vec3(0, 0, -40), 0);
-	pickedShape = 0;
-
-	Activate();
-
-	shapeTransformation(yScale,10);
-	shapeTransformation(xScale,10);
-	shapeTransformation(zScale,10);
-
-	pickedShape = 1;
-
+	//pickedShape = 1;
+	//shapeTransformation(xScale,10);
 	//shapeTransformation(xGlobalTranslate, -10);
-	shapeTransformation(xGlobalTranslate, -80);
-	shapeTransformation(yGlobalTranslate, -40);
-	//shapeTransformation(zGlobalTranslate, tmp.z);
 
 	ReadPixel();
 	pickedShape = -1;
@@ -161,27 +193,7 @@ void Game::Motion()
 {
 	if(isActive)
 	{
-		int p = pickedShape;
-		pickedShape = 1;
-		shapeTransformation(xGlobalTranslate, movement_);
-		glm::mat4 pos1 = GetShapeTransformation();
-		pickedShape = 2;
-		glm::mat4 pos2 = GetShapeTransformation();
-		std::vector<IndexedModel> sol = a->intersect::isIntersect(&pos1, &pos2, *b);
-		if (sol.size() > 0) {
-			isActive = false;
-			printf("\n#sol! %d\n", sol.size());
-			for(const IndexedModel model : sol)
-				addShape(model, -1, TRIANGLES);
-			/*printf("\n");
-			for (const IndexedModel model : sol) {
-				for (const glm::vec3 pos : model.positions)
-					printf("<%f %f %f>\n", pos[0], pos[1], pos[2]);
-				printf("\n");
-			}*/
-		}
-		//shapeTransformation(zLocalRotate,0.75);
-		pickedShape = p;
+		shapeTransformation(zLocalRotate,0.75);
 	}
 }
 
