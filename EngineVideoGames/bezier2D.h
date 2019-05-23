@@ -18,7 +18,7 @@ class Bezier2D
 
 public:
 	Bezier2D(void);
-	Bezier2D(Bezier1D &b, int circularSubdivision, vec3 axis);
+	Bezier2D(Bezier1D &b, int circularSubdivision, vec3 axis, vec3 from);
 	Bezier2D(Bezier1D &b, int circularSubdivision);
 
 	IndexedModel GetSurface(int resT, int resS);						//generates model for rendering using MeshConstructor::initMeshs

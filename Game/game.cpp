@@ -59,7 +59,8 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 	std::vector<glm::mat4> segments;
 	mat4 seg0 = mat4(0);
 
-	seg0[0] = vec4(0, *lastY, 0, 1);
+	seg0[0] = vec4(*lastX, *lastY, 0, 1);
+	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
 	seg0[1] = vec4(*lastX, *lastY, 0, 1);
 	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
 	seg0[2] = vec4(*lastX, *lastY, 0, 1);
@@ -82,7 +83,8 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 	seg0[1] = vec4(*lastX, *lastY, 0, 1);
 	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
 	seg0[2] = vec4(*lastX, *lastY, 0, 1);
-	seg0[3] = vec4(0, *lastY, 0, 1);
+	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
+	seg0[3] = vec4(*lastX, *lastY, 0, 1);
 	segments.push_back(seg0);
 	return segments;
 }
@@ -90,12 +92,12 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 intersect *a = nullptr;
 intersect *b = nullptr;
 std::vector<Bezier1D> b1vec;
-float jumpy = 0.016f, jumpx = 0.005f;
+glm::vec3 yAx(0, 1, 0);
+float jumpy = 0.2f, jumpx = 0.12f;
 int snakeLength = 4;
 void Game::Init()
 {
 	addShape(Axis, -1, LINES);
-	MeshConstructor meshelper(100);
 
 	std::cout << "start snake" << std::endl;
 	float x = 0; float y = 0;
@@ -110,21 +112,27 @@ void Game::Init()
 	Bezier1D tail(getBodySegs(&x, &y, -jumpx, jumpy, 4));
 	b1vec.push_back(tail);
 
-	Bezier2D b(b1vec[0], 5);
-	addShape(b.GetSurface(12, 12), -1, LINES);//QUADS
+	vec3 axisFrom = *(b1vec[0].GetControlPoint(0, 0).GetPos());
+	Bezier2D b(b1vec[0], 5, yAx, vec3(0, axisFrom.y, 0));
+	addShape(b.GetSurface(12, 12), -1, TRIANGLES);
 	int lastPickedShape = 1;
 	for (int i = 1; i < snakeLength; i++) {
-		std::cout << i << std::endl;
-		Bezier2D b(b1vec[i], 5);
-		addShape(b.GetSurface(12, 12), lastPickedShape++, LINES);
+		axisFrom = *(b1vec[i].GetControlPoint(0, 0).GetPos());
+		Bezier2D b(b1vec[i], 5, yAx, vec3(0, axisFrom.y, 0));
+		addShape(b.GetSurface(12, 12), lastPickedShape++, TRIANGLES);
 		b.~Bezier2D();
-		//TODO TRANSLATE and parent
 	}
 	std::cout << "done snake" << std::endl;
 
-	//pickedShape = 1;
-	//shapeTransformation(xScale,10);
-	//shapeTransformation(xGlobalTranslate, -10);
+	// translate all scene away from camera
+	myTranslate(glm::vec3(0, 0, -20), 0);
+
+	pickedShape = 0;
+
+	shapeTransformation(yScale, 10);
+	shapeTransformation(xScale, 10);
+	shapeTransformation(zScale, 10);
+
 
 	ReadPixel();
 	pickedShape = -1;

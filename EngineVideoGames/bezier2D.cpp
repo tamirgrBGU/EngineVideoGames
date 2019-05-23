@@ -5,9 +5,10 @@ Bezier2D::Bezier2D(void)
 {
 }
 
-Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision, vec3 axis) {
+Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision, vec3 shapeaxis, vec3 from) {
 	this->b = b;
-	this->axis = axis;	axismode = true;
+	this->first = from;	this->axis = glm::normalize(shapeaxis);
+	axismode = true;
 	this->circularSubdivision = circularSubdivision;
 	segmentCircleParts = new mat4[circularSubdivision];
 	initParts(segmentCircleParts);
