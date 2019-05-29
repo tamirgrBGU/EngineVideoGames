@@ -39,9 +39,9 @@ void main()
 	}
 	//LightIntensity=color;
 	LightIntensity = clamp(vec3(lightColor)*vec3(0.3,0.3,0.3) + diffuse * color * vec3(lightColor) + spec * vec3(lightColor) *specularContribution,0.0,1.0);
-	//TexCoord = texCoords;
+	TexCoord = texCoords;
 	
-	color0 = weights;
+	//color0 = weights;
 	normal0 = (Normal * vec4(normal, 0.0)).xyz;
 	vec4 pos = weights.z * lastMVP * vec4(position, 1.0);
 	pos = pos + weights.y * MVP * vec4(position, 1.0);
