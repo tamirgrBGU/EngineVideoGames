@@ -156,16 +156,10 @@ void Game::Init()
 	pickedShape = -1;
 }
 
-void Game::UpdateQuaternion(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx) {
-	Shader *s = shaders[shaderIndx];
+void finUpdate(Shader *s, const int  shaderIndx, const int pickedShape) {
 	int r = ((pickedShape + 1) & 0x000000FF) >> 0;
 	int g = ((pickedShape + 1) & 0x0000FF00) >> 8;
 	int b = ((pickedShape + 1) & 0x00FF0000) >> 16;
-	s->Bind();
-	s->SetUniformMat4f("MVP", MVP);
-	s->SetUniformMat4f("lastMVP", lastMVP);
-	s->SetUniformMat4f("nextMVP", nextMVP);
-	s->SetUniformMat4f("Normal", Normal);
 	s->SetUniform4f("lightDirection", 0.0f, 0.0f, -1.0f, 0.0f);
 	if (shaderIndx == 0)
 		s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
@@ -174,21 +168,34 @@ void Game::UpdateQuaternion(const glm::mat4 &lastMVP, const glm::mat4 &MVP, cons
 	s->Unbind();
 }
 
+
+void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx) {
+	Shader *s = shaders[shaderIndx];
+	s->Bind();
+	s->SetUniformMat4f("MVP", MVP);
+	s->SetUniformMat4f("lastMVP", lastMVP);
+	s->SetUniformMat4f("nextMVP", nextMVP);
+	s->SetUniformMat4f("Normal", Normal);
+	finUpdate(s, shaderIndx, pickedShape);
+}
+
+void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4 &Quaternion, const glm::mat2x4 &nextQuaternion, const glm::mat4 &Normal, const int  shaderIndx) {
+	Shader *s = shaders[shaderIndx];
+	s->Bind();
+	s->SetUniformMat2x4f("Quaternion", Quaternion);
+	s->SetUniformMat2x4f("lastQuaternion", lastQuaternion);
+	s->SetUniformMat2x4f("nextQuaternion", nextQuaternion);
+	s->SetUniformMat4f("Normal", Normal);
+	finUpdate(s, shaderIndx, pickedShape);
+}
+
 void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx)
 {
 	Shader *s = shaders[shaderIndx];
-	int r = ((pickedShape+1) & 0x000000FF) >>  0;
-	int g = ((pickedShape+1) & 0x0000FF00) >>  8;
-	int b = ((pickedShape+1) & 0x00FF0000) >> 16;
 	s->Bind();
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
-	s->SetUniform4f("lightDirection", 0.0f , 0.0f, -1.0f, 0.0f);
-	if(shaderIndx == 0)
-		s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
-	else 
-		s->SetUniform4f("lightColor",0.1f,0.8f,0.7f,1.0f);
-	s->Unbind();
+	finUpdate(s, shaderIndx, pickedShape);
 }
 
 void Game::WhenRotate() {}

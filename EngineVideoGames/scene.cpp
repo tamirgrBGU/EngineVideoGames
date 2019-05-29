@@ -123,14 +123,16 @@ using namespace glm;
 		int p = pickedShape;
 		mat4 Normal1, MVP1;
 		std::vector<glm::mat4> mvp, norms;
-		std::vector<glm::vec4> quaternionsReal, quaternionDual;
+		std::vector<glm::mat2x4> quaternions;
 		for (unsigned int i = 0; i<shapes.size(); i++){
 			getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, i);
 			mvp.push_back(MVP1);
 			norms.push_back(Normal1);
 			detail::tdualquat<float, glm::highp> dquat = dualquat_cast(cropto3x4(mvp[i]));
-			quaternionsReal.push_back(glm::vec4(dquat.real.x, dquat.real.y, dquat.real.z, dquat.real.w));
-			quaternionDual.push_back(glm::vec4(dquat.dual.x, dquat.dual.y, dquat.dual.z, dquat.dual.w));
+			mat2x4 dquatmat(0);
+			dquatmat[0] = glm::vec4(dquat.real.x, dquat.real.y, dquat.real.z, dquat.real.w);
+			dquatmat[1] = glm::vec4(dquat.dual.x, dquat.dual.y, dquat.dual.z, dquat.dual.w);
+			quaternions.push_back(dquatmat);
 		}
 
 		glm::mat4 lastMVP(0), nextMVP(0);
@@ -153,8 +155,8 @@ using namespace glm;
 						nextMVP = mat4(0);
 					pickedShape = i;
 
-					UpdateQuaternion(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());//linear
-					//UpdateQuaternion(lastMVP, mvp[i], nextMVP, norms[i],shapes[i]->GetShader());//dquat
+					UpdateLinear(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());//linear
+					//UpdateQuaternion(lastMVP, quaternions[i], nextMVP, norms[i],shapes[i]->GetShader());//dquat
 					shapes[i]->Draw(shaders,textures,false);					
 				}
 				else 
@@ -164,7 +166,6 @@ using namespace glm;
 					shapes[i]->Draw(shaders,textures,true);
 					
 				}
-				lastMVP = MVP;
 			}
 		}
 		pickedShape = p;

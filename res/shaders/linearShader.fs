@@ -2,11 +2,15 @@
 
 in vec3 color0;
 
-uniform sampler2D sampler;
-uniform vec4 lightDirection;
-uniform vec4 lightColor;
+//varying vec2 MCposition;
+in vec3 LightIntensity;
+in vec2 TexCoord;
+uniform sampler2D ourTexture;
 
 void main()
 {
 	gl_FragColor = vec4(color0,1);
+	//vec4 t = texture2D(ourTexture, TexCoord.xy);
+	//vec4 t = texture2D(ourTexture, gl_TexCoord[0].xy);
+	//gl_FragColor =  t* vec4(LightIntensity,1); //you must have gl_FragColor
 }
