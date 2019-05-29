@@ -180,6 +180,8 @@ void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const gl
 }
 
 void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4 &Quaternion, const glm::mat2x4 &nextQuaternion, const glm::mat4 &Normal, const int  shaderIndx) {
+	//printf("<%f %f %f %f>", Quaternion[0].x, Quaternion[0].y, Quaternion[0].z, Quaternion[0].w);
+	//printf(" <%f %f %f %f>\n", Quaternion[1].x, Quaternion[1].y, Quaternion[1].z, Quaternion[1].w);
 	Shader *s = shaders[shaderIndx];
 	s->Bind();
 	s->SetUniformMat2x4f("Quaternion", Quaternion);

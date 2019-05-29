@@ -128,7 +128,7 @@ using namespace glm;
 			getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, i);
 			mvp.push_back(MVP1);
 			norms.push_back(Normal1);
-			detail::tdualquat<float, glm::highp> dquat = dualquat_cast(cropto3x4(mvp[i]));
+			detail::tdualquat<float, glm::highp> dquat = dualquat_cast(cropto3x4(glm::transpose(mvp[i])));
 			mat2x4 dquatmat(0);
 			dquatmat[0] = glm::vec4(dquat.real.x, dquat.real.y, dquat.real.z, dquat.real.w);
 			dquatmat[1] = glm::vec4(dquat.dual.x, dquat.dual.y, dquat.dual.z, dquat.dual.w);
