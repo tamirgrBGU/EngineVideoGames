@@ -58,7 +58,7 @@
 					break;
 				case GLFW_KEY_RIGHT: 
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->zLocalRotate, 5.1f);
+						scn->shapeTransformation(scn->zLocalRotate, 5.0f);
 					else
 						scn->OpositeDirectionRot(z, 10.f);
 					break;
@@ -70,13 +70,13 @@
 					break;
 				case GLFW_KEY_UP:
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->xLocalRotate,5.f);
+						scn->shapeTransformation(scn->xLocalRotate,5.0f);
 					else
 						scn->OpositeDirectionRot(x, 5.f);
 					break;
 				case GLFW_KEY_DOWN:
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->xGlobalRotate,-5.f);
+						scn->shapeTransformation(scn->xLocalRotate,-5.0f);
 					else
 						scn->OpositeDirectionRot(x, 5.f);
 					break;

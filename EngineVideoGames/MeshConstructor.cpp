@@ -107,16 +107,16 @@ void MeshConstructor::InitMesh(const IndexedModel &model){
 	int i = 0;
 	for (; i < VEC3_ATTRIB_NUM; i++)
 	{
-		vbs.push_back(new VertexBuffer(model.GetData(i),verticesNum*sizeof(model.positions[0])));	
+		vbs.push_back(new VertexBuffer(model.GetData(i), verticesNum*sizeof(model.positions[0])));	
 		vao.AddBuffer(*vbs.back(),i,3,GL_FLOAT);
 	}
 	for(;i < VEC2_ATTRIB_NUM + VEC3_ATTRIB_NUM;i++)
 	{
-		vbs.push_back(new VertexBuffer(model.GetData(i),verticesNum*sizeof(model.positions[0])));	
+		vbs.push_back(new VertexBuffer(model.GetData(i), verticesNum*sizeof(model.texCoords[0])));	
 		vao.AddBuffer(*vbs.back(),i,2,GL_FLOAT);
 	}
 
-	ib = new IndexBuffer((unsigned int*)model.GetData(5),indicesNum);
+	ib = new IndexBuffer((unsigned int*)model.GetData(5), indicesNum);
 	
 	vao.Unbind();
 	is2D = true;

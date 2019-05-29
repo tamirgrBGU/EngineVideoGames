@@ -53,11 +53,11 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					float SEGsPart = s / float(resS);
 					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], SEGtPart, SEGsPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
+
 					model.positions.push_back(pos3);
-					model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
+					model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
 					model.colors.push_back(color);
-					vec3 normal = calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart);
-					model.normals.push_back(normal);
+					model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
 					model.texCoords.push_back(vec2(tPart, sPart));
 				}
 			}
@@ -70,10 +70,11 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			float SEGsPart = s / float(resS);
 			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, SEGsPart);
 			vec3 pos3(pos.x, pos.y, pos.z);
+
 			model.positions.push_back(pos3);
-			model.weights.push_back(calcWeight(b.segNo() - 1, segmentSindx, 1, sPart));
-			model.colors.push_back(color);
 			model.normals.push_back(calc_bezier_point2D_get_normal(b.segNo()-1, pos3, 1));
+			model.colors.push_back(color);
+			model.weights.push_back(calcWeight(b.segNo() - 1, segmentSindx, 1, sPart));
 			model.texCoords.push_back(vec2(1, sPart));
 		}
 	}

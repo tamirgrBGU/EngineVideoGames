@@ -3,7 +3,7 @@
 #include "scene.h"
 #include <iostream>
 #include <glm/gtc/quaternion.hpp>
-
+#include <glm/gtx/dual_quaternion.hpp>
 
 using namespace std;
 using namespace glm;
@@ -90,49 +90,81 @@ using namespace glm;
 		return shapes[pickedShape]->makeTrans();
 	}
 
+	void Scene::getNormalAndMVP(mat4 &Normal, mat4 &MVP, mat4 *Normal1, mat4 *MVP1, int i) {
+		*Normal1 = mat4(1);
+		pickedShape = i;
+		for (int j = i; chainParents[j] > -1; j = chainParents[j])
+		{
+			*Normal1 = shapes[chainParents[j]]->makeTrans() * *Normal1;
+		}
+
+		*MVP1 = MVP * *Normal1;
+		*Normal1 = Normal * *Normal1;
+
+		*MVP1 = *MVP1 * shapes[i]->makeTransScale(mat4(1));
+		*Normal1 = *Normal1 * shapes[i]->makeTrans();
+	}
+
+	mat3x4 cropto3x4(mat4 &in) {
+		mat3x4 out;
+		out[0] = in[0];
+		out[1] = in[1];
+		out[2] = in[2];
+		return out;
+
+	}
+
+	//assumption ! chained shapes are uploaded together
 	void Scene::Draw(int shaderIndx,int cameraIndx,bool debugMode)
 	{
 		glm::mat4 Normal = makeTrans();
 		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
-		
+
 		int p = pickedShape;
-//		shaders[shaderIndx]->Bind();
+		mat4 Normal1, MVP1;
+		std::vector<glm::mat4> mvp, norms;
+		std::vector<glm::vec4> quaternionsReal, quaternionDual;
+		for (unsigned int i = 0; i<shapes.size(); i++){
+			getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, i);
+			mvp.push_back(MVP1);
+			norms.push_back(Normal1);
+			detail::tdualquat<float, glm::highp> dquat = dualquat_cast(cropto3x4(mvp[i]));
+			quaternionsReal.push_back(glm::vec4(dquat.real.x, dquat.real.y, dquat.real.z, dquat.real.w));
+			quaternionDual.push_back(glm::vec4(dquat.dual.x, dquat.dual.y, dquat.dual.z, dquat.dual.w));
+		}
+
+		glm::mat4 lastMVP(0), nextMVP(0);
+
 		for (unsigned int i=0; i<shapes.size();i++)
 		{
 			if(shapes[i]->Is2Render())
 			{
-				mat4 Normal1 = mat4(1);
-				pickedShape = i;
-				for (int j = i; chainParents[j] > -1; j = chainParents[j])
+				if (shaderIndx > 0)
 				{
-					Normal1 =  shapes[chainParents[j]]->makeTrans() * Normal1;
-				}
-			
-				mat4 MVP1 = MVP * Normal1; 
-				Normal1 = Normal * Normal1;
+					//ACTUALLY we want it just in a dual quaternion shader
+					//printf("%d %d\n", chainParents[i], i);
+					if (i<shapes.size()-1 && chainParents[i + 1] == i)
+						lastMVP = mvp[i + 1];
+					else
+						lastMVP = mat4(0);
+					if (chainParents[i] > -1)
+						nextMVP = mvp[chainParents[i]];
+					else
+						nextMVP = mat4(0);
+					pickedShape = i;
 
-				MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
-				Normal1 = Normal1 * shapes[i]->makeTrans();
-			    if(i>=1)
-				{
-				//	printMat(shapes[i]->makeTrans());
-				//	printMat(Normal1);
-				//	printMat(MVP1);
-				}
-				
-
-				if(shaderIndx > 0)
-				{
-					Update(MVP1,Normal1,shapes[i]->GetShader());
-					shapes[i]->Draw(shaders,textures,false);
-					
+					UpdateQuaternion(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());//linear
+					//UpdateQuaternion(lastMVP, mvp[i], nextMVP, norms[i],shapes[i]->GetShader());//dquat
+					shapes[i]->Draw(shaders,textures,false);					
 				}
 				else 
 				{
-					Update(MVP1,Normal1,0);
+					pickedShape = i;
+					Update(mvp[i], norms[i],0);
 					shapes[i]->Draw(shaders,textures,true);
 					
 				}
+				lastMVP = MVP;
 			}
 		}
 		pickedShape = p;

@@ -55,10 +55,10 @@ void Game::updateIntersectors(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
-static std::vector<glm::mat4> getHeadSegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
+static std::vector<glm::mat4> getHeadSegs(float *lastX, float *lastY, float jumpX, float jumpY, int segs) {
 	std::vector<glm::mat4> segments;
 	mat4 seg0 = mat4(0);
-	float mult = 1;
+	float mult = 1 - 1 / float(segs);
 	for (int i = 0; i < segs; i++) {
 		seg0[0] = vec4(*lastX, *lastY, 0, 1);
 		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
@@ -73,7 +73,7 @@ static std::vector<glm::mat4> getHeadSegs(float *lastX, float *lastY, float jump
 	return segments;
 }
 
-static std::vector<glm::mat4> getTailSegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
+static std::vector<glm::mat4> getTailSegs(float *lastX, float *lastY, float jumpX, float jumpY, int segs) {
 	std::vector<glm::mat4> segments;
 	mat4 seg0 = mat4(0);
 	float mult = 0;
@@ -91,7 +91,7 @@ static std::vector<glm::mat4> getTailSegs(float *lastX, float *lastY, float jump
 	return segments;
 }
 
-static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
+static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jumpX, float jumpY, int segs) {
 	std::vector<glm::mat4> segments;
 	mat4 seg0 = mat4(0);
 	for (int i = 0; i < segs; i++) {
@@ -111,15 +111,15 @@ intersect *a = nullptr;
 intersect *b = nullptr;
 std::vector<Bezier1D> b1vec;
 glm::vec3 yAx(0, 1, 0);
-float jumpy = 0.2f, jumpx = 0.08f;
-int snakeLength = 4, bezierRes = 3, cirSubdiv = 2;
+float jumpy = 0.8f, jumpx = 0.32f;
+int snakeLength = 5, bezierRes = 20, cirSubdiv = 4, segs = 5, ends = 10;
 void Game::Init()
 {
 	addShape(Axis, -1, LINES);
 
 	std::cout << "start snake" << std::endl;
-	float x = 0; float y = 0;
-	Bezier1D tail(getTailSegs(&x, &y, jumpx, jumpy, 4));
+	float x = 0; float y = 0; float rounding = float(segs) / ends;
+	Bezier1D tail(getTailSegs(&x, &y, jumpx * rounding, jumpy, ends));
 	b1vec.push_back(tail);
 	for (int i = snakeLength - 2; i > 0; i--) {
 		//y += jumpy;
@@ -127,7 +127,7 @@ void Game::Init()
 		b1vec.push_back(body);
 	}
 	//y += jumpy/4;
-	Bezier1D head(getHeadSegs(&x, &y, -jumpx, jumpy, 4));
+	Bezier1D head(getHeadSegs(&x, &y, -jumpx * rounding, jumpy, ends));
 	b1vec.push_back(head);
 
 	vec3 axisFrom = *(b1vec[0].GetControlPoint(0, 0).GetPos());
@@ -156,7 +156,25 @@ void Game::Init()
 	pickedShape = -1;
 }
 
-	void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx)
+void Game::UpdateQuaternion(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx) {
+	Shader *s = shaders[shaderIndx];
+	int r = ((pickedShape + 1) & 0x000000FF) >> 0;
+	int g = ((pickedShape + 1) & 0x0000FF00) >> 8;
+	int b = ((pickedShape + 1) & 0x00FF0000) >> 16;
+	s->Bind();
+	s->SetUniformMat4f("MVP", MVP);
+	s->SetUniformMat4f("lastMVP", lastMVP);
+	s->SetUniformMat4f("nextMVP", nextMVP);
+	s->SetUniformMat4f("Normal", Normal);
+	s->SetUniform4f("lightDirection", 0.0f, 0.0f, -1.0f, 0.0f);
+	if (shaderIndx == 0)
+		s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+	else
+		s->SetUniform4f("lightColor", 0.1f, 0.8f, 0.7f, 1.0f);
+	s->Unbind();
+}
+
+void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx)
 {
 	Shader *s = shaders[shaderIndx];
 	int r = ((pickedShape+1) & 0x000000FF) >>  0;
