@@ -55,20 +55,46 @@ void Game::updateIntersectors(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
+static std::vector<glm::mat4> getHeadSegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
+	std::vector<glm::mat4> segments;
+	mat4 seg0 = mat4(0);
+	float mult = 1;
+	for (int i = 0; i < segs; i++) {
+		seg0[0] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
+		seg0[1] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
+		seg0[2] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
+		seg0[3] = vec4(*lastX, *lastY, 0, 1);
+		mult -= 1 / float(segs);
+		segments.push_back(seg0);
+	}
+	return segments;
+}
+
+static std::vector<glm::mat4> getTailSegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
+	std::vector<glm::mat4> segments;
+	mat4 seg0 = mat4(0);
+	float mult = 0;
+	for (int i = 0; i < segs; i++) {
+		seg0[0] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
+		seg0[1] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
+		seg0[2] = vec4(*lastX, *lastY, 0, 1);
+		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
+		seg0[3] = vec4(*lastX, *lastY, 0, 1);
+		mult += 1 / float(segs);
+		segments.push_back(seg0);
+	}
+	return segments;
+}
+
 static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jumpX, float jumpY, float segs) {
 	std::vector<glm::mat4> segments;
 	mat4 seg0 = mat4(0);
-
-	seg0[0] = vec4(*lastX, *lastY, 0, 1);
-	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-	seg0[1] = vec4(*lastX, *lastY, 0, 1);
-	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-	seg0[2] = vec4(*lastX, *lastY, 0, 1);
-	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-	seg0[3] = vec4(*lastX, *lastY, 0, 1);
-
-	segments.push_back(seg0);
-	for (int i = 0; i < segs - 1; i++) {
+	for (int i = 0; i < segs; i++) {
 		seg0[0] = vec4(*lastX, *lastY, 0, 1);
 		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
 		seg0[1] = vec4(*lastX, *lastY, 0, 1);
@@ -78,14 +104,6 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 		seg0[3] = vec4(*lastX, *lastY, 0, 1);
 		segments.push_back(seg0);
 	}
-	seg0[0] = vec4(*lastX, *lastY, 0, 1);
-	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-	seg0[1] = vec4(*lastX, *lastY, 0, 1);
-	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-	seg0[2] = vec4(*lastX, *lastY, 0, 1);
-	*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-	seg0[3] = vec4(*lastX, *lastY, 0, 1);
-	segments.push_back(seg0);
 	return segments;
 }
 
@@ -93,33 +111,33 @@ intersect *a = nullptr;
 intersect *b = nullptr;
 std::vector<Bezier1D> b1vec;
 glm::vec3 yAx(0, 1, 0);
-float jumpy = 0.2f, jumpx = 0.12f;
-int snakeLength = 4;
+float jumpy = 0.2f, jumpx = 0.08f;
+int snakeLength = 4, bezierRes = 3, cirSubdiv = 2;
 void Game::Init()
 {
 	addShape(Axis, -1, LINES);
 
 	std::cout << "start snake" << std::endl;
 	float x = 0; float y = 0;
-	Bezier1D head(getBodySegs(&x, &y, jumpx, jumpy, 4));
-	b1vec.push_back(head);
+	Bezier1D tail(getTailSegs(&x, &y, jumpx, jumpy, 4));
+	b1vec.push_back(tail);
 	for (int i = snakeLength - 2; i > 0; i--) {
-		y += jumpy;
+		//y += jumpy;
 		Bezier1D body(getBodySegs(&x, &y, 0, jumpy, 4));
 		b1vec.push_back(body);
 	}
-	y += jumpy;
-	Bezier1D tail(getBodySegs(&x, &y, -jumpx, jumpy, 4));
-	b1vec.push_back(tail);
+	//y += jumpy/4;
+	Bezier1D head(getHeadSegs(&x, &y, -jumpx, jumpy, 4));
+	b1vec.push_back(head);
 
 	vec3 axisFrom = *(b1vec[0].GetControlPoint(0, 0).GetPos());
-	Bezier2D b(b1vec[0], 5, yAx, vec3(0, axisFrom.y, 0));
-	addShape(b.GetSurface(12, 12), -1, TRIANGLES);
+	Bezier2D b(b1vec[0], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
+	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES);
 	int lastPickedShape = 1;
 	for (int i = 1; i < snakeLength; i++) {
 		axisFrom = *(b1vec[i].GetControlPoint(0, 0).GetPos());
-		Bezier2D b(b1vec[i], 5, yAx, vec3(0, axisFrom.y, 0));
-		addShape(b.GetSurface(12, 12), lastPickedShape++, TRIANGLES);
+		Bezier2D b(b1vec[i], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
+		addShape(b.GetSurface(bezierRes, bezierRes), lastPickedShape++, TRIANGLES);
 		b.~Bezier2D();
 	}
 	std::cout << "done snake" << std::endl;
@@ -156,9 +174,7 @@ void Game::Init()
 }
 
 void Game::WhenRotate() {}
-
-void Game::WhenTranslate()
-{	}
+void Game::WhenTranslate() {}
 
 void Game::savePastPositions(int controlPoint) {
 	int indx = 0;

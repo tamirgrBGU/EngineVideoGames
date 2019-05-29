@@ -33,6 +33,8 @@ Shape::Shape(const IndexedModel &model, unsigned int mode){
 	this->mode = mode;
 	isCopy = false;
 	toRender = true;
+	texID = -1;
+	shaderID = 1;
 }
 
 Shape::Shape(const int SimpleShapeType,unsigned int mode)
@@ -60,7 +62,7 @@ Shape::Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,
 
 
 void Shape::Draw( const std::vector<Shader*> shaders, const std::vector<Texture*> textures,bool isPicking)
-{
+{	
 	if(texID>=0)
 		textures[texID]->Bind();
 	if(isPicking)

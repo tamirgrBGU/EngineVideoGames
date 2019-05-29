@@ -45,11 +45,13 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			gen_surface(surfaces[segmentSindx], segmentT, segmentSindx);
 		}
 		for (int t = 0; t < resT; t++) {
-			float tPart = t / float(resT);
+			float tPart = (t + resT*segmentTindx) / float(resT*b.segNo());
+			float SEGtPart = t / float(resT);
 			for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 				for (int s = 0; s < resS; s++) {
-					float sPart = s / float(resS);
-					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], tPart, sPart);
+					float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
+					float SEGsPart = s / float(resS);
+					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], SEGtPart, SEGsPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
 					model.positions.push_back(pos3);
 					model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
@@ -64,8 +66,9 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 
 	for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 		for (int s = 0; s < resS; s++) {
-			float sPart = s / float(resS);
-			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, sPart);
+			float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
+			float SEGsPart = s / float(resS);
+			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, SEGsPart);
 			vec3 pos3(pos.x, pos.y, pos.z);
 			model.positions.push_back(pos3);
 			model.weights.push_back(calcWeight(b.segNo() - 1, segmentSindx, 1, sPart));

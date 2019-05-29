@@ -72,8 +72,7 @@ using namespace glm;
 
 	void Scene::addShader(const std::string& fileName)
 	{
-		shaders.push_back(new Shader(fileName));
-		
+		shaders.push_back(new Shader(fileName));		
 	}
 
 	void Scene::AddTexture(const std::string& textureFileName)
