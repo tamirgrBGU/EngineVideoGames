@@ -2,6 +2,7 @@
 #include "shader.h"
 #include "shape.h"
 #include "camera.h"
+#include "DrawBuffer.h"
 #include "VertexArray.hpp"
 #include <vector>
 
@@ -26,7 +27,7 @@ public:
 		MeshCopy,
 	};
 	Scene();
-	Scene(glm::vec3 position,float angle,float hwRelation,float near, float far);
+	Scene(glm::vec3 position,int width,int height,float angle,float near, float far);
 	
 	void addShapeFromFile(const std::string& fileName,int parent,unsigned int mode);
 	virtual void addShape(int type,int parent,unsigned int mode);
@@ -34,6 +35,8 @@ public:
 	
 	void addShader(const std::string& fileName);
 	void AddTexture(const std::string& textureFileName);
+	void AddCamera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar);
+	void addBuffer(int left, int bottum, int width,int height, int buffer);
 	void ZeroShapesTrans();
 
 	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//
@@ -81,7 +84,8 @@ public:
 private:	
 
 	std::vector<Camera*> cameras; //light will have the properties of camera
-	
+	std::vector<DrawBuffer*> buffers;
+
 	Shape *axisMesh;
 	int verticesSize;
 	int indicesSize;
@@ -89,6 +93,7 @@ private:
 	float depth;
 	int xold, yold,xrel, yrel;
 	int cameraIndx;
+	void Clear(float r, float g, float b, float a);
 
 protected:
 	std::vector<Shape*> shapes;

@@ -25,6 +25,33 @@ void IndexedModel::CalcNormals()
 	}
 }
 
+IndexedModel PlaneTriangles()
+{
+	Vertex vertices[] =
+	{
+		Vertex(glm::vec3(-1, -1, -1), glm::vec2(1, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(glm::vec3(-1, 1, -1), glm::vec2(0, 0), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(glm::vec3(1, 1, -1), glm::vec2(0, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+		Vertex(glm::vec3(1, -1, -1), glm::vec2(1, 1), glm::vec3(0, 0, -1),glm::vec3(0, 0, 1)),
+	};
+	unsigned int indices[] =	{0, 1, 2,
+				0, 2, 3};
+	IndexedModel model;
+	
+	for(unsigned int i = 0; i < 4; i++)
+	{
+		model.positions.push_back(*vertices[i].GetPos());
+		model.colors.push_back(*vertices[i].GetColor());
+		model.normals.push_back(*vertices[i].GetNormal());
+		model.weights.push_back(*vertices[i].GetWeight());
+		model.texCoords.push_back(*vertices[i].GetTexCoord());
+	
+	}
+	for(unsigned int i = 0; i < 6; i++)
+        model.indices.push_back(indices[i]);
+	
+	return model;
+}
 
 IndexedModel CubeTriangles()
 {

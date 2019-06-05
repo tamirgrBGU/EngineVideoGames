@@ -14,12 +14,20 @@ uniform vec4 lightDirection;
 void main()
 {
     vec3 eyePosition = vec3(0,0,0);
-	vec3 specularContribution =vec3(0.7,0.7,0.7);
+	vec3 specularContribution =vec3(0.9,0.9,0.9);
 	float shiness = 10.0f;
-	vec3 tnorm =  - normal0;
+	vec3 tnorm = -normal0;
+
+    float a = 0.5f,b = 10.0f;
+    float x = texCoord0.s;
+    float y = texCoord0.t;
+    tnorm.x =  - normal0.x - a*((b*cos(b*x*y))*sin(b*y*x) + 2*sin(b*x)*(cos(b*y))) ;
+    tnorm.y =  - normal0.y - a*(sin(b*x)*(cos(b*y)) +(b*cos(b*x*y))*sin(b*y*x));
+   tnorm.z =  - normal0.z -1;
+   tnorm = normalize(tnorm); 
 	
 	vec3 lightVec = normalize(vec3(lightDirection));
-	vec3 reflectVec = reflect(-lightVec, tnorm);
+	vec3 reflectVec = reflect(lightVec, tnorm);
 	vec3 viewVec = normalize(eyePosition - position0);
 	float diffuse = max(dot(lightVec, tnorm), 0.0);
 	float spec = 0;

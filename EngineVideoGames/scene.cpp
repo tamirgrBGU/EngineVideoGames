@@ -27,7 +27,7 @@ using namespace glm;
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(3);
 		
-		cameras.push_back(new Camera(vec3(0,0,1.0f),60.0f,1.0f,0.1f,100.0f));
+		cameras.push_back(new Camera(vec3(0,0,1.0f),800,800,60.0f,0.1f,100.0f));
 		pickedShape = -1;
 		depth = 0;
 		cameraIndx = 0;
@@ -36,13 +36,14 @@ using namespace glm;
 		isActive = false;
 	}
 
-	Scene::Scene(vec3 position,float angle,float hwRelation,float near, float far)
+	Scene::Scene(vec3 position,int width, int height,float angle,float near, float far)
 	{
 		//verticesSize = sizeof(vertices)/sizeof(vertices[0]);
 		//
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(6);
-		cameras.push_back(new Camera(position,angle,hwRelation,near,far));
+		
+		cameras.push_back(new Camera(position,width,height,angle,near,far));
 	//	axisMesh = new Shape(axisVertices,sizeof(axisVertices)/sizeof(axisVertices[0]),axisIndices, sizeof(axisIndices)/sizeof(axisIndices[0]));
 		pickedShape = -1;
 		depth = 0;
@@ -50,6 +51,7 @@ using namespace glm;
 		xold = 0;
 		yold = 0;
 		isActive = false;
+		
 	}
 
 	void Scene::addShapeFromFile(const std::string& fileName,int parent,unsigned int mode)
@@ -81,6 +83,15 @@ using namespace glm;
 		textures.push_back(new Texture(textureFileName));
 	}
 
+	void Scene::AddCamera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar)
+	{
+		cameras.push_back(new Camera(pos,width,height,fov,zNear,zFar));
+	}
+
+	void Scene::addBuffer(int left, int bottum, int width,int height, int buffer)
+	{
+		buffers.push_back(new DrawBuffer());
+	}
 	mat4 Scene::GetViewProjection(int indx) const
 	{
 		return cameras[indx]->GetViewProjection();
@@ -93,11 +104,20 @@ using namespace glm;
 
 	void Scene::Draw(int shaderIndx,int cameraIndx,bool debugMode)
 	{
+						
 		glm::mat4 Normal = makeTrans();
-		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
 		
+		glm::mat4 MVP = cameras[cameraIndx]->GetViewProjection() * Normal;
+		glViewport(0,0,cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
 		int p = pickedShape;
-//		shaders[shaderIndx]->Bind();
+		if(debugMode)
+		{
+			if(shaderIndx>0)
+				Clear(1,1,1,1);
+			else
+				Clear(0,0,0,0);
+		}
+
 		for (unsigned int i=0; i<shapes.size();i++)
 		{
 			if(shapes[i]->Is2Render())
@@ -114,14 +134,13 @@ using namespace glm;
 
 				MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
 				Normal1 = Normal1 * shapes[i]->makeTrans();
-			    if(i>=1)
+				if(i>=1)
 				{
 				//	printMat(shapes[i]->makeTrans());
 				//	printMat(Normal1);
 				//	printMat(MVP1);
 				}
 				
-
 				if(shaderIndx > 0)
 				{
 					Update(MVP1,Normal1,shapes[i]->GetShader());
@@ -129,10 +148,9 @@ using namespace glm;
 					
 				}
 				else 
-				{
+				{ //picking
 					Update(MVP1,Normal1,0);
 					shapes[i]->Draw(shaders,textures,true);
-					
 				}
 			}
 		}
@@ -378,16 +396,16 @@ using namespace glm;
 	void Scene::resize(int width,int height)
 	{
 		glViewport(0,0,width,height);
-		cameras[0]->setProjection((float)width/(float)height,cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar());
+		
+		cameras[0]->setProjection(width,height,cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar());
 	}
 
 	float Scene::picking(int x,int y)
 	{
 		//float depth;
-		glClearColor(0.0,0.0,0.0,0.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		Draw(0,0,false); 
-						
+		
+		Draw(0,0,true); 
+		
 		GLint viewport[4];  
 		unsigned char data[4];
 		glGetIntegerv(GL_VIEWPORT, viewport); //reading viewport parameters
@@ -527,8 +545,19 @@ using namespace glm;
 			delete tex;
 		}
 
+	for(DrawBuffer* buf: buffers)
+		{
+			delete buf;
+		}
+
 	delete axisMesh;
 
+}
+
+void Scene::Clear(float r, float g, float b, float a)
+{
+	glClearColor(r, g, b, a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 	 
 	void Scene::ScaleAllDirections(int factor)

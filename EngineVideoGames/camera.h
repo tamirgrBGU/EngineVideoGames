@@ -7,25 +7,29 @@
 struct Camera
 {
 public:
-	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar)
+	Camera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar)
 	{
 		this->pos = pos;
+		this->width = width;
+		this->height = height;
 		this->forward = glm::vec3(0.0f, 0.0f, -1.0f);
 		this->up = glm::vec3(0.0f, 1.0f, 0.0f);
-		this->projection = glm::perspective(fov, aspect, zNear, zFar);
+		this->projection = glm::perspective(fov,GetWHRelation() , zNear, zFar);
 		this->projection = this->projection * glm::lookAt(pos, pos + forward, up);
 		this->fov = fov;
 		this->near = zNear;
 		this->far = zFar;
-		this->relation = aspect;
+		
 	}
 
-	void setProjection( float aspect, float zNear, float zFar)
+	void setProjection( int width, int height, float zNear, float zFar)
 	{
-		this->projection = glm::perspective(fov,aspect, zNear, zFar)* glm::lookAt(pos, pos + forward, up);
+		this->width = width;
+		this->height = height;
+		this->projection = glm::perspective(fov,GetWHRelation(), zNear, zFar)* glm::lookAt(pos, pos + forward, up);
 		this->near = zNear;
 		this->far = zFar;
-		this->relation = aspect;
+		
 	}
 
 	inline glm::mat4 GetViewProjection() const
@@ -33,7 +37,15 @@ public:
 		return projection ;
 	}
 
-	
+	int GetWidth()
+	{
+		return width;
+	}
+
+	int GetHeight()
+	{
+		return height;
+	}
 
 	void MoveForward(float amt)
 	{
@@ -77,7 +89,7 @@ public:
 	}
 	inline float GetWHRelation()
 	{
-		return relation;
+		return (float) width / height;
 	}
 protected:
 private:
@@ -86,7 +98,8 @@ private:
 	glm::vec3 forward;
 	glm::vec3 up;
 	float fov;
-	float far,near,relation;
+	float far,near;
+	int width,height;
 };
 
 #endif

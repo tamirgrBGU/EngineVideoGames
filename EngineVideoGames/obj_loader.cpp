@@ -128,6 +128,7 @@ IndexedModel OBJModel::ToIndexedModel()
             result.texCoords.push_back(currentTexCoord);
             result.normals.push_back(currentNormal);
 			result.colors.push_back(currentColor);
+			result.weights.push_back(glm::vec3(0,1,0));
         }
         else
             resultModelIndex = previousVertexLocation;

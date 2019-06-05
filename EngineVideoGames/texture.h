@@ -6,9 +6,17 @@
 class Texture
 {
 public:
+	enum
+	{
+		COLOR,
+		DEPTH,
+		STENCIL,
+		ACCUM,
+	};
 	Texture(const std::string& fileName);
-
+	Texture(int width, int height,int mode);
 	void Bind();
+	void bindTex2Buffer( int num, int mode);
 
 	 ~Texture();
 protected:

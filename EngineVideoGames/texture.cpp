@@ -24,6 +24,32 @@ Texture::Texture(const std::string& fileName)
     stbi_image_free(data);
 }
 
+Texture::Texture(int width, int height,int mode)
+{
+	glGenTextures(1, &m_texture);
+  //  	glActiveTexture(GL_TEXTURE0 + num);
+   glBindTexture(GL_TEXTURE_2D, m_texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);      //GL_REPEAT specified so that CGOL is simulated on a torus.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    switch(mode)
+	{
+	case COLOR:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //note GL_RED internal format, to save memory.
+		break;
+	case DEPTH:
+		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		break;
+	case STENCIL:
+			glTexImage2D (GL_TEXTURE_2D, 0, GL_STENCIL_INDEX16, width, height, 0, GL_STENCIL_COMPONENTS, GL_UNSIGNED_BYTE, NULL);
+		break;
+	default:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //note GL_RED internal format, to save memory.
+	}
+}
+
 Texture::~Texture()
 {
 	glDeleteTextures(1, &m_texture);
@@ -32,4 +58,24 @@ Texture::~Texture()
 void Texture::Bind()
 {
 	glBindTexture(GL_TEXTURE_2D, m_texture);
+}
+
+void Texture::bindTex2Buffer( int num,int mode)
+{
+	switch(mode)
+	{
+	case COLOR:
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + num , m_texture, 0);
+		break;
+	case DEPTH:
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT , m_texture, 0);
+		break;
+	case STENCIL:
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT , m_texture, 0);
+		break;
+	default:
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + num , m_texture, 0);
+	}
+	
+	
 }

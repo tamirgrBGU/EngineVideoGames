@@ -15,7 +15,7 @@ static void printMat(const glm::mat4 mat)
 
 Game::Game():Scene(){curve = 0;}
 
-Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far) : Scene(position,angle,hwRelation,near,far)
+Game::Game(glm::vec3 position,int width,int height,float angle,float near, float far) : Scene(position,width,height,angle,near,far)
 { 
 	curve = new Bezier1D();
 }
@@ -37,42 +37,24 @@ void Game::addShape(int type,int parent,unsigned int mode)
 void Game::Init()
 {
 	addShape(Axis,-1,LINES);
-	addShape(Octahedron,-1,TRIANGLES);
-	//addShapeFromFile("../res/objs/torus.obj",-1,TRIANGLES);
-	addShapeCopy(1,-1,TRIANGLES);
-	addShape(Cube,1,LINE_LOOP);
-	addShapeCopy(3,2,LINE_LOOP);
+	
+	addShapeFromFile("../res/objs/monkey3.obj",-1,TRIANGLES);
+	
+	addShape(Cube,-1,TRIANGLES);
 	
 	
 	//translate all scene away from camera
-	myTranslate(glm::vec3(0,0,-20),0);
-
-	pickedShape = 0;
-
-	shapeTransformation(yScale,10);
-	shapeTransformation(xScale,10);
-	shapeTransformation(zScale,10);
-
-	
-	ReadPixel();
-	
-	pickedShape = 2;
-	shapeTransformation(zLocalRotate,45);	
+	myTranslate(glm::vec3(0,0,-5),0);
 
 	pickedShape = 1;
-
-	shapeTransformation(zGlobalTranslate,-10);
-	shapeTransformation(yScale,3.30f);
-	shapeTransformation(xScale,3.30f);
-	shapeTransformation(zScale,3.30f);
-
-	pickedShape =3;
-	shapeTransformation(yScale,3.30f);
-	shapeTransformation(xScale,3.30f);
-	shapeTransformation(zScale,3.30f);
-
+	shapeTransformation(xGlobalTranslate,2);
+	//ScaleAllDirections(2);
+	SetShapeTex(1,0);
+	SetShapeTex(2,1);
+	
+	ReadPixel();
 	pickedShape = -1;
-	Activate();
+	//Activate();
 }
 
 	void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx)
@@ -88,7 +70,7 @@ void Game::Init()
 	if(shaderIndx == 0)
 		s->SetUniform4f("lightColor",r/255.0f, g/255.0f, b/255.0f,1.0f);
 	else 
-		s->SetUniform4f("lightColor",0.1f,0.8f,0.7f,1.0f);
+		s->SetUniform4f("lightColor",0.7f,0.8f,0.1f,1.0f);
 	s->Unbind();
 }
 
@@ -111,10 +93,7 @@ void Game::Motion()
 {
 	if(isActive)
 	{
-		int p = pickedShape;
-		pickedShape = 2;
-		shapeTransformation(zLocalRotate,0.75);
-		pickedShape = p;
+		
 	}
 }
 

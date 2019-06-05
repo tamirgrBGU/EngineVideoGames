@@ -8,9 +8,8 @@ int main(int argc,char *argv[])
 	const float zFar = 100.0f;
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;
-	const float relation = (float)DISPLAY_WIDTH/(float)DISPLAY_HEIGHT;
 
-	Game *scn = new Game(glm::vec3(0.0f, 0.0f, 1.0f), CAM_ANGLE, relation, zNear,zFar);
+	Game *scn = new Game(glm::vec3(0.0f, 0.0f, 1.0f),DISPLAY_WIDTH,DISPLAY_HEIGHT, CAM_ANGLE, zNear,zFar);
 	
 	Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, "OpenGL");
 	
@@ -20,17 +19,19 @@ int main(int argc,char *argv[])
 
 	scn->addShader("../res/shaders/pickingShader");	
 	scn->addShader("../res/shaders/basicShader");
-	scn->addShader("../res/shaders/basicShadertex");
-	scn->AddTexture("../res/textures/snake1.png");
-
+	//scn->addShader("../res/shaders/basicShadertex");
+	scn->AddTexture("../res/textures/box0.bmp");
+	scn->AddTexture("../res/textures/plane.png");
+	scn->AddCamera(glm::vec3(0.0f, 0.0f, 1.0f),300,300, CAM_ANGLE, zNear,zFar);
 	display.setScene(scn);
 
 	while(!display.closeWindow())
 	{
-		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 		scn->Draw(1,0,true);
+		scn->Draw(1,1,false);
 		scn->Motion();
 		display.SwapBuffers();
+		
 		display.PollEvents();
 	}
 	delete scn;

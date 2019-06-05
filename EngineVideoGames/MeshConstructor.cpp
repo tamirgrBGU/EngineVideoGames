@@ -101,7 +101,7 @@ void MeshConstructor::InitMesh( IndexedModel &model){
 	}
 	for(;i < VEC2_ATTRIB_NUM + VEC3_ATTRIB_NUM;i++)
 	{
-		vbs.push_back(new VertexBuffer(model.GetData(i),verticesNum*sizeof(model.positions[0])));	
+		vbs.push_back(new VertexBuffer(model.GetData(i),verticesNum*sizeof(model.texCoords[0])));	
 		vao.AddBuffer(*vbs.back(),i,2,GL_FLOAT);
 	}
 

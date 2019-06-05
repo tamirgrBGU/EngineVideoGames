@@ -37,9 +37,9 @@
 					if(scn->IsActive())
 						scn->Deactivate();
 					else
-						scn->Deactivate();
+						scn->Activate();
 				break;
-								case GLFW_KEY_RIGHT:
+				case GLFW_KEY_RIGHT:
 					//scn->shapeTransformation(scn->zGlobalRotate,-20.1f);
 					scn->shapeTransformation(scn->zLocalRotate,5.1f);
 //						cout<< "right: "<<endl;
@@ -86,7 +86,7 @@
 		Game *scn = (Game*)glfwGetWindowUserPointer(window);
 
 		scn->resize(width,height);
-		//relation = (float)width/(float)height;
+		
 	}
 
 	void init(Display &display)

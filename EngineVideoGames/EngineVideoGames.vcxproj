@@ -75,6 +75,7 @@
   <ItemGroup>
     <ClCompile Include="bezier1D.cpp" />
     <ClCompile Include="bezier2D.cpp" />
+    <ClCompile Include="DrawBuffer.cpp" />
     <ClCompile Include="EulerAngles.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="kdtree.cpp" />
@@ -95,6 +96,7 @@
     <ClInclude Include="bezier1D.h" />
     <ClInclude Include="bezier2D.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="DrawBuffer.h" />
     <ClInclude Include="EulerAngles.h" />
     <ClInclude Include="IndexBuffer.hpp" />
     <ClInclude Include="kdtree.h" />
