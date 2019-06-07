@@ -14,6 +14,9 @@ MeshConstructor::MeshConstructor(const int type)
 	case Axis:	
 		InitLine(AxisGenerator());
 		break;
+	case Plane:
+		InitMesh(PlaneTriangles());
+		break;
 	case Cube:
 		 InitMesh(CubeTriangles());
 		 break;

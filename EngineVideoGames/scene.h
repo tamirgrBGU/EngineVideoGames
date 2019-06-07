@@ -6,6 +6,16 @@
 #include "VertexArray.hpp"
 #include <vector>
 
+enum buffers
+	{
+		COLOR,
+		DEPTH,
+		STENCIL,
+		BACK,
+		FRONT,
+		ACCUM,
+		NONE,
+	};
 
 class Scene : public MovableGLM
 {
@@ -15,9 +25,10 @@ public:
 	enum transformations{xLocalTranslate,yLocalTranslate,zLocalTranslate,xGlobalTranslate,yGlobalTranslate,zGlobalTranslate,
 		xLocalRotate,yLocalRotate,zLocalRotate,xGlobalRotate,yGlobalRotate,zGlobalRotate,xScale,yScale,zScale,xCameraTranslate,yCameraTranslate,zCameraTranslate};
 	enum modes{POINTS,LINES,LINE_LOOP,LINE_STRIP,TRIANGLES,TRIANGLE_STRIP,TRIANGLE_FAN,QUADS};
-	enum Shapes
+	enum shapes
 	{
 		Axis,
+		Plane,
 		Cube,
 		Octahedron,
 		Tethrahedron,
@@ -26,6 +37,8 @@ public:
 		LineCopy,
 		MeshCopy,
 	};
+	
+	
 	Scene();
 	Scene(glm::vec3 position,int width,int height,float angle,float near, float far);
 	
@@ -34,18 +47,21 @@ public:
 	void addShapeCopy(int indx,int parent,unsigned int mode);
 	
 	void addShader(const std::string& fileName);
-	void AddTexture(const std::string& textureFileName);
+	void AddTexture(const std::string& textureFileName, bool for2D);
+	void AddTexture(int width,int height,int mode);
 	void AddCamera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar);
-	void addBuffer(int left, int bottum, int width,int height, int buffer);
+	void AddBuffer(int texIndx,int mode);
 	void ZeroShapesTrans();
 
 	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//
 
 	virtual void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx) = 0;
+	virtual void Update2D(glm::mat4& mat, int time, const int shaderIndx);
 	virtual void WhenTranslate(){};
 	virtual void WhenRotate(){};
 	virtual void Motion(){};
-	virtual void Draw(int shaderIndx,int cameraIndx,bool debugMode);
+	virtual void Draw(int shaderIndx,int cameraIndx,int buffer,bool toClear,bool debugMode);
+	virtual void Draw2D(int shaderIndx,int cameraIndx,int buffer,bool toClear,bool debugMode);
 
 	glm::mat4 GetViewProjection(int indx) const; 
 	glm::mat4 GetShapeTransformation() const;
@@ -82,11 +98,10 @@ public:
 	inline void SetShapeShader(int shpIndx,int shdrIndx){shapes[shpIndx]->SetShader(shdrIndx);} 
 	
 private:	
-
+	
 	std::vector<Camera*> cameras; //light will have the properties of camera
 	std::vector<DrawBuffer*> buffers;
-
-	Shape *axisMesh;
+	std::vector<int> texIndices;
 	int verticesSize;
 	int indicesSize;
 
@@ -96,11 +111,12 @@ private:
 	void Clear(float r, float g, float b, float a);
 
 protected:
+	Shape *plane2D;
 	std::vector<Shape*> shapes;
 	std::vector<Shader*> shaders;
 	std::vector<int> chainParents;
 	std::vector<Texture*> textures;
-
+	
 	int pickedShape;
 	int direction;
 	static const int scaleFactor =2;

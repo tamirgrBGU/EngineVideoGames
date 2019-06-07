@@ -43,6 +43,8 @@ public:
 
 	inline int GetShader(){return shaderID;}
 
+	inline int GetTexture(){return texID;}
+
 	virtual ~Shape(void);
 };
 

@@ -4,7 +4,9 @@
 DrawBuffer::DrawBuffer(void)
 {
 	glGenFramebuffers(1,&buffer);
-	
+	//Bind();
+	//glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA8, 1200, 800 );
+	//UnBind();
 }
 
 
@@ -29,12 +31,44 @@ void DrawBuffer::Bind()
 	glBindFramebuffer(GL_FRAMEBUFFER, buffer);
 }
 
-void DrawBuffer::SetDrawDistination( int num)
+void DrawBuffer::UnBind()
 {
-	if(num>=0)
-		glDrawBuffer(GL_COLOR_ATTACHMENT0 + num);
-	else 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void DrawBuffer::SetDrawDistination( int num,int mode)
+{
+	switch(mode)
+	{
+	case COLOR:
+		    Bind();
+			glDrawBuffer(GL_COLOR_ATTACHMENT0 + num);
+		break;
+	case DEPTH:
+		 Bind();
+		glDrawBuffer(GL_DEPTH_ATTACHMENT);
+		break;
+	case STENCIL:
+		 Bind();
+			glDrawBuffer( GL_STENCIL_ATTACHMENT );
+		break;
+	case BACK:
+		UnBind();
 		glDrawBuffer(GL_BACK);
+		break;
+	case FRONT:
+		UnBind();
+		glDrawBuffer(GL_FRONT);
+		break;
+	case NONE:
+		UnBind();
+		glDrawBuffer(GL_NONE);
+		break;
+	default:
+		UnBind();
+		glDrawBuffer(GL_BACK);
+	}
 }
 
 

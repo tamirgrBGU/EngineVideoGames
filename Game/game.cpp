@@ -36,6 +36,9 @@ void Game::addShape(int type,int parent,unsigned int mode)
 
 void Game::Init()
 {
+	plane2D = new Shape(Plane,TRIANGLES);
+	plane2D->SetShader(2);
+	
 	addShape(Axis,-1,LINES);
 	
 	addShapeFromFile("../res/objs/monkey3.obj",-1,TRIANGLES);

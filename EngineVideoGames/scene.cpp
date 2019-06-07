@@ -26,8 +26,7 @@ using namespace glm;
 		//
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(3);
-		
-		cameras.push_back(new Camera(vec3(0,0,1.0f),800,800,60.0f,0.1f,100.0f));
+		cameras.push_back(new Camera(vec3(0,0,1.0f),vec3(0,0,-1.0f),800,800,60.0f,0.1f,100.0f));		
 		pickedShape = -1;
 		depth = 0;
 		cameraIndx = 0;
@@ -42,9 +41,7 @@ using namespace glm;
 		//
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(6);
-		
-		cameras.push_back(new Camera(position,width,height,angle,near,far));
-	//	axisMesh = new Shape(axisVertices,sizeof(axisVertices)/sizeof(axisVertices[0]),axisIndices, sizeof(axisIndices)/sizeof(axisIndices[0]));
+		cameras.push_back(new Camera(position,-position,width,height,angle,near,far));
 		pickedShape = -1;
 		depth = 0;
 		cameraIndx = 0;
@@ -78,20 +75,36 @@ using namespace glm;
 		
 	}
 
-	void Scene::AddTexture(const std::string& textureFileName)
+	void Scene::AddTexture(const std::string& textureFileName,bool for2D)
 	{
+		if(for2D)
+		{
+			texIndices.push_back(textures.size());
+			plane2D->SetTexture(textures.size());
+		}
 		textures.push_back(new Texture(textureFileName));
+	}
+
+	void Scene::AddTexture(int width,int height,int mode)
+	{
+		texIndices.push_back(textures.size());
+		plane2D->SetTexture(textures.size());
+		textures.push_back(new Texture(width,height,mode));
 	}
 
 	void Scene::AddCamera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar)
 	{
-		cameras.push_back(new Camera(pos,width,height,fov,zNear,zFar));
+		cameras.push_back(new Camera(pos,-pos,width,height,fov,zNear,zFar));
 	}
 
-	void Scene::addBuffer(int left, int bottum, int width,int height, int buffer)
+	void Scene::AddBuffer(int texIndx,int mode)
 	{
 		buffers.push_back(new DrawBuffer());
+		buffers.back()->Bind();
+		textures[texIndx]->bindTex2Buffer(0,mode);
+		buffers.back()->UnBind();
 	}
+
 	mat4 Scene::GetViewProjection(int indx) const
 	{
 		return cameras[indx]->GetViewProjection();
@@ -102,15 +115,16 @@ using namespace glm;
 		return shapes[pickedShape]->makeTrans();
 	}
 
-	void Scene::Draw(int shaderIndx,int cameraIndx,bool debugMode)
+	void Scene::Draw(int shaderIndx,int cameraIndx,int buffer,bool toClear,bool debugMode)
 	{
-						
+		buffers.back()->SetDrawDistination(buffers.size()-1,buffer);
+		
 		glm::mat4 Normal = makeTrans();
 		
 		glm::mat4 MVP = cameras[cameraIndx]->GetViewProjection() * Normal;
 		glViewport(0,0,cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
 		int p = pickedShape;
-		if(debugMode)
+		if(toClear)
 		{
 			if(shaderIndx>0)
 				Clear(1,1,1,1);
@@ -134,12 +148,6 @@ using namespace glm;
 
 				MVP1 = MVP1 * shapes[i]->makeTransScale(mat4(1));
 				Normal1 = Normal1 * shapes[i]->makeTrans();
-				if(i>=1)
-				{
-				//	printMat(shapes[i]->makeTrans());
-				//	printMat(Normal1);
-				//	printMat(MVP1);
-				}
 				
 				if(shaderIndx > 0)
 				{
@@ -157,7 +165,43 @@ using namespace glm;
 		pickedShape = p;
 	}
 
-	 void Scene::shapeRotation(vec3 v, float ang,int indx)
+	void Scene::Draw2D(int shaderIndx,int cameraIndx,int buffer,bool toClear,bool debugMode)
+	{
+		buffers.back()->SetDrawDistination(buffers.size()-1,buffer);
+		glm::mat4 Normal = glm::mat4(1);
+		
+		glViewport(0,0,cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
+		
+		if(toClear)
+		{
+			if(shaderIndx>0)
+				Clear(1,1,1,1);
+			else
+				Clear(0,0,0,0);
+		}
+		Update2D(Normal,0,shaderIndx);
+		plane2D->Draw(shaders,textures,false);
+		
+	}
+
+	void Scene::Update2D(glm::mat4& mat, int time, const int shaderIndx)
+	{
+		Shader *s = shaders[shaderIndx];
+		s->Bind();
+		s->SetUniformMat4f("MVP",glm::mat4(1));
+		s->SetUniformMat4f("Normal",mat);
+		s->SetUniform1i("time", time);
+		//glBindTexture(GL_TEXTURE_2D, m_texture);
+		for(int i = 0; i<texIndices.size();i++)
+		{
+			char str[9];
+			sprintf_s<9>(str,"sampler%d",i+1);
+			s->SetUniform1i(str,textures[texIndices[i]]->GetSlot()); //to fix to slot
+		}
+
+	}
+
+	void Scene::shapeRotation(vec3 v, float ang,int indx)
 		{
 			if(v.x >0.9999)
 				shapes[indx]->globalSystemRot(ang,v,xAxis1);
@@ -404,7 +448,7 @@ using namespace glm;
 	{
 		//float depth;
 		
-		Draw(0,0,true); 
+		Draw(0,0,BACK,true,false); 
 		
 		GLint viewport[4];  
 		unsigned char data[4];
@@ -526,8 +570,9 @@ using namespace glm;
 			shapes[shpIndx]->Unhide();
 	}
 
-	Scene::~Scene(void)
-	{
+
+Scene::~Scene(void)
+{
 	for (Shape* shp : shapes)
 		{
 			delete shp;
@@ -549,8 +594,8 @@ using namespace glm;
 		{
 			delete buf;
 		}
-
-	delete axisMesh;
+	if(plane2D)
+		delete plane2D;
 
 }
 

@@ -54,7 +54,7 @@ Shape::Shape(Bezier1D *curve, unsigned int xResolution,unsigned int yResolution,
 void Shape::Draw( const std::vector<Shader*> shaders, const std::vector<Texture*> textures,bool isPicking)
 {
 	if(texID>=0)
-		textures[texID]->Bind();
+		textures[texID]->Bind(0);
 	if(isPicking)
 		shaders[0]->Bind();
 	else

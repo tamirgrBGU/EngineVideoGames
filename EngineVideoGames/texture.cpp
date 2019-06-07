@@ -13,7 +13,7 @@ Texture::Texture(const std::string& fileName)
 		std::cerr << "Unable to load texture: " << fileName << std::endl;
         
     glGenTextures(1, &m_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+    Bind(m_texture);
         
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -27,13 +27,8 @@ Texture::Texture(const std::string& fileName)
 Texture::Texture(int width, int height,int mode)
 {
 	glGenTextures(1, &m_texture);
-  //  	glActiveTexture(GL_TEXTURE0 + num);
-   glBindTexture(GL_TEXTURE_2D, m_texture);
+    Bind(m_texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);      //GL_REPEAT specified so that CGOL is simulated on a torus.
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     switch(mode)
 	{
 	case COLOR:
@@ -48,6 +43,11 @@ Texture::Texture(int width, int height,int mode)
 	default:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //note GL_RED internal format, to save memory.
 	}
+	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);      //GL_REPEAT specified so that CGOL is simulated on a torus.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
 
 Texture::~Texture()
@@ -55,8 +55,9 @@ Texture::~Texture()
 	glDeleteTextures(1, &m_texture);
 }
 
-void Texture::Bind()
+void Texture::Bind(int slot)
 {
+	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
@@ -65,16 +66,16 @@ void Texture::bindTex2Buffer( int num,int mode)
 	switch(mode)
 	{
 	case COLOR:
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + num , m_texture, 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + num , m_texture, 0);
 		break;
 	case DEPTH:
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT , m_texture, 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT , m_texture, 0);
 		break;
 	case STENCIL:
 			glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT , m_texture, 0);
 		break;
 	default:
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + num , m_texture, 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + num , m_texture, 0);
 	}
 	
 	

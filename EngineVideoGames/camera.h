@@ -7,12 +7,12 @@
 struct Camera
 {
 public:
-	Camera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar)
+	Camera(const glm::vec3& pos,const glm::vec3& forward,int width,int height , float fov, float zNear, float zFar)
 	{
 		this->pos = pos;
 		this->width = width;
 		this->height = height;
-		this->forward = glm::vec3(0.0f, 0.0f, -1.0f);
+		this->forward = forward; //glm::vec3(0.0f, 0.0f, -1.0f);
 		this->up = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->projection = glm::perspective(fov,GetWHRelation() , zNear, zFar);
 		this->projection = this->projection * glm::lookAt(pos, pos + forward, up);
