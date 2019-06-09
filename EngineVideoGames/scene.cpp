@@ -102,6 +102,7 @@ using namespace glm;
 		buffers.push_back(new DrawBuffer());
 		buffers.back()->Bind();
 		textures[texIndx]->bindTex2Buffer(0,mode);
+		textures[texIndx+1]->bindTex2Buffer(0,DEPTH);
 		buffers.back()->UnBind();
 	}
 
@@ -175,7 +176,7 @@ using namespace glm;
 		if(toClear)
 		{
 			if(shaderIndx>0)
-				Clear(1,1,1,1);
+				Clear(1,0,1,1);
 			else
 				Clear(0,0,0,0);
 		}
@@ -189,7 +190,7 @@ using namespace glm;
 		Shader *s = shaders[shaderIndx];
 		s->Bind();
 		s->SetUniformMat4f("MVP",glm::mat4(1));
-		s->SetUniformMat4f("Normal",mat);
+		//s->SetUniformMat4f("Normal",mat);
 		s->SetUniform1i("time", time);
 		//glBindTexture(GL_TEXTURE_2D, m_texture);
 		for(int i = 0; i<texIndices.size();i++)

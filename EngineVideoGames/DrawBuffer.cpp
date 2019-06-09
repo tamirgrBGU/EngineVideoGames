@@ -4,6 +4,10 @@
 DrawBuffer::DrawBuffer(void)
 {
 	glGenFramebuffers(1,&buffer);
+	//glGenFramebuffers(1,&depthBuffer);
+	glGenRenderbuffers(1,&depthBuffer);
+	
+	
 	//Bind();
 	//glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA8, 1200, 800 );
 	//UnBind();
@@ -29,11 +33,16 @@ DrawBuffer::DrawBuffer(void)
 void DrawBuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+	CreateDepthBufferAttachment(1200,800);
+	
 }
+
+
 
 void DrawBuffer::UnBind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_BUFFER);
 }
 
 
@@ -71,8 +80,17 @@ void DrawBuffer::SetDrawDistination( int num,int mode)
 	}
 }
 
-
+void DrawBuffer::CreateDepthBufferAttachment(int width,int height)
+{
+	
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT,width,height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,depthBuffer);
+	
+}
 
 DrawBuffer::~DrawBuffer(void)
 {
+	glDeleteFramebuffers(1, &buffer);
+	glDeleteRenderbuffers(1,&depthBuffer);
 }

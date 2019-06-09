@@ -26,10 +26,11 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/box0.bmp",false);
 	scn->AddTexture("../res/textures/plane.png",true);
 	scn->AddTexture(DISPLAY_WIDTH,DISPLAY_HEIGHT,COLOR);
+	scn->AddTexture(DISPLAY_WIDTH,DISPLAY_HEIGHT,DEPTH);
 	scn->AddBuffer(2,COLOR);
 	
 
-	scn->AddCamera(glm::vec3(0.0f, 0.0f, 1.0f),300,200, CAM_ANGLE, zNear,zFar);
+	scn->AddCamera(glm::vec3(0.0f, 0.0f, 1.0f),600,400, CAM_ANGLE, zNear,zFar);
 	display.setScene(scn);
 
 	while(!display.closeWindow())
