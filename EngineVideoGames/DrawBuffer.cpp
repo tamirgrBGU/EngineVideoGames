@@ -1,48 +1,28 @@
 #include "DrawBuffer.h"
 #include "GL/glew.h"
 
-DrawBuffer::DrawBuffer(void)
+DrawBuffer::DrawBuffer(int width,int height)
 {
-	glGenFramebuffers(1,&buffer);
-	//glGenFramebuffers(1,&depthBuffer);
-	glGenRenderbuffers(1,&depthBuffer);
+
+	CreateColorBufferAttachment(width,height);
+	CreateDepthBufferAttachment(width,height);
 	
 	
-	//Bind();
-	//glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA8, 1200, 800 );
-	//UnBind();
 }
 
-
-//void DrawBuffer::GetViewport(int *viewport)
-//{
-//	viewport[0] = left;
-//	viewport[1] = bottom;
-//	viewport[2] = width;
-//	viewport[3] = height;
-//}
-//	
-//void DrawBuffer::SetViewport(int _left, int _bottom, int _width,int _height)
-//{
-//	left = _left;
-//	bottom = _bottom;
-//	width = _width;
-//	height = _height;
-//		
-//}
 void DrawBuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-	CreateDepthBufferAttachment(1200,800);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	
 	
 }
-
 
 
 void DrawBuffer::UnBind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_BUFFER);
+	//glBindRenderbuffer(GL_RENDERBUFFER, GL_DEPTH_BUFFER);
 }
 
 
@@ -56,7 +36,7 @@ void DrawBuffer::SetDrawDistination( int num,int mode)
 		break;
 	case DEPTH:
 		 Bind();
-		glDrawBuffer(GL_DEPTH_ATTACHMENT);
+		glDrawBuffer(GL_NONE);
 		break;
 	case STENCIL:
 		 Bind();
@@ -80,9 +60,21 @@ void DrawBuffer::SetDrawDistination( int num,int mode)
 	}
 }
 
+void DrawBuffer::CreateColorBufferAttachment(int width,int height)
+{
+	glGenFramebuffers(1,&buffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+	glGenRenderbuffers(1,&buffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, buffer);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_RGBA8,width,height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,buffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void DrawBuffer::CreateDepthBufferAttachment(int width,int height)
 {
-	
+
+	glGenRenderbuffers(1,&depthBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT,width,height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,depthBuffer);

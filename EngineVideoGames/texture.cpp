@@ -35,7 +35,7 @@ Texture::Texture(int width, int height,int mode)
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //note GL_RED internal format, to save memory.
 		break;
 	case DEPTH:
-		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		break;
 	case STENCIL:
 			glTexImage2D (GL_TEXTURE_2D, 0, GL_STENCIL_INDEX16, width, height, 0, GL_STENCIL_COMPONENTS, GL_UNSIGNED_BYTE, NULL);

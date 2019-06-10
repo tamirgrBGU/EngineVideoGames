@@ -2,6 +2,7 @@
 #include "shader.h"
 #include "shape.h"
 #include "camera.h"
+#include "Viewport.h"
 #include "DrawBuffer.h"
 #include "VertexArray.hpp"
 #include <vector>
@@ -40,7 +41,7 @@ public:
 	
 	
 	Scene();
-	Scene(glm::vec3 position,int width,int height,float angle,float near, float far);
+	Scene(glm::vec3 position,float angle,float near, float far,Viewport &vp);
 	
 	void addShapeFromFile(const std::string& fileName,int parent,unsigned int mode);
 	virtual void addShape(int type,int parent,unsigned int mode);
@@ -49,8 +50,8 @@ public:
 	void addShader(const std::string& fileName);
 	void AddTexture(const std::string& textureFileName, bool for2D);
 	void AddTexture(int width,int height,int mode);
-	void AddCamera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar);
-	void AddBuffer(int texIndx,int mode);
+	void AddCamera(const glm::vec3& pos , float fov, float zNear, float zFar,Viewport vp);
+	void AddBuffer(int texIndx,int cameraIndx,int mode);
 	void ZeroShapesTrans();
 
 	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//

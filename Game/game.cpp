@@ -15,7 +15,7 @@ static void printMat(const glm::mat4 mat)
 
 Game::Game():Scene(){curve = 0;}
 
-Game::Game(glm::vec3 position,int width,int height,float angle,float near, float far) : Scene(position,width,height,angle,near,far)
+Game::Game(glm::vec3 position,float angle,float near, float far,Viewport &vp) : Scene(position,angle,near,far,vp)
 { 
 	curve = new Bezier1D();
 }

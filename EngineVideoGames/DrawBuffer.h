@@ -18,12 +18,10 @@ public:
 		ACCUM,
 		NONE,
 	};
-	DrawBuffer(void);
+	DrawBuffer(int width,int height);
 	void SetDrawDistination( int num,int mode);
 	void CreateDepthBufferAttachment(int width,int height);
-//	DrawBuffer(int _left, int _bottom, int _width,int _height, int _buffer);
-	//void GetViewport(int *viewport);
-//	void SetViewport(int left, int bottom, int width,int height);
+	void CreateColorBufferAttachment(int width,int height);
 	void Bind();
 	void UnBind();
 	~DrawBuffer(void);

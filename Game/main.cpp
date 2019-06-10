@@ -5,13 +5,15 @@
 
 int main(int argc,char *argv[])
 {
+	Viewport vp1(0,0,1200,800);
+	Viewport vp2(0,0,400,266);
 	const int DISPLAY_WIDTH = 1200;
 	const int DISPLAY_HEIGHT = 800;
 	const float zFar = 100.0f;
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;
 
-	Game *scn = new Game(glm::vec3(0.0f, 0.0f, 1.0f),DISPLAY_WIDTH,DISPLAY_HEIGHT, CAM_ANGLE, zNear,zFar);
+	Game *scn = new Game(glm::vec3(0.0f, 0.0f, 1.0f), CAM_ANGLE, zNear,zFar,vp1);
 	
 	Display display(DISPLAY_WIDTH, DISPLAY_HEIGHT, "OpenGL");
 	
@@ -27,10 +29,10 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/plane.png",true);
 	scn->AddTexture(DISPLAY_WIDTH,DISPLAY_HEIGHT,COLOR);
 	scn->AddTexture(DISPLAY_WIDTH,DISPLAY_HEIGHT,DEPTH);
-	scn->AddBuffer(2,COLOR);
+	scn->AddBuffer(2,0,COLOR);
 	
 
-	scn->AddCamera(glm::vec3(0.0f, 0.0f, 1.0f),600,400, CAM_ANGLE, zNear,zFar);
+	scn->AddCamera(glm::vec3(0.0f, 0.0f, 1.0f), CAM_ANGLE, zNear,zFar,vp2);
 	display.setScene(scn);
 
 	while(!display.closeWindow())

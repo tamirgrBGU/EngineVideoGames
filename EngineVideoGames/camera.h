@@ -1,17 +1,15 @@
 #ifndef CAMERA_INCLUDED_H
 #define CAMERA_INCLUDED_H
-
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include "Viewport.h"
 
 struct Camera
 {
 public:
-	Camera(const glm::vec3& pos,const glm::vec3& forward,int width,int height , float fov, float zNear, float zFar)
+	Camera(const glm::vec3& pos,const glm::vec3& forward, float fov, float zNear, float zFar, const Viewport &view)
 	{
 		this->pos = pos;
-		this->width = width;
-		this->height = height;
 		this->forward = forward; //glm::vec3(0.0f, 0.0f, -1.0f);
 		this->up = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->projection = glm::perspective(fov,GetWHRelation() , zNear, zFar);
@@ -19,17 +17,14 @@ public:
 		this->fov = fov;
 		this->near = zNear;
 		this->far = zFar;
-		
+		this->vp = view;
 	}
 
-	void setProjection( int width, int height, float zNear, float zFar)
+	void setProjection(float zNear, float zFar, Viewport &view)
 	{
-		this->width = width;
-		this->height = height;
-		this->projection = glm::perspective(fov,GetWHRelation(), zNear, zFar)* glm::lookAt(pos, pos + forward, up);
+		this->projection = glm::perspective(fov,view.GetWHRelation(), zNear, zFar)* glm::lookAt(pos, pos + forward, up);
 		this->near = zNear;
-		this->far = zFar;
-		
+		this->far = zFar;		
 	}
 
 	inline glm::mat4 GetViewProjection() const
@@ -39,12 +34,22 @@ public:
 
 	int GetWidth()
 	{
-		return width;
+		return vp.GetWidth();
 	}
 
 	int GetHeight()
 	{
-		return height;
+		return vp.GetHeight();
+	}
+
+	int GetLeft()
+	{
+		return vp.GetLeft();
+	}
+
+	int GetBottom()
+	{
+		return vp.GetBottom();
 	}
 
 	void MoveForward(float amt)
@@ -89,7 +94,7 @@ public:
 	}
 	inline float GetWHRelation()
 	{
-		return (float) width / height;
+		return vp.GetWHRelation();
 	}
 protected:
 private:
@@ -99,7 +104,7 @@ private:
 	glm::vec3 up;
 	float fov;
 	float far,near;
-	int width,height;
+	Viewport vp;
 };
 
 #endif

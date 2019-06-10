@@ -26,7 +26,7 @@ using namespace glm;
 		//
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(3);
-		cameras.push_back(new Camera(vec3(0,0,1.0f),vec3(0,0,-1.0f),800,800,60.0f,0.1f,100.0f));		
+		cameras.push_back(new Camera(vec3(0,0,1.0f),vec3(0,0,-1.0f),60.0f,0.1f,100.0f,Viewport()));		
 		pickedShape = -1;
 		depth = 0;
 		cameraIndx = 0;
@@ -35,13 +35,13 @@ using namespace glm;
 		isActive = false;
 	}
 
-	Scene::Scene(vec3 position,int width, int height,float angle,float near, float far)
+	Scene::Scene(vec3 position,float angle,float near, float far,Viewport &vp)
 	{
 		//verticesSize = sizeof(vertices)/sizeof(vertices[0]);
 		//
 		//indicesSize = sizeof(indices)/sizeof(indices[0]) ; 
 		glLineWidth(6);
-		cameras.push_back(new Camera(position,-position,width,height,angle,near,far));
+		cameras.push_back(new Camera(position,-position,angle,near,far,vp));
 		pickedShape = -1;
 		depth = 0;
 		cameraIndx = 0;
@@ -92,14 +92,14 @@ using namespace glm;
 		textures.push_back(new Texture(width,height,mode));
 	}
 
-	void Scene::AddCamera(const glm::vec3& pos,int width,int height , float fov, float zNear, float zFar)
+	void Scene::AddCamera(const glm::vec3& pos , float fov, float zNear, float zFar,Viewport vp)
 	{
-		cameras.push_back(new Camera(pos,-pos,width,height,fov,zNear,zFar));
+		cameras.push_back(new Camera(pos,-pos,fov,zNear,zFar,vp));
 	}
 
-	void Scene::AddBuffer(int texIndx,int mode)
+	void Scene::AddBuffer(int texIndx,int cameraIndx,int mode)
 	{
-		buffers.push_back(new DrawBuffer());
+		buffers.push_back(new DrawBuffer(cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight()));
 		buffers.back()->Bind();
 		textures[texIndx]->bindTex2Buffer(0,mode);
 		textures[texIndx+1]->bindTex2Buffer(0,DEPTH);
@@ -180,7 +180,10 @@ using namespace glm;
 			else
 				Clear(0,0,0,0);
 		}
-		Update2D(Normal,0,shaderIndx);
+		if(isActive)
+			Update2D(Normal,1,shaderIndx);
+		else
+			Update2D(Normal,0,shaderIndx);
 		plane2D->Draw(shaders,textures,false);
 		
 	}
@@ -192,7 +195,7 @@ using namespace glm;
 		s->SetUniformMat4f("MVP",glm::mat4(1));
 		//s->SetUniformMat4f("Normal",mat);
 		s->SetUniform1i("time", time);
-		//glBindTexture(GL_TEXTURE_2D, m_texture);
+		
 		for(int i = 0; i<texIndices.size();i++)
 		{
 			char str[9];
@@ -440,14 +443,13 @@ using namespace glm;
 	
 	void Scene::resize(int width,int height)
 	{
-		glViewport(0,0,width,height);
+		glViewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height);
 		
-		cameras[0]->setProjection(width,height,cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar());
+		cameras[0]->setProjection(cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar(),Viewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height));
 	}
 
 	float Scene::picking(int x,int y)
 	{
-		//float depth;
 		
 		Draw(0,0,BACK,true,false); 
 		
@@ -524,8 +526,8 @@ using namespace glm;
 				//float zTmp = 2.0*depth -1.0;
 				glGetIntegerv(GL_VIEWPORT, viewport);
 				float z=cameras[cameraIndx]->GetFar()+depth*(cameras[cameraIndx]->GetNear()-cameras[cameraIndx]->GetFar());
-				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
-				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0)*(cameras[cameraIndx]->GetFar()/z);
+				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0f)*(cameras[cameraIndx]->GetFar()/z);
+				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0f)*(cameras[cameraIndx]->GetFar()/z);
 
 				shapeTransformation(xCameraTranslate,-transX);
 				shapeTransformation(yCameraTranslate,transY);
