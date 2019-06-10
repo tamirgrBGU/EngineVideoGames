@@ -23,12 +23,12 @@ int main(int argc,char *argv[])
 
 	scn->addShader("../res/shaders/pickingShader");	
 	scn->addShader("../res/shaders/basicShader");
-	scn->addShader("../res/shaders/weightsShader2");
+	scn->addShader("../res/shaders/basicShader2D");
 
 	scn->AddTexture("../res/textures/box0.bmp",false);
 	scn->AddTexture("../res/textures/plane.png",true);
-	scn->AddTexture(DISPLAY_WIDTH,DISPLAY_HEIGHT,COLOR);
-	scn->AddTexture(DISPLAY_WIDTH,DISPLAY_HEIGHT,DEPTH);
+	scn->AddTexture(vp1.GetWidth(),vp1.GetHeight(),COLOR);
+	scn->AddTexture(vp1.GetWidth(),vp1.GetHeight(),DEPTH);
 	scn->AddBuffer(2,0,COLOR);
 	
 
