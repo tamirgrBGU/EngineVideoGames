@@ -10,7 +10,7 @@ public:
 	Camera(const glm::vec3& pos,const glm::vec3& forward, float fov, float zNear, float zFar, const Viewport &view)
 	{
 		this->pos = pos;
-		this->forward = forward; //glm::vec3(0.0f, 0.0f, -1.0f);
+		this->forward = forward; 
 		this->up = glm::vec3(0.0f, 1.0f, 0.0f);
 		this->projection = glm::perspective(fov,GetWHRelation() , zNear, zFar);
 		this->projection = this->projection * glm::lookAt(pos, pos + forward, up);
@@ -22,6 +22,7 @@ public:
 
 	void setProjection(float zNear, float zFar, Viewport &view)
 	{
+		this->vp = view;
 		this->projection = glm::perspective(fov,view.GetWHRelation(), zNear, zFar)* glm::lookAt(pos, pos + forward, up);
 		this->near = zNear;
 		this->far = zFar;		

@@ -123,7 +123,7 @@ using namespace glm;
 		glm::mat4 Normal = makeTrans();
 		
 		glm::mat4 MVP = cameras[cameraIndx]->GetViewProjection() * Normal;
-		glViewport(0,0,cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
+		glViewport(cameras[cameraIndx]->GetLeft(),cameras[cameraIndx]->GetBottom(),cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
 		int p = pickedShape;
 		if(toClear)
 		{
@@ -443,7 +443,7 @@ using namespace glm;
 	
 	void Scene::resize(int width,int height)
 	{
-		glViewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height);
+		//glViewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height);
 		
 		cameras[0]->setProjection(cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar(),Viewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height));
 	}
