@@ -12,6 +12,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linearSolver", "linearSolve
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IK", "IK\IK.vcxproj", "{90FE4BBB-DB39-46B3-A195-5E8C41B74687}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DisplaySDL", "DisplaySDL\DisplaySDL.vcxproj", "{35E904ED-8DF8-4250-983E-1F1D832D2DEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -42,6 +44,10 @@ Global
 		{90FE4BBB-DB39-46B3-A195-5E8C41B74687}.Debug|Win32.Build.0 = Debug|Win32
 		{90FE4BBB-DB39-46B3-A195-5E8C41B74687}.Release|Win32.ActiveCfg = Release|Win32
 		{90FE4BBB-DB39-46B3-A195-5E8C41B74687}.Release|Win32.Build.0 = Release|Win32
+		{35E904ED-8DF8-4250-983E-1F1D832D2DEC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{35E904ED-8DF8-4250-983E-1F1D832D2DEC}.Debug|Win32.Build.0 = Debug|Win32
+		{35E904ED-8DF8-4250-983E-1F1D832D2DEC}.Release|Win32.ActiveCfg = Release|Win32
+		{35E904ED-8DF8-4250-983E-1F1D832D2DEC}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

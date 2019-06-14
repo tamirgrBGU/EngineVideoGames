@@ -7,6 +7,9 @@ class DrawBuffer
 	//int height;
 	unsigned int buffer;
 	unsigned int depthBuffer;
+
+		void CreateDepthBufferAttachment(int width,int height);
+	void CreateColorBufferAttachment(int width,int height);
 public:
 	enum
 	{
@@ -20,8 +23,7 @@ public:
 	};
 	DrawBuffer(int width,int height);
 	void SetDrawDistination( int num,int mode);
-	void CreateDepthBufferAttachment(int width,int height);
-	void CreateColorBufferAttachment(int width,int height);
+	void resize(int width,int height);
 	void Bind();
 	void UnBind();
 	~DrawBuffer(void);

@@ -1,14 +1,14 @@
 #include "InputManager.h"
 #include "glm\glm.hpp"
 
-
-
-int main(int argc,char *argv[])
+	int main(int argc,char *argv[])
 {
-	Viewport vp1(0,0,1200,800);
-	Viewport vp2(0,0,400,266);
-	const int DISPLAY_WIDTH = 1200;
+
+	const int DISPLAY_WIDTH = 1600;
 	const int DISPLAY_HEIGHT = 800;
+	Viewport vp1(400,0,DISPLAY_WIDTH-400,DISPLAY_HEIGHT-0);
+	Viewport vp2(0,0,400,266);
+
 	const float zFar = 100.0f;
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;

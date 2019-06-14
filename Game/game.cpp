@@ -40,7 +40,7 @@ void Game::Init()
 	plane2D->SetShader(2);
 	
 	addShape(Axis,-1,LINES);
-	
+	shapes[0]->Hide();
 	addShapeFromFile("../res/objs/monkey3.obj",-1,TRIANGLES);
 	
 	addShape(Cube,-1,TRIANGLES);

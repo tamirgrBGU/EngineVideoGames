@@ -4,7 +4,7 @@
 #include <glm/gtx/transform.hpp>
 #include "Viewport.h"
 
-struct Camera
+struct Camera 
 {
 public:
 	Camera(const glm::vec3& pos,const glm::vec3& forward, float fov, float zNear, float zFar, const Viewport &view)

@@ -118,12 +118,16 @@ using namespace glm;
 
 	void Scene::Draw(int shaderIndx,int cameraIndx,int buffer,bool toClear,bool debugMode)
 	{
+		glEnable(GL_CULL_FACE);
 		buffers.back()->SetDrawDistination(buffers.size()-1,buffer);
 		
 		glm::mat4 Normal = makeTrans();
-		
+		if(buffer == BACK)
+			glViewport(cameras[cameraIndx]->GetLeft(),cameras[cameraIndx]->GetBottom(),cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
+		else
+			glViewport(0,0,cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
+
 		glm::mat4 MVP = cameras[cameraIndx]->GetViewProjection() * Normal;
-		glViewport(cameras[cameraIndx]->GetLeft(),cameras[cameraIndx]->GetBottom(),cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
 		int p = pickedShape;
 		if(toClear)
 		{
@@ -168,15 +172,16 @@ using namespace glm;
 
 	void Scene::Draw2D(int shaderIndx,int cameraIndx,int buffer,bool toClear,bool debugMode)
 	{
+		glDisable(GL_CULL_FACE);
 		buffers.back()->SetDrawDistination(buffers.size()-1,buffer);
 		glm::mat4 Normal = glm::mat4(1);
 		
-		glViewport(0,0,cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
+		glViewport(cameras[cameraIndx]->GetLeft(),cameras[cameraIndx]->GetBottom(),cameras[cameraIndx]->GetWidth(),cameras[cameraIndx]->GetHeight());
 		
 		if(toClear)
 		{
 			if(shaderIndx>0)
-				Clear(1,0,1,1);
+				Clear(1,1,1,1);
 			else
 				Clear(0,0,0,0);
 		}
@@ -446,6 +451,21 @@ using namespace glm;
 		//glViewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height);
 		
 		cameras[0]->setProjection(cameras[cameraIndx]->GetNear(),cameras[cameraIndx]->GetFar(),Viewport(cameras[0]->GetLeft(),cameras[0]->GetBottom(),width,height));
+		if(buffers.size()>0)
+		{
+			buffers[0]->resize(width,height);
+			for(Texture* tex: textures)
+			{
+				if(tex->IsReadFromBuffer())
+				{
+					delete tex;
+					tex = new Texture(width,height,COLOR);
+					buffers[0]->Bind();
+					tex->bindTex2Buffer(0,COLOR);
+					buffers[0]->UnBind();
+				}
+			}
+		}
 	}
 
 	float Scene::picking(int x,int y)
@@ -522,12 +542,12 @@ using namespace glm;
 		{
 			if(button == 1 )
 			{				
-				GLint viewport[4];
+				//GLint viewport[4];
 				//float zTmp = 2.0*depth -1.0;
-				glGetIntegerv(GL_VIEWPORT, viewport);
+				//glGetIntegerv(GL_VIEWPORT, viewport);
 				float z=cameras[cameraIndx]->GetFar()+depth*(cameras[cameraIndx]->GetNear()-cameras[cameraIndx]->GetFar());
-				float transX = cameras[cameraIndx]->GetWHRelation()*(xrel)/(float) (viewport[2])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0f)*(cameras[cameraIndx]->GetFar()/z);
-				float transY =(yrel)/(float) (viewport[3])*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0f)*(cameras[cameraIndx]->GetFar()/z);
+				float transX = (xrel)/(float) (cameras[cameraIndx]->GetWidth())*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0f)*(cameras[cameraIndx]->GetFar()/z);
+				float transY =(yrel)/(float) (cameras[cameraIndx]->GetHeight())*cameras[cameraIndx]->GetNear()*2.0f*tan(cameras[cameraIndx]->GetAngle()*M_PI/360.0f)*(cameras[cameraIndx]->GetFar()/z);
 
 				shapeTransformation(xCameraTranslate,-transX);
 				shapeTransformation(yCameraTranslate,transY);

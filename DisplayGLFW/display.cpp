@@ -24,6 +24,8 @@ Display::Display(int width, int height, const std::string& title)
     }
 	isFullScreen = false;
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	//glReadBuffer(GL_BACK);
 
 }
@@ -57,9 +59,9 @@ void* Display::getScene()
 	return glfwGetWindowUserPointer(m_window);
 }
 
-int Display::closeWindow()
+bool Display::closeWindow()
 {
-	return glfwWindowShouldClose(m_window);
+	return glfwWindowShouldClose(m_window) !=0;
 }
 
 Display::~Display()

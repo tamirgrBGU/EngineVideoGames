@@ -36,7 +36,7 @@ void DrawBuffer::SetDrawDistination( int num,int mode)
 		break;
 	case DEPTH:
 		 Bind();
-		glDrawBuffer(GL_NONE);
+		glDrawBuffer(GL_DEPTH_ATTACHMENT);
 		break;
 	case STENCIL:
 		 Bind();
@@ -79,6 +79,20 @@ void DrawBuffer::CreateDepthBufferAttachment(int width,int height)
 	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT,width,height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,depthBuffer);
 	
+}
+
+void DrawBuffer::resize(int width,int height)
+{  	
+	glBindFramebuffer(GL_FRAMEBUFFER, buffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, buffer);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_RGBA8,width,height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_RENDERBUFFER,buffer);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT,width,height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,depthBuffer);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 DrawBuffer::~DrawBuffer(void)
