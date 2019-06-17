@@ -1,6 +1,12 @@
-﻿Build started 14/06/2019 12:14:28.
-     1>Project "C:\Dev\EngineVideoGames\Game\Game.vcxproj" on node 2 (Build target(s)).
-     1>Link:
+﻿Build started 17/06/2019 10:01:48.
+     1>Project "C:\Dev\EngineVideoGames\Game\Game.vcxproj" on node 3 (Rebuild target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /IC:\Dev\EngineVideoGames\res/includes /IC:\Dev\EngineVideoGames\DisplayGLFW /IC:\Dev\EngineVideoGames\EngineVideoGames/ /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt game.cpp main.cpp
+         main.cpp
+     1>c:\dev\enginevideogames\game\inputmanager.h(20): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+         game.cpp
+         Generating Code...
+       Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Dev\EngineVideoGames\Debug\Game.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\Dev\EngineVideoGames\res/libs glew32s.lib glfw3.lib opengl32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Dev\EngineVideoGames\Debug\Game.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Dev\EngineVideoGames\Debug\Game.lib" /MACHINE:X86 Debug\game.obj
          Debug\main.obj
          C:\Dev\EngineVideoGames\Debug\DisplayGLFW.lib
@@ -17,8 +23,8 @@
      1>EngineVideoGames.lib(DrawBuffer.obj) : warning LNK4049: locally defined symbol ___glewRenderbufferStorage imported
      1>glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc100.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Dev\EngineVideoGames\Debug\vc100.pdb'; linking object as if no debug info
          Game.vcxproj -> C:\Dev\EngineVideoGames\Debug\Game.exe
-     1>Done Building Project "C:\Dev\EngineVideoGames\Game\Game.vcxproj" (Build target(s)).
+     1>Done Building Project "C:\Dev\EngineVideoGames\Game\Game.vcxproj" (Rebuild target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:02.10
+Time Elapsed 00:00:04.75

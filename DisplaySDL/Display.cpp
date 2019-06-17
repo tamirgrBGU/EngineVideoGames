@@ -1,3 +1,4 @@
+#define GLEW_STATIC
 #include "Display.h"
 #include <iostream>
 #include <GL/glew.h>
@@ -14,8 +15,8 @@ Display::Display(int width, int height, const std::string& title)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,16);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
 
-	m_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
-	m_glContext = SDL_GL_CreateContext(m_window);
+	m_window.window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+	m_glContext = SDL_GL_CreateContext(m_window.window);
 
 	GLenum res = glewInit();
     if(res != GLEW_OK)
@@ -27,12 +28,13 @@ Display::Display(int width, int height, const std::string& title)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+	m_window.userPointer = 0;
 }
 
 Display::~Display()
 {
 	SDL_GL_DeleteContext(m_glContext);
-	SDL_DestroyWindow(m_window);
+	SDL_DestroyWindow(m_window.window);
 	SDL_Quit();
 }
 
@@ -44,30 +46,33 @@ void  Display::PollEvents()
 		switch(e.type)
 		{
 		case SDL_QUIT:
-			m_isclosed= true;
+			m_isclosed = true;
 			break;
 		case SDL_KEYDOWN:
-			//window,key,scancode,action,mode
-			keyFunc(m_window,e.key.keysym.sym,e.key.keysym.scancode,SDL_KEYDOWN,e.key.keysym.mod);
+			if(e.key.keysym.scancode == SDLK_ESCAPE)
+				m_isclosed = true;
+			else
+				//window,key,scancode,action,mode
+				keyFunc(&m_window,e.key.keysym.sym,e.key.keysym.scancode,SDL_KEYDOWN,e.key.keysym.mod);
 			break;
 		case SDL_KEYUP:
 			//window,key,scancode,action,mode
-			keyFunc(m_window,e.key.keysym.sym,e.key.keysym.scancode,SDL_KEYUP,e.key.keysym.mod);
+			keyFunc(&m_window,e.key.keysym.sym,e.key.keysym.scancode,SDL_KEYUP,e.key.keysym.mod);
 		break;
 		case SDL_MOUSEMOTION:
-			cursorPosFunc(m_window,e.motion.x,e.motion.y);
+			cursorPosFunc(&m_window,e.motion.x,e.motion.y);
 		break;
 		case SDL_MOUSEBUTTONDOWN:
 			//window, button, action,mode
-			mouseFunc(m_window,e.button.button,SDL_MOUSEBUTTONDOWN,e.button.state);
+			mouseFunc(&m_window,e.button.button,SDL_MOUSEBUTTONDOWN,e.button.state);
 			break;
 		case SDL_MOUSEBUTTONUP:
 			//window, button, action,mode
-			mouseFunc(m_window,e.button.button,SDL_MOUSEBUTTONUP,e.button.state);
+			mouseFunc(&m_window,e.button.button,SDL_MOUSEBUTTONUP,e.button.state);
 		break;
 		case SDL_WINDOWEVENT:
 			if(e.window.event == SDL_WINDOWEVENT_RESIZED)
-				resizeFunc(m_window,e.window.data1,e.window.data2);
+				resizeFunc(&m_window,e.window.data1,e.window.data2);
 		break;
 		
 		default:
@@ -81,27 +86,33 @@ void  Display::PollEvents()
 		return false;
 	}
 	void*  Display::getScene()
-	{}
-	void  Display::addKeyCallBack(void(*func)(SDL_Window *,int,int,int,int))
+	{
+		return m_window.userPointer;
+	}
+
+	void  Display::setScene(void *userPointer)
+	{
+		m_window.userPointer = userPointer;
+	}	
+
+	void  Display::addKeyCallBack(void(*func)(Window *,int,int,int,int))
 	{
 	    keyFunc = func;
 	}
-	void  Display::addMouseCallBacks(void (* mousebuttonfun)(SDL_Window*,int,int,int),void(* scrollfun)(SDL_Window*,double,double),void (* cursorposfun)(SDL_Window*,double,double))
+	void  Display::addMouseCallBacks(void (* mousebuttonfun)(Window*,int,int,int),void(* scrollfun)(Window*,double,double),void (* cursorposfun)(Window*,double,double))
 	{
 		mouseFunc = mousebuttonfun;
 		cursorPosFunc = cursorposfun;
 		scrollFunc = scrollfun;
 	}
 
-	void  Display::addResizeCallBack(void (*windowsizefun)(SDL_Window*,int,int))
+	void  Display::addResizeCallBack(void (*windowsizefun)(Window*,int,int))
 	{
 		resizeFunc = windowsizefun;
 	}
-	void  Display::setScene(void *userPointer)
-	{
-	}
+
 	void Display::SwapBuffers()
 	{
-		SDL_GL_SwapWindow(m_window);
+		SDL_GL_SwapWindow(m_window.window);
 	}
 

@@ -12,13 +12,15 @@ public:
 
 	void SwapBuffers();
 	void PollEvents();
-	bool IsFullscreen(  );
+	
+	void setScene(void *userPointer);
 	void* getScene();
 	void addKeyCallBack(void(*func)(GLFWwindow *,int,int,int,int));
 	void addMouseCallBacks(void (* mousebuttonfun)(GLFWwindow*,int,int,int),void(* scrollfun)(GLFWwindow*,double,double),void (* cursorposfun)(GLFWwindow*,double,double));
 	void addResizeCallBack(void (*windowsizefun)(GLFWwindow*,int,int));
 	
-	void setScene(void *userPointer);
+	bool IsFullscreen(  );
+	
 
 	void mouseProccessing(int button);
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
