@@ -109,10 +109,12 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 
 intersect *a = nullptr;
 intersect *b = nullptr;
+const int snakeNodesShapesStart = 1;
 std::vector<Bezier1D> b1vec;
 glm::vec3 yAx(0, 1, 0);
+glm::vec3 xAx(1, 0, 0);
 float jumpy = 0.8f, jumpx = 0.32f;
-int snakeLength = 5, bezierRes = 20, cirSubdiv = 4, segs = 5, ends = 10;
+int snakeLength = 10, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
 void Game::Init()
 {
 	addShape(Axis, -1, LINES);
@@ -143,14 +145,20 @@ void Game::Init()
 	std::cout << "done snake" << std::endl;
 
 	// translate all scene away from camera
+
 	myTranslate(glm::vec3(0, 0, -20), 0);
 
 	pickedShape = 0;
 
-	shapeTransformation(yScale, 10);
-	shapeTransformation(xScale, 10);
-	shapeTransformation(zScale, 10);
+	shapeTransformation(yScale, 100);
+	shapeTransformation(xScale, 100);
+	shapeTransformation(zScale, 100);
 
+	pickedShape = 1;
+	this->shapeTransformation(this->xGlobalRotate , -90.0f);
+
+	myRotate(90.f, xAx, 1);
+	myTranslate(glm::vec3(0, -snakeLength*jumpy*ends/2, -snakeLength*jumpy*ends), 0);
 
 	ReadPixel();
 	pickedShape = -1;
