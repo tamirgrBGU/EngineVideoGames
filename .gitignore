@@ -367,3 +367,4 @@ IK/
 *.user
 EngineVideoGames.opensdf
 EngineVideoGames.sdf
+**/Debug

@@ -156,6 +156,16 @@ void Game::Init()
 
 	pickedShape = 1;
 	this->shapeTransformation(this->xGlobalRotate , -90.0f);
+	
+	pickedShape = snakeLength-1;
+	addShape(Cube, -1, LINES);
+	this->shapeTransformation(this->xGlobalTranslate, 10.f);
+	pickedShape++;
+	addShape(Cube, -1, LINES);
+	this->shapeTransformation(this->yGlobalTranslate, 10.f);
+	pickedShape++;
+	addShape(Cube, -1, LINES);
+	this->shapeTransformation(this->zGlobalTranslate, 10.f);
 
 	myRotate(90.f, xAx, 1);
 	myTranslate(glm::vec3(0, -snakeLength*jumpy*ends/2, -snakeLength*jumpy*ends), 0);
@@ -252,31 +262,38 @@ void Game::Motion()
 {
 	if(isActive)
 	{
-		shapeTransformation(zLocalRotate,0.75);
+		shapeTransformation(xLocalTranslate,0.75);
 	}
+}
+
+bool snakeviewmode = false;
+int snakeHeadNode = snakeNodesShapesStart+snakeLength-1;
+vec3 snakeDirection; //TODO
+void  Game::changeCameraMode() {
+	snakeviewmode = !snakeviewmode;
+	//vec3 headpos = shapes[snakeHeadNode]->getPointInSystem();
+	//printf("<%f,%f,%f>\n", headpos.x, headpos.y, headpos.z);
+	printf("rot\n");
+	shapes[snakeHeadNode]->printRot(false);
+	shapes[snakeHeadNode]->printRot(true);
+	printf("angles\n");
+	shapes[snakeHeadNode]->printAngles(false);
+	shapes[snakeHeadNode]->printAngles(true);
+	if (snakeviewmode) {
+		myRotate(90.f, xAx, 1);
+		myTranslate(glm::vec3(0, 5 + snakeLength*jumpy*ends / 2,  15 + snakeLength*jumpy*ends), 0);
+	}
+	else {
+		myRotate(-90.f, xAx, 1);
+		myTranslate(glm::vec3(0, -5 -snakeLength*jumpy*ends / 2, -15 - snakeLength*jumpy*ends), 0);
+	}
+}
+
+void updateCameraMode() {
+	//TODO
 }
 
 Game::~Game(void)
 {
 	delete curve;
-}
-
-int Game::getControlPointByShapeId(int shapeId) {
-	bool found = false;
-	int index = 0;
-	int ans = -1;
-	int arr_size = controlPointsShapesIds.size();
-	while (!found && (index < arr_size)) {
-		if (controlPointsShapesIds[index] == shapeId) {
-			ans = index;
-			found = true;
-		}
-		index++;
-	}
-	return ans;
-}
-
-
-void Game::addControlPointShapeId(int shapeId) {
-	controlPointsShapesIds.push_back(shapeId);
 }

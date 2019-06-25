@@ -21,11 +21,11 @@
 	}
 	
 	vec3 z(0, 0, 1);
+	vec3 y(0, 1, 0);
 	vec3 x(1, 0, 0);
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		Game *scn = (Game*)glfwGetWindowUserPointer(window);
-
 		if(action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
 			switch (key)
@@ -43,7 +43,7 @@
 					else
 						scn->Activate();
 				break;
-				case GLFW_KEY_A:
+				case GLFW_KEY_A://todo chenge player direction
 					scn->change_movement(-0.001f);
 					break;
 				case GLFW_KEY_S:
@@ -51,37 +51,39 @@
 					break;
 
 				case GLFW_KEY_D:
-					scn->SetDirection();
+					scn->changeCameraMode();
 					break;
+
 				case GLFW_KEY_C:
 					scn->cameramode = !scn->cameramode;
 					break;
 				case GLFW_KEY_RIGHT: 
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->zLocalRotate, 5.0f);
+						scn->shapeTransformation(scn->zLocalRotate, 1.0f);
 					else
-						scn->OpositeDirectionRot(z, 10.f);
+						scn->myRotate( 2.f, z, 0);
 					break;
 				case GLFW_KEY_LEFT:
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->zLocalRotate,-5.0f);
+						scn->shapeTransformation(scn->zLocalRotate,-1.0f);
 					else
-						scn->OpositeDirectionRot(z, 10.f);
+						scn->myRotate(-2.f, z, 0);
 					break;
 				case GLFW_KEY_UP:
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->xLocalRotate,5.0f);
+						scn->shapeTransformation(scn->xLocalRotate, 1.0f);
 					else
-						scn->OpositeDirectionRot(x, 5.f);
+						scn->myRotate( 2.f, x, 1);
 					break;
 				case GLFW_KEY_DOWN:
 					if (scn->cameramode)
-						scn->shapeTransformation(scn->xLocalRotate,-5.0f);
+						scn->shapeTransformation(scn->xLocalRotate,-1.0f);
 					else
-						scn->OpositeDirectionRot(x, 5.f);
+						scn->myRotate(-2.f, x, 1);
 					break;
 
 			default:
+				printf("undefined key %d\n", key);
 				break;
 			}
 		}

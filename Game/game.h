@@ -29,6 +29,8 @@ public:
 	void savePastPositions(int controlPoint);
 	void updateControlShapes(int controlPoint, Bezier1D *bez);
 	void Motion();
+	void changeCameraMode();
+	void updateCameraMode();
 	
 	void Game::changeMode() {
 		projMode = (projMode + 1) % 6;
@@ -40,12 +42,5 @@ public:
 	}
 
 	~Game(void);
-
-
-	//void setControlPointShapeId(int segment, int indx, int shapeId);
-	int getControlPointByShapeId(int shapeId);
-	void addControlPointShapeId(int shapeId);
-	/*int getControlPointShapeId(int segment, int indx);*/
-
 };
 
