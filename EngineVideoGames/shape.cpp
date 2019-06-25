@@ -23,7 +23,7 @@ Shape::Shape(const std::string& fileName, unsigned int mode){
 	this->mode = mode;
 	toRender = true;
 	texID = -1;
-	shaderID = 1;
+	shaderID = 3;
 
 }
 

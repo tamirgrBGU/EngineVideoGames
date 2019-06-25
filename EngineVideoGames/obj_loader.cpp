@@ -113,6 +113,7 @@ IndexedModel OBJModel::ToIndexedModel()
             normalModel.texCoords.push_back(currentTexCoord);
             normalModel.normals.push_back(currentNormal);
 			normalModel.colors.push_back(currentColor);
+			normalModel.weights.push_back(vec3(0));
         }
         else
             normalModelIndex = it->second;

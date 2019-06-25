@@ -143,6 +143,7 @@ void Game::Init()
 		b.~Bezier2D();
 	}
 	std::cout << "done snake" << std::endl;
+	//addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);//TODO AMIT, ADD PHONE
 
 	// translate all scene away from camera
 
