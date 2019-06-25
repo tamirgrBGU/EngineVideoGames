@@ -111,8 +111,9 @@ intersect *a = nullptr;
 intersect *b = nullptr;
 const int snakeNodesShapesStart = 1;
 std::vector<Bezier1D> b1vec;
-glm::vec3 yAx(0, 1, 0);
 glm::vec3 xAx(1, 0, 0);
+glm::vec3 yAx(0, 1, 0);
+glm::vec3 zAx(0, 0, 1);
 float jumpy = 0.8f, jumpx = 0.32f;
 int snakeLength = 10, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
 void Game::Init()
@@ -147,7 +148,7 @@ void Game::Init()
 
 	// translate all scene away from camera
 
-	myTranslate(glm::vec3(0, 0, -20), 0);
+	//myTranslate(glm::vec3(0, 0, -20), 0);
 
 	pickedShape = 0;
 
@@ -156,20 +157,19 @@ void Game::Init()
 	shapeTransformation(zScale, 100);
 
 	pickedShape = 1;
-	this->shapeTransformation(this->xGlobalRotate , -90.0f);
+	this->shapeTransformation(this->zGlobalRotate , 90.0f);
 	
-	pickedShape = snakeLength-1;
-	addShape(Cube, -1, LINES);
-	this->shapeTransformation(this->xGlobalTranslate, 10.f);
+	addShape(Cube, -1, TRIANGLES);
+	addShape(Cube, -1, TRIANGLES);
+	addShape(Cube, -1, TRIANGLES);
+	pickedShape = snakeLength+snakeNodesShapesStart;
+	this->shapeTransformation(this->xGlobalTranslate, 5.f);
 	pickedShape++;
-	addShape(Cube, -1, LINES);
 	this->shapeTransformation(this->yGlobalTranslate, 10.f);
 	pickedShape++;
-	addShape(Cube, -1, LINES);
-	this->shapeTransformation(this->zGlobalTranslate, 10.f);
+	this->shapeTransformation(this->zGlobalTranslate, 15.f);
 
-	myRotate(90.f, xAx, 1);
-	myTranslate(glm::vec3(0, -snakeLength*jumpy*ends/2, -snakeLength*jumpy*ends), 0);
+	myTranslate(glm::vec3(0, -y/2, -y), 0);
 
 	ReadPixel();
 	pickedShape = -1;
@@ -270,23 +270,24 @@ void Game::Motion()
 bool snakeviewmode = false;
 int snakeHeadNode = snakeNodesShapesStart+snakeLength-1;
 vec3 snakeDirection; //TODO
+vec3 snakeCurLocation; //TODO
 void  Game::changeCameraMode() {
 	snakeviewmode = !snakeviewmode;
 	//vec3 headpos = shapes[snakeHeadNode]->getPointInSystem();
 	//printf("<%f,%f,%f>\n", headpos.x, headpos.y, headpos.z);
-	printf("rot\n");
+	/*printf("rot\n");
 	shapes[snakeHeadNode]->printRot(false);
 	shapes[snakeHeadNode]->printRot(true);
 	printf("angles\n");
 	shapes[snakeHeadNode]->printAngles(false);
-	shapes[snakeHeadNode]->printAngles(true);
+	shapes[snakeHeadNode]->printAngles(true);*/
 	if (snakeviewmode) {
-		myRotate(90.f, xAx, 1);
-		myTranslate(glm::vec3(0, 5 + snakeLength*jumpy*ends / 2,  15 + snakeLength*jumpy*ends), 0);
+		myRotate(-90.f, xAx, 1);
+		myTranslate(glm::vec3(0, 30, 140), 0);
 	}
 	else {
-		myRotate(-90.f, xAx, 1);
-		myTranslate(glm::vec3(0, -5 -snakeLength*jumpy*ends / 2, -15 - snakeLength*jumpy*ends), 0);
+		myRotate(90.f, xAx, 1);
+		myTranslate(glm::vec3(0, -30,-140), 0);
 	}
 }
 

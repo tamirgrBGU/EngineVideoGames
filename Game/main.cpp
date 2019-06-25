@@ -5,7 +5,7 @@ int main(int argc,char *argv[])
 {
 	const int DISPLAY_WIDTH = 1200;
 	const int DISPLAY_HEIGHT = 800;
-	const float zFar = 100.0f;
+	const float zFar = 500.0f;
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;
 	const float relation = (float)DISPLAY_WIDTH/(float)DISPLAY_HEIGHT;
@@ -18,12 +18,12 @@ int main(int argc,char *argv[])
 	
 	scn->Init();
 
-	scn->addShader("../res/shaders/pickingShader");
-	scn->addShader("../res/shaders/linearShader");
-	scn->addShader("../res/shaders/dualQShader");
-	scn->addShader("../res/shaders/basicShader");
+	scn->addShader("../res/shaders/pickingShader");//0
+	scn->addShader("../res/shaders/linearShader");//1
+	scn->addShader("../res/shaders/dualQShader");//2
+	scn->addShader("../res/shaders/basicShader");//3
 	//scn->addShader("../res/shaders/weightsShader");
-	scn->addShader("../res/shaders/basicShadertex");
+	scn->addShader("../res/shaders/basicShadertex");//4
 	scn->AddTexture("../res/textures/snake1.png");
 
 	display.setScene(scn);

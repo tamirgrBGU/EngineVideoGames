@@ -45,7 +45,7 @@ Shape::Shape(const int SimpleShapeType,unsigned int mode)
 	isCopy = false;
 	toRender = true;
 	texID = -1;
-	shaderID = 1;
+	shaderID = 3;
 
 }
 
