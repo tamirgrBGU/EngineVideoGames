@@ -37,7 +37,7 @@ std::vector<std::string*> * scanDir(const char* path) {
 		printf("found level %s\n", buf);
 		std::string* name = new std::string(buf);
 		names->push_back(name);
-		sprintf_s(buf, "%s\\zone%d", path, i++);
+		sprintf_s(buf, "%s\\zone%d.txt", path, i++);
 	} 
 
 	return names;
@@ -284,16 +284,17 @@ void initGroundModel(std::vector<IndexedModel>* levelGround,
 		
 		if (obj->type != 0)
 			setWalls(objC, walls);
-
-		if (obj->type == -1) {//create squere at x and y;
-			levelGround->push_back(create_ground_square(obj->x, obj->y, obj->x + allscale, obj->y + allscale, obj->level * zscale));
-		}
-		else if (obj->type == 0) {//stairs
+		
+		if (obj->type == 0) {//stairs
 			setStairs(objC, walls, stairs);
 		}
 		else { //spacial index model (not square :) )
-			obj->level *= zscale;
-			specialObj->push_back(*obj);
+			//if (obj->type == -1) {//create squere at x and y;
+			levelGround->push_back(create_ground_square(obj->x, obj->y, obj->x + allscale, obj->y + allscale, obj->level * zscale));
+			if (obj->type > 0) {
+				obj->level *= zscale;
+				specialObj->push_back(*obj);
+			}
 		}
 	}
 }
