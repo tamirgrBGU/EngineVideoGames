@@ -13,6 +13,14 @@ struct objLocation {
 	int type;
 };
 
+struct objConnected {
+	struct objLocation me;
+	struct objConnected * left;
+	struct objConnected * right;
+	struct objConnected * up;
+	struct objConnected * down;
+};
+
 struct objMap {
 	std::vector<IndexedModel>* levelGround;
 	std::vector<IndexedModel>* stairs;

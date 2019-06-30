@@ -17,13 +17,13 @@ Shape::Shape(const Shape& shape,unsigned int mode)
 
 }
 
-Shape::Shape(const std::string& fileName, unsigned int mode){
+Shape::Shape(const std::string& fileName, unsigned int mode, int textureID, int shadeID){
 	mesh = new MeshConstructor(fileName);
 	isCopy = false;
 	this->mode = mode;
 	toRender = true;
-	texID = -1;
-	shaderID = 3;
+	texID = textureID;
+	shaderID = shadeID;
 
 }
 

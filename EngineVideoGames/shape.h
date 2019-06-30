@@ -23,7 +23,7 @@ public:
 
 	Shape(const Shape& shape,unsigned int mode);
 
-	Shape(const std::string& fileName,unsigned int mode);
+	Shape(const std::string& fileName,unsigned int mode, int textureID, int shaderID);
 	
 	Shape(const int SimpleShapeType,unsigned int mode);
 

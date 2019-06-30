@@ -110,14 +110,13 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 }
 
 leveGenerator lGen(0);
-
 intersect *a = nullptr;
 intersect *b = nullptr;
-const int snakeNodesShapesStart = 1;
 std::vector<Bezier1D> b1vec;
 glm::vec3 xAx(1, 0, 0);
 glm::vec3 yAx(0, 1, 0);
 glm::vec3 zAx(0, 0, 1);
+int snakeNodesShapesStart = -1;
 float jumpy = 0.8f, jumpx = 0.32f;
 int snakeLength = 10, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
 void Game::Init()
@@ -162,23 +161,25 @@ void Game::Init()
 	Bezier2D b(b1vec[0], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
 	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3 , 1);
 	//printf("%d\n", shapes.size());
-	int lastPickedShape = shapes.size()-1;
+	snakeNodesShapesStart = shapes.size() - 1;
+	int snakeNodesShapesStartTemp = snakeNodesShapesStart;
 	for (int i = 1; i < snakeLength; i++) {
 		axisFrom = *(b1vec[i].GetControlPoint(0, 0).GetPos());
 		Bezier2D b(b1vec[i], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
-		addShape(b.GetSurface(bezierRes, bezierRes), lastPickedShape++, TRIANGLES, 3, 1);
+		addShape(b.GetSurface(bezierRes, bezierRes), snakeNodesShapesStartTemp++, TRIANGLES, 3, 1);
 		b.~Bezier2D();
 	}
 	std::cout << "done snake" << std::endl;
-	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES);// NOKIA
 
-	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES);// CAVE
+	//addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 3, 1);// NOKIA
 
-	addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES);// TNT BOX
+	//addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 3, 1);// CAVE
 
-	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES);// SNAKE HEAD
+	//addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 3, 1);// TNT BOX
 
-	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES);// APPLE
+	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 1);// SNAKE HEAD
+
+	//addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 3, 1);// APPLE
 	
 	// translate all scene away from camera
 
@@ -190,7 +191,7 @@ void Game::Init()
 	shapeTransformation(xScale, 100);
 	shapeTransformation(zScale, 100);
 
-	pickedShape = 1;
+	pickedShape = snakeNodesShapesStart;
 	this->shapeTransformation(this->zGlobalRotate , 90.0f);
 	
 	addShape(Cube, -1, TRIANGLES);
@@ -325,7 +326,6 @@ void Game::Motion()
 }
 
 bool snakeviewmode = false;
-int snakeHeadNode = snakeNodesShapesStart+snakeLength-1;
 vec3 snakeDirection; //TODO
 vec3 snakeCurLocation; //TODO
 void  Game::changeCameraMode() {

@@ -52,10 +52,10 @@ using namespace glm;
 		isActive = false;
 	}
 
-	void Scene::addShapeFromFile(const std::string& fileName,int parent,unsigned int mode)
+	void Scene::addShapeFromFile(const std::string& fileName,int parent,unsigned int mode, int tex, int shad)
 	{
 		chainParents.push_back(parent);
-		shapes.push_back(new Shape(fileName,mode));
+		shapes.push_back(new Shape(fileName, mode, tex, shad));
 	}
 
 	void Scene::addShape(int type, int parent,unsigned int mode)
@@ -487,7 +487,9 @@ using namespace glm;
 	
 	void Scene::mouseProccessing(int button)
 	{
-		if(pickedShape == -1 || shapes[pickedShape]->Is2D())
+		if (shapes.size() <= pickedShape && pickedShape < -1)
+			printf("mouseProccessing out of index <%d>\n", pickedShape);
+		else if(pickedShape == -1 || shapes[pickedShape]->Is2D())
 		{
 			if(button == 1 )
 			{				
