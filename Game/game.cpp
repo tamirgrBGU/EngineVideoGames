@@ -171,18 +171,24 @@ void Game::Init()
 	}
 	std::cout << "done snake" << std::endl;
 
-	//addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 3, 1);// NOKIA
+	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 0, 3);// NOKIA
+	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 1, 3);// CAVE
 
-	//addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 3, 1);// CAVE
+	//todo attach!
 
-	//addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 3, 1);// TNT BOX
+	/*addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 2, 3);// TNT BOX
+	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 3);// SNAKE HEAD
+	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 4, 3);// APPLE	*/
 
-	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 1);// SNAKE HEAD
+	/*
+	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 3, 4);// NOKIA
+	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 3, 5);// CAVE
+	addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 3, 6);// TNT BOX
+	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 7);// SNAKE HEAD
+	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 3, 8);// APPLE	
+	*/
 
-	//addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 3, 1);// APPLE
-	
-	// translate all scene away from camera
-
+	//translate all scene away from camera
 	//myTranslate(glm::vec3(0, 0, -20), 0);
 
 	pickedShape = 0;

@@ -31,7 +31,11 @@ MeshConstructor::MeshConstructor(const int type)
 
 MeshConstructor::MeshConstructor(const std::string& fileName)
 {
-	InitMesh(OBJModel(fileName).ToIndexedModel());
+	IndexedModel im = OBJModel(fileName).ToIndexedModel();
+	if (im.positions.size() > 0)
+		InitMesh(im);
+	else
+		printf("failed to read file\n");
 }
 
 const int circularSubdivisions = 4;
