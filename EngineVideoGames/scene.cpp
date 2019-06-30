@@ -52,10 +52,10 @@ using namespace glm;
 		isActive = false;
 	}
 
-	void Scene::addShapeFromFile(const std::string& fileName,int parent,unsigned int mode)
+	void Scene::addShapeFromFile(const std::string& fileName,int parent,unsigned int mode, int tex, int shad)
 	{
 		chainParents.push_back(parent);
-		shapes.push_back(new Shape(fileName,mode));
+		shapes.push_back(new Shape(fileName, mode, tex, shad));
 	}
 
 	void Scene::addShape(int type, int parent,unsigned int mode)

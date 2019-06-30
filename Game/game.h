@@ -30,7 +30,9 @@ public:
 	void updateControlShapes(int controlPoint, Bezier1D *bez);
 	void Motion();
 	void changeCameraMode();
-	
+	void Game::PlayTheme();
+	void Game::PlayPoint();
+	void Game::PlayExplosion();
 	void Game::changeMode() {
 		projMode = (projMode + 1) % 6;
 		updateIntersectors(projMode);

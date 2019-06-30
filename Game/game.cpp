@@ -4,8 +4,9 @@
 #include "../EngineVideoGames/MeshConstructor.h"
 #include "../EngineVideoGames/Bezier1D.h"
 #include "../EngineVideoGames/Bezier2D.h"
-
-#include <iostream>
+#include <windows.h>
+#include <iostream>  
+#include <thread>
 
 static void printMat(const glm::mat4 mat)
 {
@@ -21,7 +22,7 @@ static void printMat(const glm::mat4 mat)
 
 Game::Game():Scene(){curve = 0;}
 
-Game::Game(glm::vec3 position,float angle,float hwRelation,float near, float far) : Scene(position,angle,hwRelation,near,far)
+Game::Game(glm::vec3 position,float angle,float hwRelation,float near1, float far1) : Scene(position,angle,hwRelation,near1,far1)
 { 
 	curve = new Bezier1D();	
 }
@@ -169,8 +170,17 @@ void Game::Init()
 		b.~Bezier2D();
 	}
 	std::cout << "done snake" << std::endl;
-	//addShapeFromFile("../res/objs/torus.obj", -1, TRIANGLES);//TODO AMIT, ADD PHONE
 
+	//addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 3, 1);// NOKIA
+
+	//addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 3, 1);// CAVE
+
+	//addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 3, 1);// TNT BOX
+
+	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 1);// SNAKE HEAD
+
+	//addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 3, 1);// APPLE
+	
 	// translate all scene away from camera
 
 	//myTranslate(glm::vec3(0, 0, -20), 0);
@@ -193,11 +203,34 @@ void Game::Init()
 	this->shapeTransformation(this->yGlobalTranslate, 10.f);
 	pickedShape++;
 	this->shapeTransformation(this->zGlobalTranslate, 15.f);
-
+ 
 	myTranslate(glm::vec3(0, -y/2, -y), 0);
 
+	//PLAYING THEME MUSIC
+	std::thread t1(&Game::PlayTheme, this);
+	t1.detach();
+	//new thread PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//std::thread t2(&Game::PlayPoint, this);
+	//t2.detach();
 	ReadPixel();
 	pickedShape = -1;
+}
+
+void Game::PlayTheme()
+{
+	PlaySound("../res/sounds/theme.wav", NULL,  SND_FILENAME | SND_LOOP);
+}
+
+void Game::PlayPoint()
+{
+	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+}
+
+void Game::PlayExplosion()
+{
+	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
 void finUpdate(Shader *s, const int  shaderIndx, const int pickedShape) {

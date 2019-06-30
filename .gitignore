@@ -13,6 +13,7 @@ Release/
 
 # Files
 *.user
+*.aps
 *.lib
 *.vcxproj
 *.vcxproj.filter
