@@ -1,0 +1,11 @@
+# Exported from 3D Builder
+
+newmtl Mat_0
+Kd 1.000000 1.000000 1.000000
+map_Kd _.jpg
+
+newmtl Color_D03_0
+Kd 0.607843 0.513725 0.239216
+
+newmtl M_0048_PaleGoldenrod_0
+Kd 0.933333 0.909804 0.666667
