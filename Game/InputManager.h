@@ -42,7 +42,7 @@
 						scn->Deactivate();
 					else
 						scn->Activate();
-				break;
+					break;
 				case GLFW_KEY_A://todo chenge player direction
 					scn->change_movement(-0.001f);
 					break;
@@ -81,7 +81,12 @@
 					else
 						scn->myRotate(-2.f, x, 1);
 					break;
-
+				case GLFW_KEY_KP_SUBTRACT:
+					scn->shapeTransformation(scn->zCameraTranslate, -10.f);
+					break;
+				case GLFW_KEY_KP_ADD:
+					scn->shapeTransformation(scn->zCameraTranslate,  10.f);
+					break;
 			default:
 				printf("undefined key %d\n", key);
 				break;

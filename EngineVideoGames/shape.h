@@ -19,7 +19,7 @@ private:
 public:
 	unsigned int mode;
 
-	Shape(const IndexedModel& model, unsigned int mode);
+	Shape(const IndexedModel& model, unsigned int mode, int textureID, int shaderID);
 
 	Shape(const Shape& shape,unsigned int mode);
 

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "levelParser.h"
 #include "../KDtree/intersect.cpp"
 #include "../EngineVideoGames/MeshConstructor.h"
 #include "../EngineVideoGames/Bezier1D.h"
@@ -29,10 +30,10 @@ Bezier1D *Game::getBezier1D() {
 	return curve;
 };
 
-void Game::addShape(IndexedModel model, int parent, unsigned int mode)
+void Game::addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader)
 {
 	chainParents.push_back(parent);
-	shapes.push_back(new Shape(model, mode));	
+	shapes.push_back(new Shape(model, mode, tex, shader));
 }
 
 void Game::addShape(int type,int parent,unsigned int mode)
@@ -107,6 +108,8 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 	return segments;
 }
 
+leveGenerator lGen(0);
+
 intersect *a = nullptr;
 intersect *b = nullptr;
 const int snakeNodesShapesStart = 1;
@@ -119,6 +122,27 @@ int snakeLength = 10, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
 void Game::Init()
 {
 	addShape(Axis, -1, LINES);
+	
+	//todo map need to know the level of everything so it can prevent snake from falling and
+	// know the direction of stairs to make it climb right..
+	struct objMap map = lGen.getLevel(0);
+	if (map.levelGround != nullptr) {
+		for (IndexedModel &obj : *map.levelGround)
+			addShape(obj, -1, TRIANGLES, 2, 3);
+		for (IndexedModel &obj : *map.walls) {
+			addShape(obj, -1, TRIANGLES, 2, 3);
+			//todo on snake colide!
+		}
+		for (IndexedModel &obj : *map.stairs) {
+			addShape(obj, -1, TRIANGLES, 2, 3);
+			//todo on snake colide
+		}
+		/*TODO		
+		for (IndexedModel &obj : *map.specialObj)
+			addShape(obj, -1, TRIANGLES);*/
+	}
+	else
+		printf("level did not been loaded!");
 
 	std::cout << "start snake" << std::endl;
 	float x = 0; float y = 0; float rounding = float(segs) / ends;
@@ -135,12 +159,13 @@ void Game::Init()
 
 	vec3 axisFrom = *(b1vec[0].GetControlPoint(0, 0).GetPos());
 	Bezier2D b(b1vec[0], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
-	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES);
-	int lastPickedShape = 1;
+	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3 , 1);
+	//printf("%d\n", shapes.size());
+	int lastPickedShape = shapes.size()-1;
 	for (int i = 1; i < snakeLength; i++) {
 		axisFrom = *(b1vec[i].GetControlPoint(0, 0).GetPos());
 		Bezier2D b(b1vec[i], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
-		addShape(b.GetSurface(bezierRes, bezierRes), lastPickedShape++, TRIANGLES);
+		addShape(b.GetSurface(bezierRes, bezierRes), lastPickedShape++, TRIANGLES, 3, 1);
 		b.~Bezier2D();
 	}
 	std::cout << "done snake" << std::endl;

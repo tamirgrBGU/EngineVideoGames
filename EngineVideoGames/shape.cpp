@@ -27,14 +27,14 @@ Shape::Shape(const std::string& fileName, unsigned int mode){
 
 }
 
-Shape::Shape(const IndexedModel &model, unsigned int mode){
+Shape::Shape(const IndexedModel &model, unsigned int mode, int textureID, int shadID){
 	mesh = new MeshConstructor(model);
 	//mesh->Bind();
 	this->mode = mode;
 	isCopy = false;
 	toRender = true;
-	texID = -1;
-	shaderID = 1;
+	texID = textureID;
+	shaderID = shadID;
 }
 
 Shape::Shape(const int SimpleShapeType,unsigned int mode)

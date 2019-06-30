@@ -17,14 +17,18 @@ int main(int argc,char *argv[])
 	init(display);
 	
 	scn->Init();
-
+	
 	scn->addShader("../res/shaders/pickingShader");//0
 	scn->addShader("../res/shaders/linearShader");//1
 	scn->addShader("../res/shaders/dualQShader");//2
 	scn->addShader("../res/shaders/basicShader");//3
 	//scn->addShader("../res/shaders/weightsShader");
 	scn->addShader("../res/shaders/basicShadertex");//4
-	scn->AddTexture("../res/textures/snake1.png");
+	scn->AddTexture("../res/textures/grass.bmp");//0
+	scn->AddTexture("../res/textures/grass2.bmp");//1
+	scn->AddTexture("../res/textures/grass3.bmp");//2
+	//scn->AddTexture("../res/textures/snake.jpg");
+	scn->AddTexture("../res/textures/snake1.png");//3
 
 	display.setScene(scn);
 

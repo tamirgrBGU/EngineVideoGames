@@ -31,7 +31,8 @@ Bezier2D::~Bezier2D(void)
 	}
 }
 
-glm::vec3 color(glm::vec3(0.2f, 0.1f, 0.90f));
+//glm::vec3 color(glm::vec3(0.2f, 0.1f, 0.90f));
+glm::vec3 color(glm::vec3(0.6f, 0.6f, 0.6f));
 IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	IndexedModel model;
 	updateAxis();
