@@ -251,7 +251,7 @@ void setStairs(const struct objConnected objC, std::vector<IndexedModel>* walls,
 		stairs->push_back(create_Hstairs_square(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.y + allscale, obj.level * zscale));
 
 		if (objC.up != nullptr && (objC.up->me.level > obj.level))
-			walls->push_back(create_UHtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
+			walls->push_back(create_UHtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
 		else
 			walls->push_back(create_Htriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
 

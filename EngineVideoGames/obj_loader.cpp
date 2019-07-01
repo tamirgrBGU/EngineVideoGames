@@ -57,6 +57,16 @@ OBJModel::OBJModel(const std::string& fileName)
     }
 }
 
+glm::vec3 calcWeight(float t)
+{
+	float f1 = 0, f3 = 0;
+	if (t>0.5)
+		f3 = (1.0f - 4.0f*(1.0f - t)*t)*(1.0f - t) / 2.0f + (1.0f - 4.0f*(1.0f - t)*t)*t / 2.0f;
+	else
+		f1 = (1.0f - 4.0f*(1.0f - t)*t)*(1.0f - t) / 2.0f + (1.0f - 4.0f*(1.0f - t)*t)*t / 2.0f;
+	float f2 = (2.0f*(1.0f - t)*(t + 0.0f) + 0.5f);
+	return glm::vec3(f1, f2, f3);
+}
 
 IndexedModel OBJModel::ToIndexedModel()
 {
@@ -87,7 +97,7 @@ IndexedModel OBJModel::ToIndexedModel()
         if(hasUVs)
             currentTexCoord = uvs[currentIndex->uvIndex];
         else
-            currentTexCoord = glm::vec2(0,0);
+            currentTexCoord = glm::vec2(float(i) / numIndices, float(i) / numIndices);
             
         if(hasNormals)
         {   
@@ -113,6 +123,7 @@ IndexedModel OBJModel::ToIndexedModel()
             normalModel.texCoords.push_back(currentTexCoord);
             normalModel.normals.push_back(currentNormal);
 			normalModel.colors.push_back(currentColor);
+			normalModel.weights.push_back(calcWeight(currentTexCoord.x));
         }
         else
             normalModelIndex = it->second;
@@ -128,7 +139,7 @@ IndexedModel OBJModel::ToIndexedModel()
             result.texCoords.push_back(currentTexCoord);
             result.normals.push_back(currentNormal);
 			result.colors.push_back(currentColor);
-			result.weights.push_back(vec3(0));
+			result.weights.push_back(calcWeight(currentTexCoord.x));
         }
         else
             resultModelIndex = previousVertexLocation;

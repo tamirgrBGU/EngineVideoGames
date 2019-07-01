@@ -109,42 +109,16 @@ static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jump
 	return segments;
 }
 
-leveGenerator lGen(0);
-intersect *a = nullptr;
-intersect *b = nullptr;
-std::vector<Bezier1D> b1vec;
 glm::vec3 xAx(1, 0, 0);
 glm::vec3 yAx(0, 1, 0);
 glm::vec3 zAx(0, 0, 1);
 int snakeNodesShapesStart = -1;
+int  snakeFullLength = -1;
 float jumpy = 0.8f, jumpx = 0.32f;
-int snakeLength = 10, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
-void Game::Init()
-{
-	addShape(Axis, -1, LINES);
-	
-	//todo map need to know the level of everything so it can prevent snake from falling and
-	// know the direction of stairs to make it climb right..
-	struct objMap map = lGen.getLevel(0);
-	if (map.levelGround != nullptr) {
-		for (IndexedModel &obj : *map.levelGround)
-			addShape(obj, -1, TRIANGLES, 2, 3);
-		for (IndexedModel &obj : *map.walls) {
-			addShape(obj, -1, TRIANGLES, 2, 3);
-			//todo on snake colide!
-		}
-		for (IndexedModel &obj : *map.stairs) {
-			addShape(obj, -1, TRIANGLES, 2, 3);
-			//todo on snake colide
-		}
-		/*TODO		
-		for (IndexedModel &obj : *map.specialObj)
-			addShape(obj, -1, TRIANGLES);*/
-	}
-	else
-		printf("level did not been loaded!");
-
-	std::cout << "start snake" << std::endl;
+/*The vertebral column of a snake consists of anywhere between 200 and 400 (or more) vertebrae.*/
+int snakeLength = 15, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
+void Game::genSnake() {
+	std::vector<Bezier1D> b1vec;
 	float x = 0; float y = 0; float rounding = float(segs) / ends;
 	Bezier1D tail(getTailSegs(&x, &y, jumpx * rounding, jumpy, ends));
 	b1vec.push_back(tail);
@@ -153,49 +127,84 @@ void Game::Init()
 		Bezier1D body(getBodySegs(&x, &y, 0, jumpy, 4));
 		b1vec.push_back(body);
 	}
-	//y += jumpy/4;
+	/*
 	Bezier1D head(getHeadSegs(&x, &y, -jumpx * rounding, jumpy, ends));
 	b1vec.push_back(head);
+	*/
 
 	vec3 axisFrom = *(b1vec[0].GetControlPoint(0, 0).GetPos());
 	Bezier2D b(b1vec[0], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
-	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3 , 1);
+	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3, 1);
 	//printf("%d\n", shapes.size());
 	snakeNodesShapesStart = shapes.size() - 1;
 	int snakeNodesShapesStartTemp = snakeNodesShapesStart;
-	for (int i = 1; i < snakeLength; i++) {
+	for (unsigned int i = 1; i < b1vec.size(); i++) {
 		axisFrom = *(b1vec[i].GetControlPoint(0, 0).GetPos());
 		Bezier2D b(b1vec[i], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
 		addShape(b.GetSurface(bezierRes, bezierRes), snakeNodesShapesStartTemp++, TRIANGLES, 3, 1);
 		b.~Bezier2D();
 	}
-	std::cout << "done snake" << std::endl;
 
-	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 0, 3);// NOKIA
-	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 1, 3);// CAVE
+	
+	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 1);// SNAKE HEAD
+	//TODO extract head to know if touched
+	pickedShape = snakeNodesShapesStartTemp + 1;
+	shapeTransformation(yLocalTranslate, -y-10);
+	//shapeTransformation(xScale, 0.20f);
+	//shapeTransformation(yScale, 0.25f);
+	//shapeTransformation(zScale, 0.29f);
+	shapeTransformation(xLocalRotate, 180);
+	shapeTransformation(yLocalRotate, 180);
+	setParent(snakeNodesShapesStartTemp, snakeNodesShapesStartTemp++);	
+	y += 20;//assumption of shape size
+	snakeFullLength = y;
+}
+
+//leveGenerator lGen(0);
+intersect *a = nullptr;
+intersect *b = nullptr;
+void Game::Init()
+{
+	//addShape(Axis, -1, LINES);
+	
+	//todo map need to know the level of everything so it can prevent snake from falling and
+	// know the direction of stairs to make it climb right..
+	
+	//struct objMap map = lGen.getLevel(0);//todo - level -1 is random
+	//if (map.levelGround != nullptr) {
+	//	for (IndexedModel &obj : *map.levelGround)
+	//		addShape(obj, -1, TRIANGLES, 2, 3);
+	//	for (IndexedModel &obj : *map.walls) {
+	//		addShape(obj, -1, TRIANGLES, 2, 3);
+	//		//todo on snake colide!
+	//	}
+	//	for (IndexedModel &obj : *map.stairs) {
+	//		addShape(obj, -1, TRIANGLES, 2, 3);
+	//		//todo on snake colide
+	//	}
+	//	/*TODO		
+	//	for (IndexedModel &obj : *map.specialObj)
+	//		addShape(obj, -1, TRIANGLES);*/
+	//}
+	//else
+	//	printf("level did not been loaded!");	
+
+	std::cout << "start snake" << std::endl;
+	genSnake();
+	std::cout << "done snake" << std::endl;
 
 	//todo attach!
 
-	/*addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 2, 3);// TNT BOX
-	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 3);// SNAKE HEAD
-	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 4, 3);// APPLE	*/
-
 	/*
-	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 3, 4);// NOKIA
-	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 3, 5);// CAVE
-	addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 3, 6);// TNT BOX
-	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 7);// SNAKE HEAD
-	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 3, 8);// APPLE	
+	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 0, 3);// NOKIA
+	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 1, 3);// CAVE
+	addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 2, 3);// TNT BOX
+	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 3);// SNAKE HEAD
+	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 4, 3);// APPLE
 	*/
 
 	//translate all scene away from camera
 	//myTranslate(glm::vec3(0, 0, -20), 0);
-
-	pickedShape = 0;
-
-	shapeTransformation(yScale, 100);
-	shapeTransformation(xScale, 100);
-	shapeTransformation(zScale, 100);
 
 	pickedShape = snakeNodesShapesStart;
 	this->shapeTransformation(this->zGlobalRotate , 90.0f);
@@ -210,11 +219,11 @@ void Game::Init()
 	pickedShape++;
 	this->shapeTransformation(this->zGlobalTranslate, 15.f);
  
-	myTranslate(glm::vec3(0, -y/2, -y), 0);
+	myTranslate(glm::vec3(0, -snakeFullLength/2, -snakeFullLength), 0);
 
 	//PLAYING THEME MUSIC
-	std::thread t1(&Game::PlayTheme, this);
-	t1.detach();
+	//std::thread t1(&Game::PlayTheme, this);
+	//t1.detach();
 	//new thread PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);

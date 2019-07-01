@@ -15,6 +15,7 @@ public:
 	bool cameramode = false;
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
+	void genSnake();
 	void Init();
 	void addShape(int type,int parent,unsigned int mode);
 	void addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader);
