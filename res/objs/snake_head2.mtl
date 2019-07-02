@@ -1,0 +1,13 @@
+# Exported from 3D Builder
+
+newmtl Mat_0
+Kd 1.000000 1.000000 1.000000
+map_Kd York-Python.jpg
+
+newmtl Mat_1
+Kd 1.000000 1.000000 1.000000
+map_Kd eyesauron.jpg
+
+newmtl Mat_2
+Kd 1.000000 1.000000 1.000000
+map_Kd 310118012122PapillaeTonguePrint.png
