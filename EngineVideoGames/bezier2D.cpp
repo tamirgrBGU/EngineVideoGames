@@ -50,7 +50,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			float SEGtPart = t / float(resT);
 			for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 				for (int s = 0; s < resS; s++) {
-					float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
+					float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision-1);
 					float SEGsPart = s / float(resS);
 					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], SEGtPart, SEGsPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
@@ -67,7 +67,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 
 	for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 		for (int s = 0; s < resS; s++) {
-			float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
+			float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision-1);
 			float SEGsPart = s / float(resS);
 			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, SEGsPart);
 			vec3 pos3(pos.x, pos.y, pos.z);

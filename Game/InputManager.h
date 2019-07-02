@@ -57,6 +57,13 @@
 				case GLFW_KEY_C:
 					scn->cameramode = !scn->cameramode;
 					break;
+				case GLFW_KEY_RIGHT://TODO head intersect with nodes disable rotation
+					scn->playerInput(true);
+					break;
+				case GLFW_KEY_LEFT:
+					scn->playerInput(false);
+					break;
+				/*
 				case GLFW_KEY_RIGHT: 
 					if (scn->cameramode)
 						scn->shapeTransformation(scn->zLocalRotate, 1.0f);
@@ -81,6 +88,7 @@
 					else
 						scn->myRotate(-2.f, x, 1);
 					break;
+				*/
 				case GLFW_KEY_KP_SUBTRACT:
 					scn->shapeTransformation(scn->zCameraTranslate, -10.f);
 					break;

@@ -114,6 +114,20 @@ using namespace glm;
 
 	}
 
+	std::vector<glm::mat4> freezedMvp;
+	void Scene::freeze() {
+		glm::mat4 Normal = makeTrans();
+		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
+
+		int p = pickedShape;
+		mat4 Normal1, MVP1;
+		freezedMvp.clear();
+		for (unsigned int i = 0; i<shapes.size(); i++) {
+			getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, i);
+			freezedMvp.push_back(MVP1);
+		}
+	}
+
 	//assumption ! chained shapes are uploaded together
 	void Scene::Draw(int shaderIndx,int cameraIndx,bool debugMode)
 	{
@@ -123,16 +137,10 @@ using namespace glm;
 		int p = pickedShape;
 		mat4 Normal1, MVP1;
 		std::vector<glm::mat4> mvp, norms;
-		std::vector<glm::mat2x4> quaternions;
 		for (unsigned int i = 0; i<shapes.size(); i++){
 			getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, i);
 			mvp.push_back(MVP1);
 			norms.push_back(Normal1);
-			detail::tdualquat<float, glm::highp> dquat = dualquat_cast(cropto3x4(glm::transpose(mvp[i])));
-			mat2x4 dquatmat(0);
-			dquatmat[0] = glm::vec4(dquat.real.x, dquat.real.y, dquat.real.z, dquat.real.w);
-			dquatmat[1] = glm::vec4(dquat.dual.x, dquat.dual.y, dquat.dual.z, dquat.dual.w);
-			quaternions.push_back(dquatmat);
 		}
 
 		glm::mat4 lastMVP(0), nextMVP(0);
@@ -143,20 +151,13 @@ using namespace glm;
 			{
 				if (shaderIndx > 0)
 				{
-					//ACTUALLY we want it just in a dual quaternion shader
-					//printf("%d %d\n", chainParents[i], i);
 					if (i<shapes.size()-1 && chainParents[i + 1] == i)
 						lastMVP = mvp[i + 1];
-					else
-						lastMVP = mat4(0);
 					if (chainParents[i] > -1)
 						nextMVP = mvp[chainParents[i]];
-					else
-						nextMVP = mat4(0);
 					pickedShape = i;
 
-					UpdateLinear(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());//linear
-					//UpdateQuaternion(lastMVP, quaternions[i], nextMVP, norms[i],shapes[i]->GetShader());//dquat
+					UpdateLinear(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());
 					shapes[i]->Draw(shaders,textures,false);					
 				}
 				else 
@@ -265,7 +266,6 @@ using namespace glm;
 				if(pickedShape ==-1)
 					myRotate(amt,vec3(0,0,1),zAxis1);
 				else
-
 					shapes[pickedShape]->myRotate(amt,vec3(0,0,1),zAxis1);
 			break;
 			case xGlobalRotate:

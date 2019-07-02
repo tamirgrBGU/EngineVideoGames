@@ -32,6 +32,21 @@ public:
 		this->axis  = glm::normalize(this->last - this->first);
 	}
 
+	float angle_mine_rad(vec3 v1, vec3 v2) {
+		if (std::isnan(v1.x) || std::isnan(v2.x))
+			return nan;
+		v1 = normaliz(v1);
+		v2 = normaliz(v2);
+		float mult = multParams(v1, v2);
+		if (mult > 1)  mult = 1;
+		else if (mult < -1) mult = -1;
+		return glm::acos(mult);
+	}
+
+	float angle_mine_deg(vec3 v1, vec3 v2) {
+		return glm::degrees(angle_mine_rad(v1, v2));
+	}
+
 	~Bezier2D(void);
 
 private:
@@ -143,20 +158,6 @@ private:
 	}
 
 	float nan = float(std::sqrt(-1));
-	float angle_mine_rad(vec3 v1, vec3 v2) {
-		if (std::isnan(v1.x) || std::isnan(v2.x))
-			return nan;
-		v1 = normaliz(v1);
-		v2 = normaliz(v2);
-		float mult = multParams(v1, v2);
-		if		(mult > 1)  mult = 1;
-		else if (mult < -1) mult = -1;
-		return glm::acos(mult);
-	}
-
-	float angle_mine_deg(vec3 v1, vec3 v2) {
-		return glm::degrees(angle_mine_rad(v1, v2));
-	}
 
 	void rotataByAxis(vec3 Axis, vec3 rotateBy, mat4 *toRotate) {
 		float angleToRotate = angle_mine_deg(Axis, rotateBy);

@@ -1,9 +1,5 @@
 #include "game.h"
-#include "levelParser.h"
 #include "../KDtree/intersect.cpp"
-#include "../EngineVideoGames/MeshConstructor.h"
-#include "../EngineVideoGames/Bezier1D.h"
-#include "../EngineVideoGames/Bezier2D.h"
 #include <windows.h>
 #include <iostream>  
 #include <thread>
@@ -57,110 +53,143 @@ void Game::updateIntersectors(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
-static std::vector<glm::mat4> getHeadSegs(float *lastX, float *lastY, float jumpX, float jumpY, int segs) {
-	std::vector<glm::mat4> segments;
-	mat4 seg0 = mat4(0);
-	float mult = 1 - 1 / float(segs);
-	for (int i = 0; i < segs; i++) {
-		seg0[0] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
-		seg0[1] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
-		seg0[2] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
-		seg0[3] = vec4(*lastX, *lastY, 0, 1);
-		mult -= 1 / float(segs);
-		segments.push_back(seg0);
-	}
-	return segments;
-}
-
-static std::vector<glm::mat4> getTailSegs(float *lastX, float *lastY, float jumpX, float jumpY, int segs) {
-	std::vector<glm::mat4> segments;
-	mat4 seg0 = mat4(0);
-	float mult = 0;
-	for (int i = 0; i < segs; i++) {
-		seg0[0] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
-		seg0[1] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
-		seg0[2] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY*mult;
-		seg0[3] = vec4(*lastX, *lastY, 0, 1);
-		mult += 1 / float(segs);
-		segments.push_back(seg0);
-	}
-	return segments;
-}
-
-static std::vector<glm::mat4> getBodySegs(float *lastX, float *lastY, float jumpX, float jumpY, int segs) {
-	std::vector<glm::mat4> segments;
-	mat4 seg0 = mat4(0);
-	for (int i = 0; i < segs; i++) {
-		seg0[0] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-		seg0[1] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-		seg0[2] = vec4(*lastX, *lastY, 0, 1);
-		*lastX = *lastX + jumpX;	*lastY = *lastY + jumpY;
-		seg0[3] = vec4(*lastX, *lastY, 0, 1);
-		segments.push_back(seg0);
-	}
-	return segments;
-}
-
 glm::vec3 xAx(1, 0, 0);
 glm::vec3 yAx(0, 1, 0);
 glm::vec3 zAx(0, 0, 1);
+vec3 snakeDirection; //TODO - maintain on key pressed
+vec3 snakeCurLocation; //TODO
 int snakeNodesShapesStart = -1;
+int snakeNodesShapesEnd = -1;
 int  snakeFullLength = -1;
 float jumpy = 0.8f, jumpx = 0.32f;
-/*The vertebral column of a snake consists of anywhere between 200 and 400 (or more) vertebrae.*/
-int snakeLength = 15, bezierRes = 10, cirSubdiv = 4, segs = 5, ends = 10;
-void Game::genSnake() {
-	std::vector<Bezier1D> b1vec;
-	float x = 0; float y = 0; float rounding = float(segs) / ends;
-	Bezier1D tail(getTailSegs(&x, &y, jumpx * rounding, jumpy, ends));
-	b1vec.push_back(tail);
-	for (int i = snakeLength - 2; i > 0; i--) {
-		//y += jumpy;
-		Bezier1D body(getBodySegs(&x, &y, 0, jumpy, 4));
-		b1vec.push_back(body);
+float lastYext = 0;
+static const int bezierRes = 10, cirSubdiv = 4;
+void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs) {
+	std::vector<glm::mat4> segments;
+	float lastY = 0;
+	mat4 seg0 = mat4(0);
+	for (int i = 0; i < segs; i++) {
+		seg0[0] = vec4(*lastX, lastY, 0, 1);
+		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
+		seg0[1] = vec4(*lastX, lastY, 0, 1);
+		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
+		seg0[2] = vec4(*lastX, lastY, 0, 1);
+		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
+		seg0[3] = vec4(*lastX, lastY, 0, 1);
+		mult += sign*1 / float(segs);
+		segments.push_back(seg0);
 	}
-	/*
-	Bezier1D head(getHeadSegs(&x, &y, -jumpx * rounding, jumpy, ends));
-	b1vec.push_back(head);
-	*/
-
-	vec3 axisFrom = *(b1vec[0].GetControlPoint(0, 0).GetPos());
-	Bezier2D b(b1vec[0], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
+	Bezier1D body(segments);
+	vec3 axisFrom = *(body.GetControlPoint(0, 0).GetPos());
+	Bezier2D b(body, cirSubdiv, yAx, vec3(0, axisFrom.y, 0)); 
 	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3, 1);
-	//printf("%d\n", shapes.size());
-	snakeNodesShapesStart = shapes.size() - 1;
-	int snakeNodesShapesStartTemp = snakeNodesShapesStart;
-	for (unsigned int i = 1; i < b1vec.size(); i++) {
-		axisFrom = *(b1vec[i].GetControlPoint(0, 0).GetPos());
-		Bezier2D b(b1vec[i], cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
-		addShape(b.GetSurface(bezierRes, bezierRes), snakeNodesShapesStartTemp++, TRIANGLES, 3, 1);
-		b.~Bezier2D();
+	shapeTransformation(yGlobalTranslate, lastYext);
+	lastYext = lastY;
+	pickedShape++;
+}
+
+void Game::getTailSegs(float *lastX, float jumpX, float jumpY, int segs) {
+	getSegs(lastX, 0, 1, jumpX, jumpY, segs);
+}
+
+void Game::getBodySegs(float *lastX, float jumpX, float jumpY, int segs) {
+	getSegs(lastX, 1, 0, jumpX, jumpY, segs);
+}
+
+void Game::getHeadSegs(float *lastX, float jumpX, float jumpY, int segs) {
+	getSegs(lastX, 1 - 1 / float(segs), -1, jumpX, jumpY, segs);
+}
+
+vec3 myDir(int direction) {
+	if (direction == 0)
+		return yAx;
+	if (direction == 2)
+		return -yAx;
+	if (direction == 1)
+		return xAx;
+	//if (direction == 3)
+	return -xAx;
+}
+
+/*The vertebral column of a snake consists of anywhere between 200 and 400 (or more) vertebrae.*/
+static const int snakeLength = 15, segs = 5, ends = 10;
+void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
+	std::vector<Bezier2D> b1vec;
+	float x = 0; float y = 0; float rounding = float(segs) / ends;
+
+	snakeNodesShapesStart = shapes.size();
+	pickedShape = snakeNodesShapesStart;//chaining!
+
+	getTailSegs(&x, jumpx * rounding, jumpy, ends);
+	for (int i = snakeLength - 2; i > 0; i--)
+		getBodySegs(&x, 0, jumpy, 4);		
+	getHeadSegs(&x, -jumpx * rounding, jumpy, ends);
+
+	snakeNodesShapesEnd = shapes.size() - 1;
+
+	for (unsigned int i = snakeNodesShapesStart + 1; i < shapes.size(); i++) {
+		setParent(i, i-1);
 	}
 
-	
-	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 1);// SNAKE HEAD
+	/*addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 2, 4);// SNAKE HEAD
 	//TODO extract head to know if touched
 	pickedShape = snakeNodesShapesStartTemp + 1;
-	shapeTransformation(yLocalTranslate, -y-10);
-	//shapeTransformation(xScale, 0.20f);
-	//shapeTransformation(yScale, 0.25f);
-	//shapeTransformation(zScale, 0.29f);
+	shapeTransformation(yLocalTranslate, -snakeFullLength-50);
+	shapeTransformation(xScale, 0.20f);
+	shapeTransformation(yScale, 0.25f);
+	shapeTransformation(zScale, 0.29f);
 	shapeTransformation(xLocalRotate, 180);
 	shapeTransformation(yLocalRotate, 180);
 	setParent(snakeNodesShapesStartTemp, snakeNodesShapesStartTemp++);	
 	y += 20;//assumption of shape size
+	*/
+	
 	snakeFullLength = y;
+	pickedShape = snakeNodesShapesStart;
+	shapeTransformation(xLocalTranslate, xLoc);
+	shapeTransformation(yLocalTranslate, yLoc);
+	shapeTransformation(zLocalTranslate, zLoc);
+	shapeTransformation(zLocalRotate, 180.f);
+	shapeTransformation(zLocalRotate, 90.f * direction);
+	snakeDirection = myDir(direction);
+	snakeCurLocation = vec3(xLoc, yLoc, zLoc);
 }
 
-//leveGenerator lGen(0);
+const char *caveStr = "../res/objs/cave.obj";
+const char *nokiaStr = "../res/objs/Nokia_3310.obj";
+const char *tntStr = "../res/objs/TNT_box.obj";
+const char *appleStr = "../res/objs/apple.obj";
+const char *snake_headStr = "../res/objs/snake_head.obj";
+void Game::genObj(const char * ptr, int tex, float x, float y, float z, int direction){
+	addShapeFromFile(ptr, -1, TRIANGLES, tex, 3);
+	pickedShape = shapes.size()-1;
+	shapeTransformation(xLocalTranslate, x);
+	shapeTransformation(yLocalTranslate, y);
+	shapeTransformation(zLocalTranslate, z);
+	shapeTransformation(zLocalRotate, 90.f * direction);
+}
+
+void Game::specialObjHandle(objLocation &obj) {
+	float x=obj.x, y=obj.y, z=float(obj.level);
+	int dir = obj.direction;
+	printf("%f %f %f %d %d\n", x, y, z, dir, obj.type);
+	switch (obj.type) {
+		case 1:
+			genSnake(x, y, z, dir);
+			break;
+		case 2:
+			genObj(caveStr, 2, x, y, z, dir);
+			break;
+		case 3:
+			genObj(appleStr, 3, x, y, z, dir);
+			break;
+		default:
+			printf("unknown special obj <%d>\n", obj.type);
+			break;
+	}
+}
+
+leveGenerator lGen(0);
 intersect *a = nullptr;
 intersect *b = nullptr;
 void Game::Init()
@@ -170,56 +199,45 @@ void Game::Init()
 	//todo map need to know the level of everything so it can prevent snake from falling and
 	// know the direction of stairs to make it climb right..
 	
-	//struct objMap map = lGen.getLevel(0);//todo - level -1 is random
-	//if (map.levelGround != nullptr) {
-	//	for (IndexedModel &obj : *map.levelGround)
-	//		addShape(obj, -1, TRIANGLES, 2, 3);
-	//	for (IndexedModel &obj : *map.walls) {
-	//		addShape(obj, -1, TRIANGLES, 2, 3);
-	//		//todo on snake colide!
-	//	}
-	//	for (IndexedModel &obj : *map.stairs) {
-	//		addShape(obj, -1, TRIANGLES, 2, 3);
-	//		//todo on snake colide
-	//	}
-	//	/*TODO		
-	//	for (IndexedModel &obj : *map.specialObj)
-	//		addShape(obj, -1, TRIANGLES);*/
-	//}
-	//else
-	//	printf("level did not been loaded!");	
-
-	std::cout << "start snake" << std::endl;
-	genSnake();
-	std::cout << "done snake" << std::endl;
-
-	//todo attach!
-
-	/*
-	addShapeFromFile("../res/objs/Nokia_3310.obj", -1, TRIANGLES, 0, 3);// NOKIA
-	addShapeFromFile("../res/objs/cave.obj", -1, TRIANGLES, 1, 3);// CAVE
-	addShapeFromFile("../res/objs/TNT_box.obj", -1, TRIANGLES, 2, 3);// TNT BOX
-	addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, 3, 3);// SNAKE HEAD
-	addShapeFromFile("../res/objs/apple.obj", -1, TRIANGLES, 4, 3);// APPLE
-	*/
+	struct objMap map = lGen.getLevel(0);//todo - level -1 is random
+	if (map.levelGround != nullptr) {
+		for (IndexedModel &obj : *map.levelGround)
+			addShape(obj, -1, TRIANGLES, 2, 3);
+		for (IndexedModel &obj : *map.walls) {
+			addShape(obj, -1, TRIANGLES, 2, 3);
+			//todo on snake colide!
+		}
+		for (IndexedModel &obj : *map.stairs) {
+			addShape(obj, -1, TRIANGLES, 2, 3);
+			//todo on snake colide
+		}
+		for (objLocation &obj : *map.specialObj)
+			specialObjHandle(obj);
+	}
+	else
+		printf("level did not been loaded!");	
 
 	//translate all scene away from camera
 	//myTranslate(glm::vec3(0, 0, -20), 0);
-
-	pickedShape = snakeNodesShapesStart;
-	this->shapeTransformation(this->zGlobalRotate , 90.0f);
+		
+	vec3 midSnake = snakeDirection;
+	int halfS = snakeFullLength / 2;
+	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, 0);// midSnake.z*halfS);
+	midSnake = snakeCurLocation - midSnake;
+	myTranslate(-midSnake, 0);
+	//this->shapeTransformation(this->yGlobalTranslate, midSnake.y);
+	//this->shapeTransformation(this->zGlobalTranslate, midSnake.z);
+	myTranslate(glm::vec3(0, 0, -snakeFullLength), 0);
 	
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
-	pickedShape = snakeLength+snakeNodesShapesStart;
-	this->shapeTransformation(this->xGlobalTranslate, 5.f);
-	pickedShape++;
-	this->shapeTransformation(this->yGlobalTranslate, 10.f);
-	pickedShape++;
-	this->shapeTransformation(this->zGlobalTranslate, 15.f);
- 
-	myTranslate(glm::vec3(0, -snakeFullLength/2, -snakeFullLength), 0);
+	pickedShape = shapes.size() - 1;
+	this->shapeTransformation(this->xGlobalTranslate, 10.f);
+	pickedShape--;
+	this->shapeTransformation(this->yGlobalTranslate, 20.f);
+	pickedShape--;
+	this->shapeTransformation(this->zGlobalTranslate, 30.f);
 
 	//PLAYING THEME MUSIC
 	//std::thread t1(&Game::PlayTheme, this);
@@ -230,6 +248,7 @@ void Game::Init()
 	//std::thread t2(&Game::PlayPoint, this);
 	//t2.detach();
 	ReadPixel();
+	Activate();
 	pickedShape = -1;
 }
 
@@ -336,35 +355,51 @@ void Game::Motion()
 {
 	if(isActive)
 	{
-		shapeTransformation(xLocalTranslate,0.75);
+		int a = pickedShape;
+		pickedShape = snakeNodesShapesStart;
+		shapeTransformation(xGlobalTranslate, snakeDirection.x);
+		shapeTransformation(yGlobalTranslate, snakeDirection.y);
+		shapeTransformation(zGlobalTranslate, snakeDirection.z);
+
+
+		myTranslate(-snakeDirection, 0);
+		/*shapeTransformation(xCameraTranslate, snakeDirection.x);
+		shapeTransformation(yCameraTranslate, snakeDirection.y);
+		shapeTransformation(zCameraTranslate, snakeDirection.z);*/
+		pickedShape = a;
 	}
 }
 
 bool snakeviewmode = false;
-vec3 snakeDirection; //TODO
-vec3 snakeCurLocation; //TODO
-void  Game::changeCameraMode() {
+Bezier1D b1d; Bezier2D b2d;
+void Game::changeCameraMode() {
 	snakeviewmode = !snakeviewmode;
-	//vec3 headpos = shapes[snakeHeadNode]->getPointInSystem();
-	//printf("<%f,%f,%f>\n", headpos.x, headpos.y, headpos.z);
-	/*printf("rot\n");
-	shapes[snakeHeadNode]->printRot(false);
-	shapes[snakeHeadNode]->printRot(true);
-	printf("angles\n");
-	shapes[snakeHeadNode]->printAngles(false);
-	shapes[snakeHeadNode]->printAngles(true);*/
-	if (snakeviewmode) {
-		myRotate(-90.f, xAx, 1);
-		myTranslate(glm::vec3(0, 30, 140), 0);
-	}
-	else {
-		myRotate(90.f, xAx, 1);
-		myTranslate(glm::vec3(0, -30,-140), 0);
-	}
+	float angle = b2d.angle_mine_deg(-yAx, snakeDirection);
+	printf("%f\n",angle);
+	int sign = snakeviewmode ? 1 : -1;
+	Deactivate();
+	myRotate(sign * 80.f, glm::cross(zAx,snakeDirection), 8);
+	//TODO
+	//myRotate(sign * -50.f, xAx, 1);
+	//myRotate(sign * angle, zAx, 1);
+	myTranslate(glm::vec3(sign * -snakeFullLength*1.5, 0, sign * 0.8 * snakeFullLength), 0);
+	Activate();
 }
 
-void updateCameraMode() {
-	//TODO
+float anglePL = 5.f;
+mat4 rotPl = glm::rotate(anglePL, zAx);
+mat4 rotNPl = glm::rotate(-anglePL, zAx);
+void Game::playerInput(bool dir) {
+	int sign = (dir ? -1 : 1);
+	if(dir)
+		snakeDirection = glm::normalize(b1d.v4to3(b1d.v3to4(snakeDirection)*rotPl));
+	else
+		snakeDirection = glm::normalize(b1d.v4to3(b1d.v3to4(snakeDirection)*rotNPl));
+
+	int a = pickedShape;
+	pickedShape = snakeNodesShapesEnd;
+	shapeTransformation(zLocalRotate, sign*anglePL);
+	pickedShape = a;
 }
 
 Game::~Game(void)

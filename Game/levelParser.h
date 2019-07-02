@@ -2,8 +2,8 @@
 #include "bezier1D.h"
 
 static const char * levelDirName = "levels";
-static const float allscale = 50;
-static const float zscale = 35;
+static const float allscale = 200;
+static const float zscale	= 140;
 
 struct objLocation {
 	float x;

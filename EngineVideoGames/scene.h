@@ -32,6 +32,8 @@ public:
 	virtual void addShape(int type,int parent,unsigned int mode);
 	void addShapeCopy(int indx,int parent,unsigned int mode);
 	
+	void freeze();
+
 	void addShader(const std::string& fileName);
 	void AddTexture(const std::string& textureFileName);
 	void ZeroShapesTrans();
