@@ -79,12 +79,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="IntersectTracker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="levelParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="IntersectTracker.h" />
     <ClInclude Include="levelParser.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

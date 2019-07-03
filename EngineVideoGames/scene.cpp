@@ -347,7 +347,7 @@ using namespace glm;
 				else
 					{
 						//newAxis = findAxis(vec3(0,1,0));
-							int i = pickedShape;
+						int i = pickedShape;
 						for (; chainParents[i] > 0; i = chainParents[i]);
 						
 						shapes[i]->translateInSystem(*this,vec3(0,amt,0),0,false);
@@ -359,7 +359,7 @@ using namespace glm;
 				else
 					{
 					//	newAxis = findAxis(vec3(0,0,1));
-							int i = pickedShape;
+						int i = pickedShape;
 						for (; chainParents[i] > 0; i = chainParents[i]);
 			
 						shapes[i]->translateInSystem(*this,vec3(0,0,amt),0,false);

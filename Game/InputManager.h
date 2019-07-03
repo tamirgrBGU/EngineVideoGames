@@ -63,6 +63,19 @@
 				case GLFW_KEY_LEFT:
 					scn->playerInput(false);
 					break;
+				case GLFW_KEY_KP_8:
+					scn->myRotate( 1.f, vec3(1,0,0), 1);
+					break;
+				case GLFW_KEY_KP_6:
+					scn->myRotate( 1.f, vec3(0, 0, 1), 0);
+					break;
+				case GLFW_KEY_KP_4:
+					scn->myRotate(-1.f, vec3(0, 0, 1), 0);
+					break;
+				case GLFW_KEY_KP_2:
+					scn->myRotate(-1.f, vec3(1, 0, 0), 1);
+					break;
+
 				/*
 				case GLFW_KEY_RIGHT: 
 					if (scn->cameramode)

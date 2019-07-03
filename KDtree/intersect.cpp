@@ -1,7 +1,4 @@
 #include "intersect.h"
-#include <stdlib.h>
-#include <list>
-
 
 //default constructor
 intersect::intersect(std::vector<glm::vec3> shape) {

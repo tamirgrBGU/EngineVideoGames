@@ -18,9 +18,10 @@ public:
 	bool cameramode = false;
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
+	void setSnakeNodesAngles();
 	void genSnake(float x, float y, float z, int direction);
 	void specialObjHandle(objLocation &obj);
-	void Game::genObj(const char * ptr, int tex, float x, float y, float z, int direction);
+	void Game::genObj(const char * ptr, int tex, float x, float y, float z, float scale, int direction);
 	void Init();
 	void playerInput(bool direction);
 	void addShape(int type,int parent,unsigned int mode);

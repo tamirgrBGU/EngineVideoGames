@@ -1,7 +1,8 @@
 #pragma once
 #include "kdtree.h"
 #include <mesh.h>
-
+#include <stdlib.h>
+#include <list>
 
 class intersect
 {
