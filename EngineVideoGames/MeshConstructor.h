@@ -13,7 +13,6 @@ class MeshConstructor
 
 	VertexArray vao;
 	IndexBuffer *ib;
-	//TO DO: add bounding box data base and build it in the constructor 
 	std::vector<VertexBuffer*> vbs;
 	bool is2D;
 	int unsigned indicesNum;

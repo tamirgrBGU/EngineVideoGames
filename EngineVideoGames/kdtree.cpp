@@ -136,7 +136,7 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 	Node* head = new Node(3);
 	max_depth = (unsigned int)log2((plist.size() >> 4));
 
-	printf("\nsize %d max depth %d\n", plist.size(), max_depth);
+	printf("size %d max depth %d ", plist.size(), max_depth);
 
 	std::list<Kdtree::vecType> xlist, ylist, zlist;
 	cloneList(plist, xlist);		
@@ -146,7 +146,7 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 	zlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[2] < b[2]; });
 
 	std::list<Kdtree::vecType> lists[3] = {xlist, ylist, zlist};
-	printf(", sorted");
+	printf(", sorted\n");
 	Kdtree::_makeTree( head, lists, 0);
 	Kdtree::root = head;
 }

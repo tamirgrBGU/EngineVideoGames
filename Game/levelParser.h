@@ -22,19 +22,27 @@ struct objConnected {
 	struct objConnected * down;
 };
 
+struct modelWrapper {
+	float x;
+	float y;
+	float z;
+	int level;
+	IndexedModel model;
+};
+
 struct objMap {
-	std::vector<IndexedModel>* levelGround;
-	std::vector<IndexedModel>* stairs;
-	std::vector<IndexedModel>* walls;
+	std::vector<modelWrapper>* levelGround;
+	std::vector<modelWrapper>* stairs;
+	std::vector<modelWrapper>* walls;
 	std::vector<struct objLocation>* specialObj;
 };
 
 class leveGenerator
 {
 private:
-	std::vector<IndexedModel>* levelGround;
-	std::vector<IndexedModel>* stairs;
-	std::vector<IndexedModel>* walls;
+	std::vector<modelWrapper>* levelGround;
+	std::vector<modelWrapper>* stairs;
+	std::vector<modelWrapper>* walls;
 	std::vector<std::string*>* levelName;
 	std::vector<struct objLocation>* specialObj;
 	int parseLevel(int i);

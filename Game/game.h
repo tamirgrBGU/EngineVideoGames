@@ -1,13 +1,6 @@
 #pragma once
 #include "scene.h"
-#include "MeshConstructor.h"
-#include "bezier1D.h"
-#include "Bezier2D.h"
 #include "levelParser.h"
-//#include "IntersectTracker.h"
-#include <windows.h>
-#include <iostream>  
-#include <thread>
 
 class Game : public Scene
 {

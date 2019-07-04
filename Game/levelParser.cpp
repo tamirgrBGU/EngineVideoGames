@@ -45,9 +45,9 @@ std::vector<std::string*> * scanDir(const char* path) {
 
 void leveGenerator::init(const char * path) {
 	levelName = scanDir(path);
-	levelGround = new std::vector<IndexedModel>();
-	walls = new std::vector<IndexedModel>();
-	stairs = new std::vector<IndexedModel>();
+	levelGround = new std::vector<modelWrapper>();
+	walls = new std::vector<modelWrapper>();
+	stairs = new std::vector<modelWrapper>();
 	specialObj = new std::vector<struct objLocation>();
 }
 
@@ -187,84 +187,105 @@ IndexedModel create_ground_square(float xa, float ya, float xc, float yc, float 
 	return create_square(vec3(xa, ya, z), vec3(xc, ya, z), vec3(xc, yc, z), vec3(xa, yc, z));
 }
 
-void inline setWalls(const struct objConnected objC, std::vector<IndexedModel>* walls) {
+void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls) {
 	struct objLocation obj = objC.me;
+	modelWrapper mw;
+	mw.x = obj.x;
+	mw.y = obj.y;
+	mw.z = obj.z;
+	mw.level = obj.level;
 	if (objC.down != nullptr) {//below wall
 		struct objLocation obj2 = objC.down->me;
 		if ((obj.level != obj2.level) & (obj2.type != 0)) {
 			if (obj.level > obj2.level)
-				walls->push_back(create_Hwall_square(obj.x, obj.y + allscale, obj.level * zscale, obj.x + allscale, obj2.level * zscale));
+				mw.model = create_Hwall_square(obj.x, obj.y + allscale, obj.level * zscale, obj.x + allscale, obj2.level * zscale);
 			else
-				walls->push_back(create_Hwall_square(obj.x, obj.y + allscale, obj2.level * zscale, obj.x + allscale, obj.level * zscale));
+				mw.model = create_Hwall_square(obj.x, obj.y + allscale, obj2.level * zscale, obj.x + allscale, obj.level * zscale);
+			walls->push_back(mw);
 		}
 	}
 	if (objC.right != nullptr) {//right wall
 		struct objLocation obj2 = objC.right->me;
 		if ((obj.level != obj2.level) & (obj2.type != 0)) {
 			if (obj.level > obj2.level)
-				walls->push_back(create_Vwall_square(obj.x + allscale, obj.y + allscale, obj.level * zscale, obj.y, obj2.level * zscale));
+				mw.model = create_Vwall_square(obj.x + allscale, obj.y + allscale, obj.level * zscale, obj.y, obj2.level * zscale);
 			else
-				walls->push_back(create_Vwall_square(obj.x + allscale, obj.y + allscale, obj2.level * zscale, obj.y, obj.level * zscale));
+				mw.model = create_Vwall_square(obj.x + allscale, obj.y + allscale, obj2.level * zscale, obj.y, obj.level * zscale);
+			walls->push_back(mw);
 		}
 	}
 }
 
-void setStairs(const struct objConnected objC, std::vector<IndexedModel>* walls, std::vector<IndexedModel>* stairs)
+void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls, std::vector<modelWrapper>* stairs)
 {
 	struct objLocation obj = objC.me;
+	modelWrapper mw;
+	mw.x = obj.x;
+	mw.y = obj.y;
+	mw.z = obj.z;
+	mw.level = obj.level;
 	//create special squere at x and y;	//add it to a seperate list so it will be able to avoid coliding with them
 	if (obj.direction == 0) {//up ^ ||
-		stairs->push_back(create_wall_square(obj.x + allscale, obj.y + allscale, obj.level * zscale, obj.x, obj.y, (obj.level + 1) * zscale));
+		mw.model = create_wall_square(obj.x + allscale, obj.y + allscale, obj.level * zscale, obj.x, obj.y, (obj.level + 1) * zscale);
+		stairs->push_back(mw);
 		if (objC.right != nullptr && (objC.right->me.level > obj.level))
-			walls->push_back(create_UVtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale));
+			mw.model = create_UVtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale);
 		else
-			walls->push_back(create_Vtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale));
+			mw.model = create_Vtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale);
+		walls->push_back(mw);
 		if (objC.left != nullptr && (objC.left->me.level > obj.level))
-			walls->push_back(create_UVtriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale));
+			mw.model = create_UVtriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale);
 		else
-			walls->push_back(create_Vtriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale));
+			mw.model = create_Vtriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale);
+		walls->push_back(mw);
 	}
 	else if (obj.direction == 1) {//right > =
-		stairs->push_back(create_Hstairs_square(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.x, obj.y, obj.level * zscale));
+		mw.model = create_Hstairs_square(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.x, obj.y, obj.level * zscale);
+		stairs->push_back(mw);
 		if (objC.up != nullptr && (objC.up->me.level > obj.level))
-			walls->push_back(create_UHtriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.x, obj.level * zscale));
+			mw.model = create_UHtriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.x, obj.level * zscale);
 		else
-			walls->push_back(create_Htriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.x, obj.level * zscale));
-
+			mw.model = create_Htriangle(obj.x + allscale, obj.y, (obj.level + 1) * zscale, obj.x, obj.level * zscale);
+		walls->push_back(mw);
 		if (objC.down != nullptr && (objC.down->me.level > obj.level))
-			walls->push_back(create_UHtriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.x, obj.level * zscale));
+			mw.model = create_UHtriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.x, obj.level * zscale);
 		else
-			walls->push_back(create_Htriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.x, obj.level * zscale));
+			mw.model = create_Htriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.x, obj.level * zscale);
+		walls->push_back(mw);
 	}
 	else if (obj.direction == 2) {//down u ||
-		stairs->push_back(create_wall_square(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.y, obj.level * zscale));
+		mw.model = create_wall_square(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.y, obj.level * zscale);
+		stairs->push_back(mw);
 		if (objC.right != nullptr && (objC.right->me.level > obj.level))
-			walls->push_back(create_UVtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale));
+			mw.model = create_UVtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale);
 		else
-			walls->push_back(create_Vtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale));
+			mw.model = create_Vtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale);
+		walls->push_back(mw);
 		if (objC.left != nullptr && (objC.left->me.level > obj.level))
-			walls->push_back(create_UVtriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale));
+			mw.model = create_UVtriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale);
 		else
-			walls->push_back(create_Vtriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale));
+			mw.model = create_Vtriangle(obj.x + allscale, obj.y + allscale, (obj.level + 1) * zscale, obj.y, obj.level * zscale);
+		walls->push_back(mw);
 	}
 	else {//left < =
-		stairs->push_back(create_Hstairs_square(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.y + allscale, obj.level * zscale));
-
+		mw.model = create_Hstairs_square(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.y + allscale, obj.level * zscale);
+		stairs->push_back(mw);
 		if (objC.up != nullptr && (objC.up->me.level > obj.level))
-			walls->push_back(create_UHtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
+			mw.model = create_UHtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale);
 		else
-			walls->push_back(create_Htriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
-
+			mw.model = create_Htriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale);
+		walls->push_back(mw);
 		if (objC.down != nullptr && (objC.down->me.level > obj.level))
-			walls->push_back(create_UHtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
+			mw.model = create_UHtriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale);
 		else
-			walls->push_back(create_Htriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale));
+			mw.model = create_Htriangle(obj.x, obj.y + allscale, (obj.level + 1) * zscale, obj.x + allscale, obj.level * zscale);
+		walls->push_back(mw);
 	}
 }
 
-void initGroundModel(std::vector<IndexedModel>* levelGround,
-	std::vector<IndexedModel>* stairs,
-	std::vector<IndexedModel>* walls,
+void initGroundModel(std::vector<modelWrapper>* levelGround,
+	std::vector<modelWrapper>* stairs,
+	std::vector<modelWrapper>* walls,
 	std::vector<struct objLocation>* specialObj,
 	const std::vector<struct objConnected> vec) {
 	levelGround->clear();
@@ -291,7 +312,13 @@ void initGroundModel(std::vector<IndexedModel>* levelGround,
 
 		else { //spacial index model (not square :) )
 			//if (obj->type == -1) {//create squere at x and y;
-			levelGround->push_back(create_ground_square(obj->x, obj->y, obj->x + allscale, obj->y + allscale, obj->z));
+			modelWrapper mw;
+			mw.x = obj->x;
+			mw.y = obj->y;
+			mw.z = obj->z;
+			mw.level = obj->level;
+			mw.model = create_ground_square(obj->x, obj->y, obj->x + allscale, obj->y + allscale, obj->z);
+			levelGround->push_back(mw);
 			if (obj->type > 0)
 				specialObj->push_back(*obj);
 		}

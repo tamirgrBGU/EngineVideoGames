@@ -1,5 +1,11 @@
 #include "game.h"
-#include "../KDtree/intersect.cpp"
+#include "bezier1D.h"
+#include "Bezier2D.h"
+#include "MeshConstructor.h"
+#include "IntersectTracker.h"
+#include <windows.h>
+#include <iostream>  
+#include <thread>
 
 static void printMat(const glm::mat4 mat)
 {
@@ -151,7 +157,16 @@ void onIntersectPrint(void) {
 	printf("hey man\n");
 }
 
-MeshConstructor mcHelper(8);
+void onIntersectWalls(void) {
+	printf("wall\n");
+}
+
+void onIntersectStairs(void) {
+	printf("stairs\n");
+}
+
+
+const MeshConstructor *meshelper = nullptr;
 void Game::specialObjHandle(objLocation &obj) {
 	float x = obj.x, y = obj.y, z = obj.z;
 	int dir = obj.direction;
@@ -159,15 +174,15 @@ void Game::specialObjHandle(objLocation &obj) {
 	switch (obj.type) {
 	case 1:
 		genSnake(x, y, z, dir);
-		//addSnakeHead(mcHelper.getlastInitMeshPositions());
+		addSnakeHead(meshelper->getlastInitMeshPositions());
 		break;
 	case 2:
 		genObj(caveStr, 2, vec3(x, y, z), 0.05f * allscale, dir);
-		//addObj(x, y, obj.level, onIntersectPrint, mcHelper.getlastInitMeshPositions());
+		addObj(x, y, obj.level, onIntersectPrint, meshelper->getlastInitMeshPositions());
 		break;
 	case 3:
 		genObj(appleStr, 3, vec3(x, y, z), 0.003f * allscale, dir);
-		//addObj(x, y, obj.level, onIntersectPrint, mcHelper.getlastInitMeshPositions());
+		addObj(x, y, obj.level, onIntersectPrint, meshelper->getlastInitMeshPositions());
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -175,22 +190,24 @@ void Game::specialObjHandle(objLocation &obj) {
 	}
 }
 
+
 leveGenerator lGen(0);
 void Game::Init()
 {
+	meshelper = new MeshConstructor(100);
 	//addShape(Axis, -1, LINES);
 	
 	struct objMap map = lGen.getLevel(0);//todo - level -1 is random
 	if (map.levelGround != nullptr) {
-		for (IndexedModel &obj : *map.levelGround)
-			addShape(obj, -1, TRIANGLES, 2, 3);
-		for (IndexedModel &obj : *map.walls) {
-			addShape(obj, -1, TRIANGLES, 2, 3);
-			//todo on snake colide!
+		for (modelWrapper &obj : *map.levelGround)
+			addShape(obj.model, -1, TRIANGLES, 2, 3);
+		for (modelWrapper &obj : *map.walls) {
+			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addObj(obj.x, obj.y, obj.level, onIntersectWalls, meshelper->getlastInitMeshPositions());
 		}
-		for (IndexedModel &obj : *map.stairs) {
-			addShape(obj, -1, TRIANGLES, 2, 3);
-			//todo on snake colide
+		for (modelWrapper &obj : *map.stairs) {
+			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addObj(obj.x, obj.y, obj.level, onIntersectStairs, meshelper->getlastInitMeshPositions());
 		}
 		for (objLocation &obj : *map.specialObj)
 			specialObjHandle(obj);

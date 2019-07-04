@@ -1,4 +1,5 @@
 #include "IntersectTracker.h"
+#include "../KDtree/intersect.cpp"
 
 std::vector<int> levelObjSize;
 std::vector<listNode<levelIntersect> *> levels;
@@ -34,7 +35,7 @@ void addNode(listNode<levelIntersect> *node) {
 	levelObjSize[lvl]++;
 }
 
-void addObj(float x, float y, int level, void(*onIntersect)(void), std::vector<glm::vec3> shape) {
+void addObj(float x, float y, int level, void(*onIntersect)(void), std::vector<glm::vec3> &shape) {
 	listNode<levelIntersect> *newFriend = new listNode<levelIntersect>();
 	newFriend->value.x = x;
 	newFriend->value.y = y;
@@ -47,7 +48,7 @@ void addObj(float x, float y, int level, void(*onIntersect)(void), std::vector<g
 }
 
 intersect *snakeHead;
-void addSnakeHead(std::vector<glm::vec3> shape) {
+void addSnakeHead(std::vector<glm::vec3> &shape) {
 	snakeHead = new intersect(shape);
 }
 
