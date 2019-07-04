@@ -19,6 +19,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C9D56F3-8B06-460D-9017-D1C3E1F6DC51}</ProjectGuid>
     <RootNamespace>DisplayGLFW</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

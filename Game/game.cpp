@@ -1,8 +1,5 @@
 #include "game.h"
 #include "../KDtree/intersect.cpp"
-#include <windows.h>
-#include <iostream>  
-#include <thread>
 
 static void printMat(const glm::mat4 mat)
 {
@@ -16,16 +13,12 @@ static void printMat(const glm::mat4 mat)
 }
 
 
-Game::Game():Scene(){curve = 0;}
+Game::Game():Scene(){}
 
-Game::Game(glm::vec3 position,float angle,float hwRelation,float near1, float far1) : Scene(position,angle,hwRelation,near1,far1)
-{ 
-	curve = new Bezier1D();	
-}
+Game::Game(glm::vec3 position,float angle,float hwRelation,float near1, float far1): 
+	Scene(position,angle,hwRelation,near1,far1){}
 
-Bezier1D *Game::getBezier1D() {
-	return curve;
-};
+Game::~Game(void) {}
 
 void Game::addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader)
 {
@@ -36,19 +29,13 @@ void Game::addShape(IndexedModel model, int parent, unsigned int mode, int tex, 
 void Game::addShape(int type,int parent,unsigned int mode)
 {
 	chainParents.push_back(parent);
-	if(type!=BezierLine && type!=BezierSurface)
-		shapes.push_back(new Shape(type,mode));
+	if (type != BezierLine && type != BezierSurface)
+		shapes.push_back(new Shape(type, mode));
 	else
-	{
-		projMode = mode;
-		if(type == BezierLine)
-			shapes.push_back(new Shape(curve, xResolution, yResolution, false, mode));
-		else
-			shapes.push_back(new Shape(curve, xResolution, yResolution, true, mode));
-	}
+		printf("Bezier1d/2d direct adding is not supported any more\n");
 }
 
-void Game::updateIntersectors(unsigned int mode){
+void Game::updateDrawMode(unsigned int mode){
 	for(unsigned int i = 1; i < shapes.size(); i++)
 		shapes[i]->mode= mode;
 }
@@ -152,49 +139,46 @@ const char *nokiaStr = "../res/objs/Nokia_3310.obj";
 const char *tntStr = "../res/objs/TNT_box.obj";
 const char *appleStr = "../res/objs/apple.obj";
 const char *snake_headStr = "../res/objs/snake_head.obj";
-void Game::genObj(const char * ptr, int tex, float x, float y, float z, float scale, int direction){
+void Game::genObj(const char * ptr, int tex, vec3 startLoc, float scale, int direction) {
 	addShapeFromFile(ptr, -1, TRIANGLES, tex, 3);
-	pickedShape = shapes.size()-1;
-	shapeTransformation(xLocalTranslate, x);
-	shapeTransformation(yLocalTranslate, y);
-	shapeTransformation(zLocalTranslate, z);
-	if (scale != -1) {
-		shapeTransformation(xScale, scale);
-		shapeTransformation(yScale, scale);
-		shapeTransformation(zScale, scale);
-	}
+	shapes[shapes.size() - 1]->myTranslate(startLoc, 1);
+	if (scale != -1)
+		shapes[shapes.size() - 1]->myScale(vec3(scale, scale, scale));
 	shapeTransformation(zLocalRotate, 90.f * direction);
 }
 
+void onIntersectPrint(void) {
+	printf("hey man\n");
+}
+
+MeshConstructor mcHelper(8);
 void Game::specialObjHandle(objLocation &obj) {
-	float x=obj.x, y=obj.y, z=float(obj.level);
+	float x = obj.x, y = obj.y, z = obj.z;
 	int dir = obj.direction;
 	//printf("%f %f %f %d %d\n", x, y, z, dir, obj.type);
 	switch (obj.type) {
-		case 1:
-			genSnake(x, y, z, dir);
-			break;
-		case 2:
-			genObj(caveStr, 2, x, y, z, 0.05f * allscale, dir);
-			break;
-		case 3:
-			genObj(appleStr, 3, x, y, z, 0.003f * allscale, dir);
-			break;
-		default:
-			printf("unknown special obj <%d>\n", obj.type);
-			break;
+	case 1:
+		genSnake(x, y, z, dir);
+		//addSnakeHead(mcHelper.getlastInitMeshPositions());
+		break;
+	case 2:
+		genObj(caveStr, 2, vec3(x, y, z), 0.05f * allscale, dir);
+		//addObj(x, y, obj.level, onIntersectPrint, mcHelper.getlastInitMeshPositions());
+		break;
+	case 3:
+		genObj(appleStr, 3, vec3(x, y, z), 0.003f * allscale, dir);
+		//addObj(x, y, obj.level, onIntersectPrint, mcHelper.getlastInitMeshPositions());
+		break;
+	default:
+		printf("unknown special obj <%d>\n", obj.type);
+		break;
 	}
 }
 
 leveGenerator lGen(0);
-intersect *a = nullptr;
-intersect *b = nullptr;
 void Game::Init()
 {
 	//addShape(Axis, -1, LINES);
-	
-	//todo map need to know the level of everything so it can prevent snake from falling and
-	// know the direction of stairs to make it climb right..
 	
 	struct objMap map = lGen.getLevel(0);//todo - level -1 is random
 	if (map.levelGround != nullptr) {
@@ -248,17 +232,17 @@ void Game::Init()
 
 void Game::PlayTheme()
 {
-	PlaySound("../res/sounds/theme.wav", NULL,  SND_FILENAME | SND_LOOP);
+	//PlaySound("../res/sounds/theme.wav", NULL,  SND_FILENAME | SND_LOOP);
 }
 
 void Game::PlayPoint()
 {
-	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
 void Game::PlayExplosion()
 {
-	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
 void finUpdate(Shader *s, const int  shaderIndx, const int pickedShape) {
@@ -308,85 +292,32 @@ void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shader
 void Game::WhenRotate() {}
 void Game::WhenTranslate() {}
 
-void Game::savePastPositions(int controlPoint) {
-	int indx = 0;
-	for ( int i = -1; i < 2; i=i+2) {
-		if (controlPoint+i > -1 && controlPoint + i < (signed)controlPointsShapesIds.size()) {
-			if (controlPoint + i == controlPointsShapesIds.size()-1) {
-				pastLoc[indx] = curve->GetControlPointPos((controlPoint + i) / 3 - 1, 3);
-			}
-			else
-				pastLoc[indx] = curve->GetControlPointPos((controlPoint + i) / 3, (controlPoint + i) % 3);
-			indx++;
-		}
-	}
-}
-
-void Game::updateControlShapes(int controlPoint, Bezier1D *bez) {
-	int index = 0;
-	int pickedShape_tmp = pickedShape;
-	vec3 move_delta;
-	for (int i = -1; i < 2; i=i+2) {
-		if (controlPoint + i > -1 && controlPoint + i < (signed) controlPointsShapesIds.size()) {
-			if (controlPoint + i == controlPointsShapesIds.size() - 1) {
-				move_delta = bez->GetControlPointPos((controlPoint + i) / 3 -1, 3) -= pastLoc[index];
-			}
-			else
-				move_delta = bez->GetControlPointPos((controlPoint + i) / 3, (controlPoint + i) % 3) -= pastLoc[index];
-			pickedShape = controlPointsShapesIds[controlPoint + i];
-			shapeTransformation(xGlobalTranslate, move_delta.x);
-			shapeTransformation(yGlobalTranslate, move_delta.y);
-			shapeTransformation(zGlobalTranslate, move_delta.z);
-			index++;
-			pickedShape = pickedShape_tmp;
-		}
-	}
-	pickedShape = pickedShape_tmp;
-	
-}
-
 void Game::setSnakeNodesAngles() {
-	/*int i = 0;
-	float diff = (nodesAngles[i + 1] - nodesAngles[i]);
-	nodesAngles[i] += diff;
-	shapes[snakeNodesShapesStart + i]->myRotate(diff, vec3(0, 0, 1), zAxis1);
-	nodesAngles[i + 1] -= diff;*/
 	for (int i = 0; i < snakeLength - 1; i++) {
-		float diff = (nodesAngles[i + 1] - nodesAngles[i])/2;
+		float diff = (nodesAngles[i + 1] - nodesAngles[i])/10;
 		nodesAngles[i] += diff;
 		shapes[snakeNodesShapesStart + i]->myRotate(diff, vec3(0, 0, 1), zAxis1);
 		//nodesAngles[i + 1] -= diff;
 		shapes[snakeNodesShapesStart + i + 1]->myRotate(-diff, vec3(0, 0, 1), zAxis1);
 	}	
 }
-/*
-for (int i = 1; i < snakeLength - 1; i++) {
-	float current = nodesAngles[i];
-	float next = (nodesAngles[i - 1] + nodesAngles[i + 1]) / 2;
-	float diff = next - current;
-	nodesAngles[i] = current + diff;
-	shapes[snakeNodesShapesStart + i]->myRotate(diff, vec3(0, 0, 1), zAxis1);
-}
-*/
 
 bool snakeviewmode = false;
 void Game::Motion()
 {
-	if(isActive)
+	if (isActive)
 	{
-		int a = pickedShape;
-		pickedShape = snakeNodesShapesStart;
-		shapeTransformation(xGlobalTranslate, snakeDirection.x);
-		shapeTransformation(yGlobalTranslate, snakeDirection.y);
-		shapeTransformation(zGlobalTranslate, snakeDirection.z);
-		
-		if (snakeviewmode)
-			myTranslate(vec3(0,0,1), 0);
-		else
-			myTranslate(-snakeDirection, 0);
+		vec3 t(snakeDirection.x / 10, snakeDirection.y / 10, snakeDirection.z / 10);
+		shapes[snakeNodesShapesStart]->myTranslate(t, 0);
 
+		if (snakeviewmode)
+			myTranslate(vec3(0, 0, 1), 0);
+		else
+			myTranslate(-t, 0);
+
+		snakeCurLocation += t;
 		setSnakeNodesAngles();
-		pickedShape = a;
+		//isIntersectSnakeHead(shapes[snakeNodesShapesEnd]->makeTrans(), snakeCurLocation.x, snakeCurLocation.y);
 	}
 }
 
@@ -431,9 +362,4 @@ void Game::playerInput(bool dir) {
 	shapes[snakeNodesShapesEnd]->myRotate(sign*anglePL, vec3(0, 0, 1), zAxis1);
 
 	Activate();
-}
-
-Game::~Game(void)
-{
-	delete curve;
 }

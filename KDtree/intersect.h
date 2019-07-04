@@ -9,14 +9,14 @@ class intersect
 
 public:
 	//constructor
-	intersect(std::vector<glm::vec3> shape);
+	intersect(std::vector<glm::vec3> &shape);
 
 	/*
 	* Return the tree root node
 	* will prepare minimal bounding box of intersection, if one exist. 
 	* iterative function
 	*/
-	std::vector<IndexedModel> isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect other);
+	std::vector<IndexedModel> isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect &other);
 
 	/*
 	* the model bounding box
@@ -36,14 +36,14 @@ protected:
 	Kdtree kd;
 
 private:
-	std::vector<IndexedModel> makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> intersect_boxes);
+	std::vector<IndexedModel> makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> &intersect_boxes);
 
 	bool isEqual(std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2);
 	//will not add duplicates
 	void insert_box(std::vector<std::vector<glm::vec3>> *boxes, std::vector<glm::vec3> boxvec, glm::mat4 *transmat, glm::vec3 color);
 
 	//will be used to find if separating panel is exist
-	int isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2);
+	int isThereSeparatingPanel(std::vector<glm::vec3> &box1, std::vector<glm::vec3> &box2);
 
 	void merge(std::vector<std::vector<glm::vec3>> *a, std::vector<std::vector<glm::vec3>> *b);
 
@@ -54,7 +54,7 @@ private:
 	void intersect::rec_is_intersect(Node *current, Node *other,
 		int depth, std::vector<std::vector<glm::vec3>> *output);
 
-	std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> boundbox);
+	inline std::vector<glm::vec3> bound_vec_to_boundbox(std::vector<float> &boundbox);
 
-	IndexedModel intersect::boxVertexesToIndexModel(std::vector<glm::vec3> intesect_box, glm::vec3 color);
+	IndexedModel intersect::boxVertexesToIndexModel(std::vector<glm::vec3> &intesect_box, glm::vec3 color);
 };

@@ -1,7 +1,7 @@
 #include "intersect.h"
 
 //default constructor
-intersect::intersect(std::vector<glm::vec3> shape) {
+intersect::intersect(std::vector<glm::vec3> &shape) {
 	kd.makeTree(shape);
 	boundbox = kd.getRoot()->boundbox;
 	boundboxvec = bound_vec_to_boundbox(boundbox);
@@ -19,7 +19,7 @@ glm::mat4 *currentTransOther;
 *   Return the tree root node
 */
 std::vector<IndexedModel> coloredBoxesOutput;
-std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect other) {
+std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect &other) {
 
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox);
 	std::vector<glm::vec3> boundboxvec2 = bound_vec_to_boundbox(other.boundbox);
@@ -39,7 +39,7 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *
 	return coloredBoxesOutput;
 }
 
-int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<glm::vec3> box2) {
+int intersect::isThereSeparatingPanel(std::vector<glm::vec3> &box1, std::vector<glm::vec3> &box2) {
 	glm::vec3 frontleftdown = v4to3(*currentTransMe * v3to4(box1[0]));
 	glm::vec3 backleftdown  = v4to3(*currentTransMe * v3to4(box1[1]));
 	glm::vec3 backrightdown = v4to3(*currentTransMe * v3to4(box1[2]));
@@ -177,7 +177,7 @@ int intersect::isThereSeparatingPanel(std::vector<glm::vec3> box1, std::vector<g
 //	return vec;
 //}
 
-std::vector<glm::vec3> intersect::bound_vec_to_boundbox(std::vector<float> boundbox) {
+inline std::vector<glm::vec3> intersect::bound_vec_to_boundbox(std::vector<float> &boundbox) {
 	std::vector<glm::vec3> vec;
 	vec.push_back(vec3(boundbox[0], boundbox[2], boundbox[5]));
 	vec.push_back(vec3(boundbox[0], boundbox[2], boundbox[4]));
@@ -265,7 +265,7 @@ void intersect::rec_is_intersect(Node *current, Node *other,
 	nodesIntersectValitate(current->right, axis, other, depth, output, boxvec, boxvec2);
 }
 
-IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> intesect_box, glm::vec3 color){	
+IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> &intesect_box, glm::vec3 color){	
 	Vertex vertices[] =
 	{
 		Vertex(intesect_box[1], glm::vec2(1, 0), glm::vec3(0, 0, -1), color),
@@ -333,7 +333,7 @@ IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> intesect
 	return model;
 }
 
-std::vector<IndexedModel> intersect::makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> intersect_boxes) {
+std::vector<IndexedModel> intersect::makeBoxesIndexModels(std::vector<std::vector<glm::vec3>> &intersect_boxes) {
 	std::vector<IndexedModel> models;
 	for (std::vector<glm::vec3> intesect_box : intersect_boxes)
 		models.push_back(boxVertexesToIndexModel(intesect_box, glm::vec3(0, 0, 0)));

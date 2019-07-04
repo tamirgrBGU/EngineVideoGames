@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 
-leveGenerator::leveGenerator(int i) { 
+leveGenerator::leveGenerator(int i) {
 	currentLevel = i;
 	init(levelDirName);
 	parseLevel(i);
@@ -33,22 +33,22 @@ std::vector<std::string*> * scanDir(const char* path) {
 	printf("\n");
 
 	sprintf_s(buf, "%s\\zone%d.txt", path, i++);
-	while (fileExists(buf)){
+	while (fileExists(buf)) {
 		printf("found level %s\n", buf);
 		std::string* name = new std::string(buf);
 		names->push_back(name);
 		sprintf_s(buf, "%s\\zone%d.txt", path, i++);
-	} 
+	}
 
 	return names;
 }
 
 void leveGenerator::init(const char * path) {
-	levelName=scanDir(path);
+	levelName = scanDir(path);
 	levelGround = new std::vector<IndexedModel>();
-	walls	    = new std::vector<IndexedModel>();
-	stairs		= new std::vector<IndexedModel>();
-	specialObj  = new std::vector<struct objLocation>();
+	walls = new std::vector<IndexedModel>();
+	stairs = new std::vector<IndexedModel>();
+	specialObj = new std::vector<struct objLocation>();
 }
 
 int nextDelimeter(char* buf, int current, int del) {
@@ -78,7 +78,7 @@ int getInt(char* buf, int first, int end) {
 
 int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs) {
 	//printf("<%s>\n", buf);
-	int i = 0, point, del, x=0;
+	int i = 0, point, del, x = 0;
 	del = nextDelimeter(buf, i, ',');
 	while (del > -1) {
 		struct objLocation obj;
@@ -87,9 +87,9 @@ int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs)
 		if (point > -1) {
 			int dash = nextDelimeter(buf, i, '-');
 
-			obj.type  = getInt(buf, i, dash);
-			obj.direction = getInt(buf, dash+1, point);
-			obj.level = getInt(buf, point+1, del);
+			obj.type = getInt(buf, i, dash);
+			obj.direction = getInt(buf, dash + 1, point);
+			obj.level = getInt(buf, point + 1, del);
 		}
 		else {
 			obj.type = -1;
@@ -215,7 +215,7 @@ void setStairs(const struct objConnected objC, std::vector<IndexedModel>* walls,
 	//create special squere at x and y;	//add it to a seperate list so it will be able to avoid coliding with them
 	if (obj.direction == 0) {//up ^ ||
 		stairs->push_back(create_wall_square(obj.x + allscale, obj.y + allscale, obj.level * zscale, obj.x, obj.y, (obj.level + 1) * zscale));
-		if (objC.right!=nullptr && (objC.right->me.level > obj.level))
+		if (objC.right != nullptr && (objC.right->me.level > obj.level))
 			walls->push_back(create_UVtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale));
 		else
 			walls->push_back(create_Vtriangle(obj.x, obj.y, (obj.level + 1) * zscale, obj.y + allscale, obj.level * zscale));
@@ -262,11 +262,11 @@ void setStairs(const struct objConnected objC, std::vector<IndexedModel>* walls,
 	}
 }
 
-void initGroundModel(std::vector<IndexedModel>* levelGround, 
-					 std::vector<IndexedModel>* stairs,
-					 std::vector<IndexedModel>* walls,
-					 std::vector<struct objLocation>* specialObj,
-					 const std::vector<struct objConnected> vec){
+void initGroundModel(std::vector<IndexedModel>* levelGround,
+	std::vector<IndexedModel>* stairs,
+	std::vector<IndexedModel>* walls,
+	std::vector<struct objLocation>* specialObj,
+	const std::vector<struct objConnected> vec) {
 	levelGround->clear();
 	stairs->clear();
 	walls->clear();
@@ -278,23 +278,22 @@ void initGroundModel(std::vector<IndexedModel>* levelGround,
 		//fix obj x and y to real location, level represents z
 		obj->x *= allscale;
 		obj->y *= allscale;
+		obj->z = obj->level * zscale;
 
 		//check left and right for vertical squres
 		//add all vertical squeres seperate list so it will be able to avoid coliding with them
-		
+
 		if (obj->type != 0)
 			setWalls(objC, walls);
-		
-		if (obj->type == 0) {//stairs
+
+		if (obj->type == 0)
 			setStairs(objC, walls, stairs);
-		}
+
 		else { //spacial index model (not square :) )
 			//if (obj->type == -1) {//create squere at x and y;
-			levelGround->push_back(create_ground_square(obj->x, obj->y, obj->x + allscale, obj->y + allscale, obj->level * zscale));
-			if (obj->type > 0) {
-				obj->level *= zscale;
+			levelGround->push_back(create_ground_square(obj->x, obj->y, obj->x + allscale, obj->y + allscale, obj->z));
+			if (obj->type > 0)
 				specialObj->push_back(*obj);
-			}
 		}
 	}
 }
@@ -305,19 +304,19 @@ std::vector<struct objConnected> toConnectedVec(int width, std::vector<struct ob
 	for (int i = 0; i < size; i++) {
 		struct objConnected a;
 		a.me = vec[i];
-		a.down  = nullptr;		a.up   = nullptr;
+		a.down = nullptr;		a.up = nullptr;
 		a.right = nullptr;		a.left = nullptr;
 		out.push_back(a);
 	}
-		
+
 	for (int i = 0; i < size; i++) {
 		struct objConnected *a = &out[i];
 		if (i + width < size)	a->down = &out[i + width];
-		if (i - width > -1)		a->up   = &out[i - width];
+		if (i - width > -1)		a->up = &out[i - width];
 
 		//printf("%d %d %d %f\n", i+1, i, width, a->me.x);
 		if (i + 1 < size && (i + 1) % width != 0)	a->right = &out[i + 1];
-		if (i > 1 && (i - 1) % width != 0) 			a->left  = &out[i - 1];
+		if (i > 1 && (i - 1) % width != 0) 			a->left = &out[i - 1];
 	}
 	return out;
 }
@@ -328,7 +327,7 @@ int leveGenerator::parseLevel(int i) {
 		return -1;
 
 	printf("levels loaded %d\n", levelName->size());
-	if (i < 0 || (unsigned) i >= levelName->size())
+	if (i < 0 || (unsigned)i >= levelName->size())
 		return -2;
 
 	char buf[maxWidth];
@@ -343,10 +342,10 @@ int leveGenerator::parseLevel(int i) {
 		int width = parseFileLine(buf, line++, &vec);
 		while (myfile.getline(buf, maxWidth, '\n')) {
 			int widthT = parseFileLine(buf, line++, &vec);
-			if(width != widthT)
+			if (width != widthT)
 				printf("bad line %d %d|%d\n", line - 1, widthT, width);
 		}
-		
+
 		myfile.close();
 		initGroundModel(levelGround, stairs, walls, specialObj, toConnectedVec(width, vec));
 		return 0;
@@ -358,17 +357,17 @@ int leveGenerator::parseLevel(int i) {
 
 struct objMap leveGenerator::getLevel(int i) {
 	if (currentLevel != i) {
-		if(parseLevel(i))
+		if (parseLevel(i))
 			return struct objMap() = { 0, 0, 0, 0 };
 		currentLevel = i;
 	}
 	struct objMap out = {
 		levelGround, stairs,
-		walls, specialObj};
+		walls, specialObj };
 	return out;
 }
 
-leveGenerator::~leveGenerator(void){
+leveGenerator::~leveGenerator(void) {
 	levelGround->clear();	delete levelGround;
 	stairs->clear();
 	walls->clear();
