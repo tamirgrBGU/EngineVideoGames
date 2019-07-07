@@ -39,5 +39,9 @@ private:
 	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
 	void getTailSegs(float *lastX, float jumpX, float jumpY, int segs);
 	void getBodySegs(float *lastX, float jumpX, float jumpY, int segs);
+
+	void addCubes();
+	void configSound();
+	void orderCamera();
 };
 

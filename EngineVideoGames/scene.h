@@ -11,8 +11,13 @@ class Scene : public MovableGLM
 
 public:
 	enum axis{xAxis,yAxis,zAxis};
+
 	enum transformations{xLocalTranslate,yLocalTranslate,zLocalTranslate,xGlobalTranslate,yGlobalTranslate,zGlobalTranslate,
 		xLocalRotate,yLocalRotate,zLocalRotate,xGlobalRotate,yGlobalRotate,zGlobalRotate,xScale,yScale,zScale,xCameraTranslate,yCameraTranslate,zCameraTranslate};
+	enum transformations2 {
+		LocalTranslate, GlobalTranslate, Scale
+	};
+
 	enum modes{POINTS,LINES,LINE_LOOP,LINE_STRIP,TRIANGLES,TRIANGLE_STRIP,TRIANGLE_FAN,QUADS};
 	enum Shapes
 	{
@@ -39,6 +44,7 @@ public:
 	void ZeroShapesTrans();
 
 	//virtual void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);//
+	void shapeTransformation(int pickedShape, int type, vec3 amt);
 
 	virtual void Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx) = 0; 
 	virtual void UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx) = 0;

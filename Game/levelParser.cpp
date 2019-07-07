@@ -391,6 +391,7 @@ struct objMap leveGenerator::getLevel(int i) {
 	struct objMap out = {
 		levelGround, stairs,
 		walls, specialObj };
+
 	return out;
 }
 

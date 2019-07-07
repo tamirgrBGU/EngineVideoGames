@@ -28,7 +28,7 @@ class Node
 	 std::vector<float> boundbox;
 	 Node* left ;// = std::unique_ptr<Node>( new Node(3) );
 	 Node* right; //( new Node(3));
-	vecType data; 
+	 vecType data; 
 	 
      //default constructor
 	 Node(int _n);

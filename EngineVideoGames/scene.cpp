@@ -183,6 +183,46 @@ using namespace glm;
 				shapes[indx]->globalSystemRot(ang,v,-1);
 		}
 
+	 void Scene::shapeTransformation(int pickedShape, int type, vec3 amt)
+	 {
+		 vec3 newAxis;
+		 if (glm::length(amt) > 1e-5)
+		 {
+			 switch (type)
+			 {
+			 case LocalTranslate:
+				 if (pickedShape == -1)
+					 myTranslate(amt, 1);
+				 else
+				 {
+					 int i = pickedShape;
+					 for (; chainParents[i] > -1; i = chainParents[i]);
+					 shapes[i]->myTranslate(amt, 1);
+				 }
+				 break;
+			 case GlobalTranslate:
+				 if (pickedShape == -1)
+					 myTranslate(amt/5.f, 0);
+				 else
+				 {
+					 int i = pickedShape;
+					 for (; chainParents[i] > -1; i = chainParents[i]);
+					 shapes[i]->myTranslate(amt, 0);
+				 }
+				 break;
+			 case Scale:
+				 if (pickedShape == -1)
+					 myScale(amt);
+				 else
+					 shapes[pickedShape]->myScale(amt);
+				 break;
+			 default:
+				 break;
+			 }
+
+		 }
+
+	 }
 	void Scene::shapeTransformation(int type,float amt)
 	{
 		   vec3 newAxis;

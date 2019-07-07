@@ -19,6 +19,7 @@ glm::mat4 *currentTransOther;
 *   Return the tree root node
 */
 std::vector<IndexedModel> coloredBoxesOutput;
+int maxDep;
 std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect &other) {
 
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox);
@@ -34,6 +35,7 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *
 
 	std::vector<std::vector<glm::vec3>> intersect_boxes;
 	coloredBoxesOutput.clear();
+	maxDep = kd.max_depth > other.kd.max_depth ? kd.max_depth : other.kd.max_depth;
 	rec_is_intersect(kd.getRoot(), other.kd.getRoot(), 0, &intersect_boxes);
 	//intersect_boxes.pop_back(); intersect_boxes.pop_back();
 	return coloredBoxesOutput;
@@ -166,17 +168,6 @@ int intersect::isThereSeparatingPanel(std::vector<glm::vec3> &box1, std::vector<
 	return 0;
 }
 
-//std::vector<glm::vec3> floats_to_vec(std::vector<float> boundbox) {
-//	std::vector<glm::vec3> vec;
-//	vec.push_back(vec3(boundbox[0], 0, 0));
-//	vec.push_back(vec3(boundbox[1], 0, 0));
-//	vec.push_back(vec3(0, boundbox[2], 0));
-//	vec.push_back(vec3(0, boundbox[3], 0));
-//	vec.push_back(vec3(0, 0, boundbox[4]));
-//	vec.push_back(vec3(0, 0, boundbox[5]));
-//	return vec;
-//}
-
 inline std::vector<glm::vec3> intersect::bound_vec_to_boundbox(std::vector<float> &boundbox) {
 	std::vector<glm::vec3> vec;
 	vec.push_back(vec3(boundbox[0], boundbox[2], boundbox[5]));
@@ -234,7 +225,7 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 {
 	bool intersect_with = 0;// 1;
 	if (next) {
-		if (next->boundbox[axis * 2] == next->boundbox[axis * 2 + 1])
+		if (false & next->boundbox[axis * 2] == next->boundbox[axis * 2 + 1])
 			intersect_with = 1;//we do not want to keep recursion on a plane	
 		else {
 			int res1 = intersectWithOther(other->left, axis, next->boundbox);
@@ -246,7 +237,7 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 			intersect_with = (res1 & res2) > 0;
 		}
 	}
-	if (intersect_with && ((unsigned)depth == kd.max_depth-1)) {//none of the children are intersecting - add perants
+	if (intersect_with && ((unsigned)depth >= maxDep-1)) {//none of the children are intersecting - add perants
 		insert_box(output, boxvec,  currentTransMe,	   glm::vec3(0.2, 0.2, 1));
 		insert_box(output, boxvec2, currentTransOther, glm::vec3(1, 0.2, 0.2));
 	}

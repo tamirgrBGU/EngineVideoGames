@@ -49,6 +49,7 @@ void Game::updateDrawMode(unsigned int mode){
 glm::vec3 xAx(1, 0, 0);
 glm::vec3 yAx(0, 1, 0);
 glm::vec3 zAx(0, 0, 1);
+int snakeLevel;
 vec3 snakeDirection; //TODO - maintain on key pressed
 vec3 snakeCurLocation; //TODO
 int snakeNodesShapesStart = -1;
@@ -130,12 +131,9 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 		nodesAngles.push_back(0.f);
 	}
 		
-	pickedShape = snakeNodesShapesStart;
-	shapeTransformation(xLocalTranslate, xLoc);
-	shapeTransformation(yLocalTranslate, yLoc - snakeFullLength);
-	shapeTransformation(zLocalTranslate, zLoc);
-	shapeTransformation(zLocalRotate, 180.f);
-	shapeTransformation(zLocalRotate, 90.f * direction);
+	shapeTransformation(snakeNodesShapesStart, LocalTranslate, vec3(xLoc, yLoc - snakeFullLength, zLoc));
+	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
+	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 	snakeDirection = myDir(direction);
 	snakeCurLocation = vec3(xLoc, yLoc, zLoc);
 }
@@ -147,10 +145,10 @@ const char *appleStr = "../res/objs/apple.obj";
 const char *snake_headStr = "../res/objs/snake_head.obj";
 void Game::genObj(const char * ptr, int tex, vec3 startLoc, float scale, int direction) {
 	addShapeFromFile(ptr, -1, TRIANGLES, tex, 3);
-	shapes[shapes.size() - 1]->myTranslate(startLoc, 1);
+	shapes[shapes.size() - 1]->myTranslate(startLoc, 0);
 	if (scale != -1)
-		shapes[shapes.size() - 1]->myScale(vec3(scale, scale, scale));
-	shapeTransformation(zLocalRotate, 90.f * direction);
+		shapeTransformation(shapes.size() - 1, Scale, vec3(scale, scale, scale));
+	shapes[shapes.size() - 1]->myRotate(90.f * direction, zAx, zAxis1);
 }
 
 void onIntersectPrint(void) {
@@ -174,15 +172,18 @@ void Game::specialObjHandle(objLocation &obj) {
 	switch (obj.type) {
 	case 1:
 		genSnake(x, y, z, dir);
+		snakeLevel = obj.level;
 		addSnakeHead(meshelper->getlastInitMeshPositions());
+		//printf("added SnakeHead\n");
 		break;
-	case 2:
-		genObj(caveStr, 2, vec3(x, y, z), 0.05f * allscale, dir);
-		addObj(x, y, obj.level, onIntersectPrint, meshelper->getlastInitMeshPositions());
+	case 2:;
+		genObj(caveStr, 2, vec3(x + allscale / 2, y + allscale / 2, z-20), 0.05f * allscale, dir);
+		addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectPrint, meshelper->getlastInitMeshPositions());
+		printf("added cave %f %f %f\n",x ,y, z);
 		break;
 	case 3:
-		genObj(appleStr, 3, vec3(x, y, z), 0.003f * allscale, dir);
-		addObj(x, y, obj.level, onIntersectPrint, meshelper->getlastInitMeshPositions());
+		genObj(appleStr, 3, vec3(x + allscale / 2, y + allscale / 2, z), 0.003f * allscale, dir);
+		addObj(x, y, obj.level, shapes[shapes.size() - 1], onIntersectPrint, meshelper->getlastInitMeshPositions());
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -190,40 +191,7 @@ void Game::specialObjHandle(objLocation &obj) {
 	}
 }
 
-
-leveGenerator lGen(0);
-void Game::Init()
-{
-	meshelper = new MeshConstructor(100);
-	//addShape(Axis, -1, LINES);
-	
-	struct objMap map = lGen.getLevel(0);//todo - level -1 is random
-	if (map.levelGround != nullptr) {
-		for (modelWrapper &obj : *map.levelGround)
-			addShape(obj.model, -1, TRIANGLES, 2, 3);
-		for (modelWrapper &obj : *map.walls) {
-			addShape(obj.model, -1, TRIANGLES, 2, 3);
-			addObj(obj.x, obj.y, obj.level, onIntersectWalls, meshelper->getlastInitMeshPositions());
-		}
-		for (modelWrapper &obj : *map.stairs) {
-			addShape(obj.model, -1, TRIANGLES, 2, 3);
-			addObj(obj.x, obj.y, obj.level, onIntersectStairs, meshelper->getlastInitMeshPositions());
-		}
-		for (objLocation &obj : *map.specialObj)
-			specialObjHandle(obj);
-	}
-	else
-		printf("level did not been loaded!");	
-
-	//translate all scene away from camera
-	//myTranslate(glm::vec3(0, 0, -20), 0);
-		
-	vec3 midSnake = snakeDirection;
-	int halfS = snakeFullLength / 2;
-	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, -snakeFullLength);// midSnake.z*halfS);
-	midSnake = snakeCurLocation - midSnake;
-	myTranslate(-midSnake, 0);
-	
+void Game::addCubes() {
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
@@ -233,15 +201,64 @@ void Game::Init()
 	this->shapeTransformation(this->yGlobalTranslate, 20.f);
 	pickedShape--;
 	this->shapeTransformation(this->zGlobalTranslate, 30.f);
+}
 
-	//PLAYING THEME MUSIC
+//PLAYING THEME MUSIC
+void Game::configSound() {
 	//std::thread t1(&Game::PlayTheme, this);
 	//t1.detach();
-	//new thread PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//std::thread t2(&Game::PlayPoint, this);
 	//t2.detach();
+}
+
+void Game::orderCamera() {
+	//translate all scene away from camera
+	//myTranslate(glm::vec3(0, 0, -20), 0);
+
+	vec3 midSnake = snakeDirection;
+	int halfS = snakeFullLength / 2;
+	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, -snakeFullLength);// midSnake.z*halfS);
+	midSnake = snakeCurLocation - midSnake;
+	myTranslate(-midSnake, 0);
+}
+
+const int firstLvl = 0;
+leveGenerator lGen(firstLvl);
+void Game::Init()
+{
+	meshelper = new MeshConstructor(100);
+	//addShape(Axis, -1, LINES);
+	
+	struct objMap map = lGen.getLevel(firstLvl);//todo - level -1 is random
+	printf("level:%d walls:%d stairs:%d\n", firstLvl, map.walls->size(), map.stairs->size());
+
+	if (map.levelGround != nullptr) {
+		for (modelWrapper &obj : *map.levelGround)
+			addShape(obj.model, -1, TRIANGLES, 2, 3);
+		for (modelWrapper &obj : *map.walls) {
+			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+				onIntersectWalls, meshelper->getlastInitMeshPositions());
+		}
+		for (modelWrapper &obj : *map.stairs) {
+			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+				onIntersectStairs, meshelper->getlastInitMeshPositions());
+		}
+		for (objLocation &obj : *map.specialObj)
+			specialObjHandle(obj);
+	}
+	else
+		printf("level did not been loaded!");	
+	printFreinds();
+
+	orderCamera();
+	addCubes();
+	configSound();
+
 	ReadPixel();
 	//Activate();
 	pickedShape = -1;
@@ -333,8 +350,9 @@ void Game::Motion()
 			myTranslate(-t, 0);
 
 		snakeCurLocation += t;
+		//printf("%f %f %f %d\n", snakeCurLocation.x, snakeCurLocation.y, snakeCurLocation.z, snakeLevel);
 		setSnakeNodesAngles();
-		//isIntersectSnakeHead(shapes[snakeNodesShapesEnd]->makeTrans(), snakeCurLocation.x, snakeCurLocation.y);
+		isIntersectSnakeHead(shapes[snakeNodesShapesEnd]->makeTrans(), snakeCurLocation.x, snakeCurLocation.y, snakeLevel);
 	}
 }
 
