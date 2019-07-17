@@ -219,7 +219,7 @@ void Game::orderCamera() {
 	//myTranslate(glm::vec3(0, 0, -20), 0);
 
 	vec3 midSnake = snakeDirection;
-	int halfS = snakeFullLength / 2;
+	int halfS = (int) snakeFullLength / 2;
 	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, -snakeFullLength);// midSnake.z*halfS);
 	midSnake = snakeCurLocation - midSnake;
 	myTranslate(-midSnake, 0);
@@ -326,14 +326,33 @@ void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shader
 void Game::WhenRotate() {}
 void Game::WhenTranslate() {}
 
+//speed also depends on user frame rate
+float speed = 3;
+float rollspeed =  1;
+
 void Game::setSnakeNodesAngles() {
 	for (int i = 0; i < snakeLength - 1; i++) {
-		float diff = (nodesAngles[i + 1] - nodesAngles[i])/10;
+		float diff = (nodesAngles[i + 1] - nodesAngles[i])*rollspeed;
 		nodesAngles[i] += diff;
-		shapes[snakeNodesShapesStart + i]->myRotate(diff, vec3(0, 0, 1), zAxis1);
-		//nodesAngles[i + 1] -= diff;
-		shapes[snakeNodesShapesStart + i + 1]->myRotate(-diff, vec3(0, 0, 1), zAxis1);
+
+		pickedShape = snakeNodesShapesStart + i;
+		shapeTransformation(zLocalRotate, diff);
+		pickedShape = snakeNodesShapesStart + i + 1; 
+		shapeTransformation(zLocalRotate, -diff);
+
+		/*
+			shapes[snakeNodesShapesStart + i]->myRotate(diff, vec3(0, 0, 1), zAxis1);
+			//nodesAngles[i + 1] -= diff;
+			shapes[snakeNodesShapesStart + i + 1]->myRotate(-diff, vec3(0, 0, 1), zAxis1);
+		*/
 	}	
+}
+
+void printmat(glm::mat4 tranSnake) {
+	printf("[\n");
+	for (int i = 0; i < 4; i++)
+		printf("%f %f %f % f\n", tranSnake[i].x, tranSnake[i].y, tranSnake[i].z, tranSnake[i].w);
+	printf("]\n");
 }
 
 bool snakeviewmode = false;
@@ -341,18 +360,28 @@ void Game::Motion()
 {
 	if (isActive)
 	{
-		vec3 t(snakeDirection.x / 10, snakeDirection.y / 10, snakeDirection.z / 10);
-		shapes[snakeNodesShapesStart]->myTranslate(t, 0);
+		vec3 temp(snakeDirection.x * speed, snakeDirection.y * speed, snakeDirection.z * speed);
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 
 		if (snakeviewmode)
 			myTranslate(vec3(0, 0, 1), 0);
 		else
-			myTranslate(-t, 0);
+			myTranslate(-temp, 0);
 
-		snakeCurLocation += t;
-		//printf("%f %f %f %d\n", snakeCurLocation.x, snakeCurLocation.y, snakeCurLocation.z, snakeLevel);
+		snakeCurLocation += temp;
 		setSnakeNodesAngles();
-		isIntersectSnakeHead(shapes[snakeNodesShapesEnd]->makeTrans(), snakeCurLocation.x, snakeCurLocation.y, snakeLevel);
+
+		//printf("%d vs %d\n", snakeNodesShapesStart, snakeNodesShapesEnd);
+		mat4 root = shapes[snakeNodesShapesStart]->makeTrans();
+		mat4 head = shapes[snakeNodesShapesEnd]->makeTrans();
+		mat4 headC = head;
+		head = root*headC;
+		for (int i = 0; i < snakeLength-2; i++)
+			head *= headC;
+		//printmat(root);
+		//printmat(head);
+
+		isIntersectSnakeHead(head, snakeCurLocation.x, snakeCurLocation.y, snakeLevel);
 	}
 }
 
@@ -370,6 +399,7 @@ void Game::changeCameraMode() {
 	//myRotate(sign * -50.f, xAx, 1);
 	//myRotate(sign * angle, zAx, 1);
 	myTranslate(glm::vec3(sign * -snakeFullLength*1.5, 0, sign * 1.5 * snakeFullLength), 0);
+
 	/*if(snakeviewmode)
 		myRotate(sign*-arrowKeyPL*anglePL, zAx, 0);
 	else*/

@@ -37,8 +37,6 @@ public:
 	virtual void addShape(int type,int parent,unsigned int mode);
 	void addShapeCopy(int indx,int parent,unsigned int mode);
 	
-	void freeze();
-
 	void addShader(const std::string& fileName);
 	void AddTexture(const std::string& textureFileName);
 	void ZeroShapesTrans();
@@ -53,6 +51,7 @@ public:
 	virtual void WhenRotate(){};
 	virtual void Motion(){};
 	virtual void Draw(int shaderIndx,int cameraIndx,bool debugMode);
+	mat4 Scene::getChainedTrans(int i);
 	void getNormalAndMVP(mat4 &Normal, mat4 &MVP, mat4 *Normal1, mat4 *MVP1, int i);
 
 	glm::mat4 GetViewProjection(int indx) const; 

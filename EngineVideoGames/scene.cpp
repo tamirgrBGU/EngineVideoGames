@@ -92,7 +92,6 @@ using namespace glm;
 
 	void Scene::getNormalAndMVP(mat4 &Normal, mat4 &MVP, mat4 *Normal1, mat4 *MVP1, int i) {
 		*Normal1 = mat4(1);
-		pickedShape = i;
 		for (int j = i; chainParents[j] > -1; j = chainParents[j])
 		{
 			*Normal1 = shapes[chainParents[j]]->makeTrans() * *Normal1;
@@ -105,6 +104,14 @@ using namespace glm;
 		*Normal1 = *Normal1 * shapes[i]->makeTrans();
 	}
 
+	mat4 Scene::getChainedTrans(int pickedShape) {
+		glm::mat4 Normal = makeTrans();
+		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
+		mat4 Normal1, MVP1;
+		getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, pickedShape);
+		return Normal1;
+	}
+
 	mat3x4 cropto3x4(mat4 &in) {
 		mat3x4 out;
 		out[0] = in[0];
@@ -112,20 +119,6 @@ using namespace glm;
 		out[2] = in[2];
 		return out;
 
-	}
-
-	std::vector<glm::mat4> freezedMvp;
-	void Scene::freeze() {
-		glm::mat4 Normal = makeTrans();
-		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
-
-		int p = pickedShape;
-		mat4 Normal1, MVP1;
-		freezedMvp.clear();
-		for (unsigned int i = 0; i<shapes.size(); i++) {
-			getNormalAndMVP(Normal, MVP, &Normal1, &MVP1, i);
-			freezedMvp.push_back(MVP1);
-		}
 	}
 
 	//assumption ! chained shapes are uploaded together
@@ -283,7 +276,7 @@ using namespace glm;
 			case zGlobalTranslate:
 				if(pickedShape ==-1)
 					myTranslate(vec3(0,0,amt/5.0),0);
-								else
+				else
 				{
 					int i = pickedShape;
 					for (; chainParents[i] > -1; i = chainParents[i]);

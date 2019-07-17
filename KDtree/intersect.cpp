@@ -237,7 +237,7 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 			intersect_with = (res1 & res2) > 0;
 		}
 	}
-	if (intersect_with && ((unsigned)depth >= maxDep-1)) {//none of the children are intersecting - add perants
+	if (intersect_with && ((signed)depth >= maxDep-1)) {//none of the children are intersecting - add perants
 		insert_box(output, boxvec,  currentTransMe,	   glm::vec3(0.2, 0.2, 1));
 		insert_box(output, boxvec2, currentTransOther, glm::vec3(1, 0.2, 0.2));
 	}
