@@ -23,6 +23,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 vec3 x(1, 0, 0);
 vec3 y(0, 1, 0);
 vec3 z(0, 0, 1);
+bool stateActive = false;
+bool numpadMoveMode = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	Game *scn = (Game*)glfwGetWindowUserPointer(window);
@@ -56,22 +58,37 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			scn->playerInput(false);
 			break;
 		case GLFW_KEY_KP_8:
-			scn->myRotate(1.f, vec3(1, 0, 0), 1);
+			numpadMoveMode ?
+			scn->myRotate(1.f, vec3(1, 0, 0), 1) :
+			scn->myTranslate(vec3(0, -1, 0), 0);
 			break;
 		case GLFW_KEY_KP_6:
-			scn->myRotate(1.f, vec3(0, 0, 1), 0);
+			numpadMoveMode ?
+			scn->myRotate(1.f, vec3(0, 0, 1), 0) :
+			scn->myTranslate(vec3(-1, 0, 0), 0);
 			break;
 		case GLFW_KEY_KP_4:
-			scn->myRotate(-1.f, vec3(0, 0, 1), 0);
+			numpadMoveMode ?
+			scn->myRotate(-1.f, vec3(0, 0, 1), 0) :
+			scn->myTranslate(vec3(1, 0, 0), 0);
 			break;
 		case GLFW_KEY_KP_2:
-			scn->myRotate(-1.f, vec3(1, 0, 0), 1);
+			numpadMoveMode?
+			scn->myRotate(-1.f, vec3(1, 0, 0), 1):
+			scn->myTranslate(vec3(0, 1, 0), 0);
+			break;
+		case GLFW_KEY_KP_0:
+			numpadMoveMode = !numpadMoveMode;
 			break;
 		case GLFW_KEY_KP_SUBTRACT:
 			scn->shapeTransformation(scn->zCameraTranslate, -10.f);
 			break;
 		case GLFW_KEY_KP_ADD:
 			scn->shapeTransformation(scn->zCameraTranslate, 10.f);
+			break;
+		case GLFW_KEY_SPACE:
+			stateActive ?scn->Deactivate():scn->Activate();
+			stateActive = !stateActive;
 			break;
 		default:
 			printf("undefined key %d\n", key);

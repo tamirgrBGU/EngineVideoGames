@@ -10,11 +10,11 @@ public:
 	EulerAngles(glm::mat4 &mat);
 	EulerAngles(float phif, float thetaf,float psif);
 	virtual ~EulerAngles(){}
-    void printAngles(int ang);
+	void printAngles(int ang);
 	float GetCosAng(int ang);
 	void buildAngMatrices(glm::mat4 &mat);
 protected:
-	
+	void copyEulerAngles(EulerAngles &copyHim);
 	void buildAngMatrix(int XorZ, float c, float s);
 	void alignedRot(int XorZ,float angle,int mode);
 	

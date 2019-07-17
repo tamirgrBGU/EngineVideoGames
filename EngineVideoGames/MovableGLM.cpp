@@ -44,7 +44,8 @@ void MovableGLM::copyTranslations(MovableGLM *mGLM)
 		translateMat[i] = mGLM->translateMat[i];
 	}
 	//TODO: update rotation 
-	rotateMat = mGLM->rotateMat;
+	//rotateMat = mGLM->makeRot();
+	//copyEulerAngles(*mGLM);
 }
 
 
@@ -60,7 +61,7 @@ mat4 MovableGLM::GetRot() const
 
 mat4 MovableGLM::makeTrans() const
 {
-	return  translateMat[0] * rotateMat * makeRot() * translateMat[1] ;
+	return  translateMat[0] * rotateMat * makeRot() * translateMat[1];
 }
 
 
@@ -85,6 +86,11 @@ void MovableGLM::myRotate(float ang, glm::vec3 &vec, int indx)
 void MovableGLM::doTranslate(glm::mat4 mat, int indx)
 {
 	translateMat[indx] = mat;
+}
+
+void MovableGLM::doRotate(mat4 rot)
+{
+	rotateMat = rot;
 }
 
 void MovableGLM::myTranslate(vec3 &vec, int indx)

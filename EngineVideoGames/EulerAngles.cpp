@@ -36,6 +36,11 @@ EulerAngles::EulerAngles(float phif, float thetaf, float psif)
 	psi = glm::rotate(psi, psif, glm::vec3(0, 0, 1));
 
 }
+void EulerAngles::copyEulerAngles(EulerAngles &copyHim) {
+	phi = copyHim.phi;
+	theta = copyHim.theta;
+	psi = copyHim.psi;
+}
 
 void EulerAngles::printAngles(int ang)
 {
