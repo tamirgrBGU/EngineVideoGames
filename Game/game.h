@@ -1,21 +1,24 @@
 #pragma once
 #include "scene.h"
+#include "snakeMoveTracker.H"
 #include "levelParser.h"
 
 class Game : public Scene
 {
+	const int snakeLength = 15, segs = 5, ends = 10;
 	int projMode = -1;
 public:
 	bool cameramode = false;
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	~Game(void);
-	void setSnakeNodesAngles();
+	glm::mat4 setSnakeNodesAnglesAndGetHead();
 	void genSnake(float x, float y, float z, int direction);
 	void specialObjHandle(objLocation &obj);
 	void genObj(const char * ptr, int tex, vec3 startLoc, float scale, int direction);
 	void Init();
 	void playerInput(bool direction);
+	void changeDirPInput(bool dir);
 	void addShape(int type, int parent, unsigned int mode);
 	void addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader);
 	void updateDrawMode(unsigned int mode);
@@ -35,6 +38,8 @@ public:
 		updateDrawMode(projMode);
 	}
 private:
+	snakeMoveTracker *sMT;
+
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
 	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
 	void getTailSegs(float *lastX, float jumpX, float jumpY, int segs);

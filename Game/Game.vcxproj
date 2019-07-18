@@ -83,13 +83,16 @@
     <ClCompile Include="IntersectTracker.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="levelParser.cpp" />
+    <ClCompile Include="snakeMoveTracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IntersectTracker.h" />
     <ClInclude Include="levelParser.h" />
+    <ClInclude Include="listNode.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="snakeMoveTracker.H" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

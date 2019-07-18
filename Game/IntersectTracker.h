@@ -1,12 +1,7 @@
 #pragma once
 #include "../KDtree/intersect.h"
 #include "shape.h"
-
-template<class T> struct listNode
-{
-	T value;
-	listNode<T> *next;
-};
+#include "listNode.h"
 
 struct levelIntersect {
 	float x;

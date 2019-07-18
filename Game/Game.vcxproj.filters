@@ -27,6 +27,9 @@
     <ClCompile Include="IntersectTracker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="snakeMoveTracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h">
@@ -42,6 +45,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IntersectTracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="snakeMoveTracker.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="listNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
