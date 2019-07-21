@@ -33,6 +33,7 @@ public:
 	void PlayTheme();
 	void PlayPoint();
 	void PlayExplosion();
+	void Debug();//will print data of current debbuging
 	void changeMode() {
 		projMode = (projMode + 1) % 6;
 		updateDrawMode(projMode);

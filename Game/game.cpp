@@ -332,33 +332,34 @@ float speed = 1;
 float rollspeed =  0.4f;
 float epsilonAngles = 10;
 int arrowKeyPL = 0;
-bool snakeRotating = false, pressed = false;
-
+Bezier1D b1d; Bezier2D b2d;
 mat4 Game::setSnakeNodesAnglesAndGetHead() 
 {
 	mat4 root = shapes[snakeNodesShapesStart]->makeTrans();
 	//printMat(root);	printf("%f %f %f\n", root[3][0], root[3][1], root[3][2]);
-	int snakeNode = snakeNodesShapesStart;
-	float max = 0;
+	pickedShape = snakeNodesShapesStart;
 
-	for (int i = 0; i < snakeLength - 1; i++) {
-		float angle = sMT->getAngle(i, root[3][0], root[3][1], root[3][2]);
-		float tempAngle = abs(angle);
-		if (max < tempAngle)			max = tempAngle;
+	float angle = sMT->getAngle(0);
+	snakeDirection = b1d.v4to3(root * vec4(0, 1, 0, 0));
+	shapeTransformation(zLocalRotate, angle);
+	pickedShape++;
+	shapeTransformation(zLocalRotate, -angle);
+	root *= shapes[pickedShape]->makeTrans();
 
-		pickedShape = snakeNode;
+	for (int i = 1; i < snakeLength - 1; i++) {
+		angle = sMT->getAngle(i);
+
 		shapeTransformation(zLocalRotate, angle);
-		root *= shapes[++snakeNode]->makeTrans();
+		pickedShape++;
+		shapeTransformation(zLocalRotate, -angle);
+		root *= shapes[pickedShape]->makeTrans();
 	}
 
-	if(max < epsilonAngles) 
-		snakeRotating = false;
-	if (pressed)
-		pressed = false;
-	else if(!arrowKeyPL)
-		changeDirPInput(arrowKeyPL < 0);	
-
 	return root;
+}
+
+void Game::Debug() {
+	sMT->printDS();
 }
 
 bool snakeviewmode = false;
@@ -367,16 +368,14 @@ void Game::Motion()
 	int savePicked = pickedShape;
 	if (isActive)
 	{
-		if (!snakeRotating) {
-			vec3 temp(snakeDirection.x * speed, snakeDirection.y * speed, snakeDirection.z * speed);
-			shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
+		vec3 temp(snakeDirection.x * speed, snakeDirection.y * speed, snakeDirection.z * speed);
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 
-			if (snakeviewmode)
-				myTranslate(vec3(0, 0, 1), 0);
-			else
-				myTranslate(-temp, 0);
-		}
-
+		if (snakeviewmode)
+			myTranslate(vec3(0, 0, 1), 0);
+		else
+			myTranslate(-temp, 0);
+		
 		mat4 head = setSnakeNodesAnglesAndGetHead();
 
 		snakeCurLocation = vec3(head[3][0], head[3][1], head[3][2]);
@@ -386,7 +385,6 @@ void Game::Motion()
 	pickedShape = savePicked;
 }
 
-Bezier1D b1d; Bezier2D b2d;
 float anglePL = 5.f;
 void Game::changeCameraMode() {
 	snakeviewmode = !snakeviewmode;
@@ -421,14 +419,11 @@ void Game::changeDirPInput(bool dir){
 	if (snakeviewmode)
 	myRotate(sign*-anglePL, zAx, 0);
 
-	sMT->add(snakeCurLocation.x, snakeCurLocation.y, snakeCurLocation.z, sign*anglePL);
+	sMT->add(sign*anglePL);
 	shapes[snakeNodesShapesEnd]->myRotate(sign*anglePL, vec3(0, 0, 1), zAxis1);
 	Activate();
 }
 
 void Game::playerInput(bool dir) {
-	snakeRotating = true;
-	pressed = true;
-
 	changeDirPInput(dir);
 }

@@ -87,8 +87,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			scn->shapeTransformation(scn->zCameraTranslate, 10.f);
 			break;
 		case GLFW_KEY_SPACE:
-			stateActive ?scn->Deactivate():scn->Activate();
+			stateActive ? scn->Deactivate():scn->Activate();
 			stateActive = !stateActive;
+			scn->Debug();
 			break;
 		default:
 			printf("undefined key %d\n", key);

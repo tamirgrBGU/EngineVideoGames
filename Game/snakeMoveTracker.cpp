@@ -15,11 +15,9 @@ listNode<motionTracker> *getLast(listNode<motionTracker> *node) {
 	return prev;
 }
 
-inline listNode<motionTracker> *genNode(float x, float y, float z, float angleTurn) {
+inline listNode<motionTracker> *genNode(int ticks, float angleTurn) {
 	listNode<motionTracker> *mTnode = new listNode<motionTracker>();
-	mTnode->value.x = x;
-	mTnode->value.y = y;
-	mTnode->value.z = z;
+	mTnode->value.ticks = ticks;
 	mTnode->value.angleTurn = angleTurn;
 	mTnode->next = nullptr;
 	return mTnode;
@@ -33,24 +31,33 @@ bool inBound(float x1, float y1, float z1, float x2, float y2, float z2) {
 	return diff < mTepsilon ? true : false;
 }
 
-void snakeMoveTracker::add(int Node, listNode<motionTracker> *a) {
+void snakeMoveTracker::add(int Node, listNode<motionTracker> *newNode) {
 	listNode<motionTracker> *mTnode = firstVec[Node];
+	newNode->next = nullptr;
 	if (mTnode) {
-		motionTracker *mTval = &(mTnode->value);		motionTracker *mTval2 = &(a->value);
-		if (inBound(mTval->x, mTval->y, mTval->z, mTval2->x, mTval2->y, mTval2->z))
-			mTval->angleTurn = mTval->angleTurn + mTval2->angleTurn;
-		else {
-			listNode<motionTracker> *last = getLast(mTnode);
-			last->next = a;
-			a->next = nullptr;
-		}
+		listNode<motionTracker> *last = getLast(mTnode);
+		last->next = newNode;
+		newNode->value.ticks = 0;
 	}
-	else	
-		firstVec[Node] = a;	
+	else {
+		firstVec[Node] = newNode;
+		newNode->value.ticks = baseTicks;
+	}
 }
 
-void snakeMoveTracker::add(float x, float y, float z, float angleTurn) {
-	add(nodesLen, genNode(x, y, z, angleTurn));
+void snakeMoveTracker::add(float angleTurn) {
+	add(nodesLen, genNode(baseTicks, angleTurn));
+}
+
+void snakeMoveTracker::printDS() {
+	for (int i = 0; i < (signed)firstVec.size(); i++) {
+		listNode<motionTracker> *node = firstVec[i];
+		printf("%d\n", i);
+		while (node) {
+			printf("%d %f\n", node->value.ticks, node->value.angleTurn);
+			node = node->next;
+		}
+	}
 }
 
 // assume it has pointer to valid 
@@ -63,13 +70,26 @@ void snakeMoveTracker::transferToNextNode(int Node) {
 		delete mTnode;	
 }
 
-float snakeMoveTracker::getAngle(int Node, float x, float y, float z) {
+float snakeMoveTracker::getSumOfAllAngles(int Node) {
+	listNode<motionTracker> *mTnode = firstVec[Node];
+	float outangle = 0;
+	while (mTnode) {
+		motionTracker *mTval = (motionTracker *)mTnode;
+		mTnode = mTnode->next;
+		outangle += mTval->angleTurn;
+		transferToNextNode(Node);		
+	}
+
+	return outangle;
+}
+
+float snakeMoveTracker::getAngle(int Node) {
 	listNode<motionTracker> *mTnode = firstVec[Node];
 	float outangle = 0;
 	if (mTnode) {
-		motionTracker *mTval = &(mTnode->value);
+		motionTracker *mTval = (motionTracker *) mTnode;
 
-		if (inBound(mTval->x, mTval->y, mTval->z, x, y, z)) {
+		if (mTval->ticks-- <= 0) {
 			outangle = mTval->angleTurn;
 			transferToNextNode(Node);
 		}
