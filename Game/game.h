@@ -8,6 +8,8 @@ class Game : public Scene
 	const int snakeLength = 15, segs = 5, ends = 10;
 	int projMode = -1;
 public:
+	glm::vec3 tailDirection;	glm::vec3 headDirection;
+	glm::vec3 headCurLocation;	glm::vec3 snakeMid;
 	bool cameramode = false;
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);

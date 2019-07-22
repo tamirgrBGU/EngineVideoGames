@@ -3,15 +3,27 @@
 #include "Bezier2D.h"
 #include "MeshConstructor.h"
 #include "IntersectTracker.h"
+#include "cameraMotion.h";
 #include <windows.h>
 #include <iostream>  
 #include <thread>
+
+static inline void printVec(const glm::vec3 vec)
+{
+	printf("%f %f %f\n", vec.x, vec.y, vec.z);
+}
+
+
+static inline void printVec(const glm::vec4 vec)
+{
+	printf("%f %f %f %f\n", vec.x, vec.y, vec.z, vec.w);
+}
 
 static void printMat(const glm::mat4 mat4)
 {
 	printf("[\n");
 	for (int i = 0; i < 4; i++)
-		printf("%f %f %f % f\n", mat4[i].x, mat4[i].y, mat4[i].z, mat4[i].w);
+		printVec(mat4[i]);
 	printf("]\n");
 }
 
@@ -19,7 +31,7 @@ Game::Game():Scene(){
 	sMT = new snakeMoveTracker(snakeLength);
 }
 
-Game::Game(glm::vec3 position,float angle,float hwRelation,float near1, float far1): 
+Game::Game(vec3 position,float angle,float hwRelation,float near1, float far1): 
 	Scene(position,angle,hwRelation,near1,far1){
 	sMT = new snakeMoveTracker(snakeLength);
 }
@@ -48,12 +60,8 @@ void Game::updateDrawMode(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
-glm::vec3 xAx(1, 0, 0);
-glm::vec3 yAx(0, 1, 0);
-glm::vec3 zAx(0, 0, 1);
+vec3 xAx(1, 0, 0);		vec3 yAx(0, 1, 0);		vec3 zAx(0, 0, 1);
 int snakeLevel;
-vec3 snakeDirection;
-vec3 snakeCurLocation;
 int snakeNodesShapesStart = -1;
 int snakeNodesShapesEnd = -1;
 float snakeFullLength = 0;
@@ -130,8 +138,8 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc - snakeFullLength, yLoc, zLoc));
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
-	snakeDirection = myDir(direction);
-	snakeCurLocation = vec3(xLoc, yLoc, zLoc);
+	tailDirection = myDir(direction);
+	headCurLocation = vec3(xLoc, yLoc, zLoc);
 }
 
 const char *caveStr = "../res/objs/cave.obj";
@@ -213,13 +221,15 @@ void Game::configSound() {
 
 void Game::orderCamera() {
 	//translate all scene away from camera
-	//myTranslate(glm::vec3(0, 0, -20), 0);
+	//myTranslate(vec3(0, 0, -20), 0);
 
-	vec3 midSnake = snakeDirection;
+	vec3 midSnake = tailDirection;
 	int halfS = (int) snakeFullLength / 2;
-	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, -snakeFullLength);// midSnake.z*halfS);
-	midSnake = snakeCurLocation - midSnake;
+	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, -1.5f*snakeFullLength);// midSnake.z*halfS);	
+	midSnake = headCurLocation - midSnake;
 	myTranslate(-midSnake, 0);
+
+	initCameraMotion(this, shapes[snakeNodesShapesStart]);
 }
 
 const int firstLvl = 0;
@@ -254,7 +264,7 @@ void Game::Init()
 	}
 	else
 		printf("level did not been loaded!");	
-	printFreinds();
+	//printFreinds();
 
 	orderCamera();
 	addCubes();
@@ -340,7 +350,7 @@ mat4 Game::setSnakeNodesAnglesAndGetHead()
 	pickedShape = snakeNodesShapesStart;
 
 	float angle = sMT->getAngle(0);
-	snakeDirection = b1d.v4to3(root * vec4(0, 1, 0, 0));
+	tailDirection = b1d.v4to3(root * vec4(0, 1, 0, 0));
 	shapeTransformation(zLocalRotate, angle);
 	pickedShape++;
 	shapeTransformation(zLocalRotate, -angle);
@@ -362,48 +372,53 @@ void Game::Debug() {
 	sMT->printDS();
 }
 
-bool snakeviewmode = false;
 void Game::Motion()
 {
 	int savePicked = pickedShape;
 	if (isActive)
 	{
-		vec3 temp(snakeDirection.x * speed, snakeDirection.y * speed, snakeDirection.z * speed);
+		vec3 temp(tailDirection.x * speed, tailDirection.y * speed, tailDirection.z * speed);
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
-
-		if (snakeviewmode)
-			myTranslate(vec3(0, 0, 1), 0);
-		else
-			myTranslate(-temp, 0);
 		
 		mat4 head = setSnakeNodesAnglesAndGetHead();
+		headDirection = b1d.v4to3(head * vec4(0, 1, 0, 0));
+		headCurLocation = vec3(head[3][0], head[3][1], head[3][2]);
 
-		snakeCurLocation = vec3(head[3][0], head[3][1], head[3][2]);
+		updateCam();
 
-		isIntersectSnakeHead(head, snakeCurLocation.x, snakeCurLocation.y, snakeLevel);
+		isIntersectSnakeHead(head, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
 	pickedShape = savePicked;
 }
 
 float anglePL = 5.f;
 void Game::changeCameraMode() {
-	snakeviewmode = !snakeviewmode;
-	//float angle = b2d.angle_mine_deg(-yAx, snakeDirection);
+	switchCamMode();
+
+	//float angle = b2d.angle_mine_deg(-yAx, tailDirection);
 	//printf("%f\n",angle);
-	int sign = snakeviewmode ? 1 : -1;
-	Deactivate();
-	myRotate(sign * 90.f, glm::cross(zAx,snakeDirection), 8);
+	//int sign = snakeviewmode ? 1 : -1;
+	//Deactivate();
+	vec4 camLoc = makeTrans()[3];
+	/*printMat(makeTrans());
+	printVec(camLoc);*/
+	myTranslate(-b1d.v4to3(camLoc), 0);
+	myRotate(90.f, glm::cross(zAx, tailDirection), 8);
+	myRotate(-90.f, xAx, 8);
+	camLoc = camLoc + vec4(0, 0, 120,0);
+	myTranslate(b1d.v4to3(makeTrans()*camLoc), 0);
+
 	//TODO
 	//myRotate(sign * -50.f, xAx, 1);
 	//myRotate(sign * angle, zAx, 1);
-	myTranslate(glm::vec3(sign * -snakeFullLength*1.5, 0, sign * 1.5 * snakeFullLength), 0);
+	//myTranslate(vec3(sign * -snakeFullLength*1.5, 0, sign * 1.5 * snakeFullLength), 0);
 
 	/*if(snakeviewmode)
 		myRotate(sign*-arrowKeyPL*anglePL, zAx, 0);
 	else*/
-		myRotate(sign*arrowKeyPL*anglePL, zAx, 0);
+	//	myRotate(sign*arrowKeyPL*anglePL, zAx, 0);
 
-	Activate();
+	//Activate();
 }
 
 mat4 rotPl = glm::rotate(anglePL, zAx);
@@ -411,13 +426,10 @@ mat4 rotNPl = glm::rotate(-anglePL, zAx);
 void Game::changeDirPInput(bool dir){
 	Deactivate();
 	int sign = (dir ? -1 : 1);
-	/*snakeDirection = dir ?
-	glm::normalize(b1d.v4to3(b1d.v3to4(snakeDirection)*rotPl)) :
-		glm::normalize(b1d.v4to3(b1d.v3to4(snakeDirection)*rotNPl));*/
-
+	/*tailDirection = dir ?
+	glm::normalize(b1d.v4to3(b1d.v3to4(tailDirection)*rotPl)) :
+		glm::normalize(b1d.v4to3(b1d.v3to4(tailDirection)*rotNPl));*/
 	arrowKeyPL += sign;
-	if (snakeviewmode)
-	myRotate(sign*-anglePL, zAx, 0);
 
 	sMT->add(sign*anglePL);
 	shapes[snakeNodesShapesEnd]->myRotate(sign*anglePL, vec3(0, 0, 1), zAxis1);

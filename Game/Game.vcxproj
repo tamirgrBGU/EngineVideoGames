@@ -79,6 +79,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cameraMotion.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="IntersectTracker.cpp" />
     <ClCompile Include="main.cpp" />
@@ -86,6 +87,7 @@
     <ClCompile Include="snakeMoveTracker.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cameraMotion.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IntersectTracker.h" />
