@@ -3,29 +3,11 @@
 #include "Bezier2D.h"
 #include "MeshConstructor.h"
 #include "IntersectTracker.h"
-#include "cameraMotion.h";
+#include "cameraMotion.h"
 #include <windows.h>
 #include <iostream>  
 #include <thread>
 
-static inline void printVec(const glm::vec3 vec)
-{
-	printf("%f %f %f\n", vec.x, vec.y, vec.z);
-}
-
-
-static inline void printVec(const glm::vec4 vec)
-{
-	printf("%f %f %f %f\n", vec.x, vec.y, vec.z, vec.w);
-}
-
-static void printMat(const glm::mat4 mat4)
-{
-	printf("[\n");
-	for (int i = 0; i < 4; i++)
-		printVec(mat4[i]);
-	printf("]\n");
-}
 
 Game::Game():Scene(){
 	sMT = new snakeMoveTracker(snakeLength);
@@ -60,12 +42,11 @@ void Game::updateDrawMode(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
-vec3 xAx(1, 0, 0);		vec3 yAx(0, 1, 0);		vec3 zAx(0, 0, 1);
 int snakeLevel;
 int snakeNodesShapesStart = -1;
 int snakeNodesShapesEnd = -1;
 float snakeFullLength = 0;
-float jumpy = 0.8f, jumpx = 0.32f;
+float jumpy = 0.4f, jumpx = 0.32f;
 float lastYext = 0;
 static const int bezierRes = 10, cirSubdiv = 4;
 void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs) {
@@ -139,6 +120,7 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 	tailDirection = myDir(direction);
+	headDirection = tailDirection;
 	headCurLocation = vec3(xLoc, yLoc, zLoc);
 }
 
@@ -225,11 +207,12 @@ void Game::orderCamera() {
 
 	vec3 midSnake = tailDirection;
 	int halfS = (int) snakeFullLength / 2;
-	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, -1.5f*snakeFullLength);// midSnake.z*halfS);	
+	float zView = -1.5f*snakeFullLength;
+	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, zView);	
 	midSnake = headCurLocation - midSnake;
 	myTranslate(-midSnake, 0);
 
-	initCameraMotion(this, shapes[snakeNodesShapesStart]);
+	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
 }
 
 const int firstLvl = 0;
@@ -393,20 +376,16 @@ void Game::Motion()
 
 float anglePL = 5.f;
 void Game::changeCameraMode() {
+	Deactivate();
 	switchCamMode();
+	//Activate();
 
 	//float angle = b2d.angle_mine_deg(-yAx, tailDirection);
 	//printf("%f\n",angle);
 	//int sign = snakeviewmode ? 1 : -1;
 	//Deactivate();
-	vec4 camLoc = makeTrans()[3];
 	/*printMat(makeTrans());
 	printVec(camLoc);*/
-	myTranslate(-b1d.v4to3(camLoc), 0);
-	myRotate(90.f, glm::cross(zAx, tailDirection), 8);
-	myRotate(-90.f, xAx, 8);
-	camLoc = camLoc + vec4(0, 0, 120,0);
-	myTranslate(b1d.v4to3(makeTrans()*camLoc), 0);
 
 	//TODO
 	//myRotate(sign * -50.f, xAx, 1);

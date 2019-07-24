@@ -3,9 +3,29 @@
 #include "snakeMoveTracker.H"
 #include "levelParser.h"
 
+static inline void printVec(const glm::vec3 vec)
+{
+	printf("%f %f %f\n", vec.x, vec.y, vec.z);
+}
+
+
+static inline void printVec(const glm::vec4 vec)
+{
+	printf("%f %f %f %f\n", vec.x, vec.y, vec.z, vec.w);
+}
+
+static void printMat(const glm::mat4 mat4)
+{
+	printf("[\n");
+	for (int i = 0; i < 4; i++)
+		printVec(mat4[i]);
+	printf("]\n");
+}
+
+static const vec3 xAx(1, 0, 0);		static const vec3 yAx(0, 1, 0);		static const vec3 zAx(0, 0, 1);
 class Game : public Scene
 {
-	const int snakeLength = 15, segs = 5, ends = 10;
+	const int snakeLength = 25, segs = 5, ends = 10;
 	int projMode = -1;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;

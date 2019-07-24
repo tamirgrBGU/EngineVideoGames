@@ -4,7 +4,7 @@
 #include "listNode.h"
 
 static float mTepsilon = 15;
-static int baseTicks = 9;
+static int baseTicks = 5;
 struct motionTracker {
 	int ticks;
 	float angleTurn;

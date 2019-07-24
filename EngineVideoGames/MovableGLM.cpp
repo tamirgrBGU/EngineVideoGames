@@ -28,6 +28,10 @@ MovableGLM::MovableGLM()
 	scaleFactor = vec3(1);
 }
 
+void MovableGLM::resetEuler() {
+	this->ZeroAngles();
+}
+
 mat4 MovableGLM::makeTransScale() const
 {
 	return makeTrans() * scale(mat4(1), scaleFactor);
@@ -65,7 +69,7 @@ mat4 MovableGLM::makeTrans() const
 }
 
 
-void MovableGLM::myRotate(float ang, glm::vec3 &vec, int indx)
+void MovableGLM::myRotate(float ang, const glm::vec3 &vec, int indx)
 {
 	if(indx >=0 && indx <=3)
 	{
