@@ -66,7 +66,8 @@ private:
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
 	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
 	void getTailSegs(float *lastX, float jumpX, float jumpY, int segs);
-	void getBodySegs(float *lastX, float jumpX, float jumpY, int segs);
+	void getBodySegs(float *lastX, float jumpX, float jumpY, int segs, int amount);
+	void orderSegPart(float segLen);
 
 	void addCubes();
 	void configSound();

@@ -581,9 +581,13 @@ using namespace glm;
 
 	Scene::~Scene(void)
 	{
+	Shape *lastShape = nullptr;
 	for (Shape* shp : shapes)
 		{
-			delete shp;
+			if (lastShape != shp) {
+				lastShape = shp;
+				delete shp;
+			}
 		}
 	for (Camera* cam : cameras)
 		{

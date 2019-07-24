@@ -68,9 +68,13 @@ void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jump
 	vec3 axisFrom = *(body.GetControlPoint(0, 0).GetPos());
 	Bezier2D b(body, cirSubdiv, yAx, vec3(0, axisFrom.y, 0)); 
 	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3, 1);
+	orderSegPart(lastY);
+}
+
+void Game::orderSegPart(float segLen) {
 	shapeTransformation(yGlobalTranslate, lastYext);
-	snakeFullLength += lastY;
-	lastYext = lastY;
+	snakeFullLength += segLen;
+	lastYext = segLen;
 	pickedShape++;
 }
 
@@ -78,8 +82,14 @@ void Game::getTailSegs(float *lastX, float jumpX, float jumpY, int segs) {
 	getSegs(lastX, 0, 1, jumpX, jumpY, segs);
 }
 
-void Game::getBodySegs(float *lastX, float jumpX, float jumpY, int segs) {
+void Game::getBodySegs(float *lastX, float jumpX, float jumpY, int segs, int amount) {
 	getSegs(lastX, 1, 0, jumpX, jumpY, segs);
+	Shape *bodySeg = shapes[shapes.size() - 1];
+	for (int i = 0; i < amount - 1; i++) {
+		chainParents.push_back(-1);
+		shapes.push_back(new Shape(*bodySeg, TRIANGLES));
+		orderSegPart(lastYext);
+	}
 }
 
 void Game::getHeadSegs(float *lastX, float jumpX, float jumpY, int segs) {
@@ -106,8 +116,8 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	pickedShape = snakeNodesShapesStart;//chaining!
 
 	getTailSegs(&x, jumpx * rounding, jumpy, ends);
-	for (int i = snakeLength - 2; i > 0; i--)
-		getBodySegs(&x, 0, jumpy, 4);		
+	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);	
+	//float width = x;
 	getHeadSegs(&x, -jumpx * rounding, jumpy, ends);
 
 	snakeNodesShapesEnd = shapes.size() - 1;
@@ -116,12 +126,12 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 		setParent(i, i-1);
 	}
 	
-	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc - snakeFullLength, yLoc, zLoc));
+	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc - snakeFullLength + allscale * 3 / 4, yLoc + allscale / 2, zLoc));
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 	tailDirection = myDir(direction);
 	headDirection = tailDirection;
-	headCurLocation = vec3(xLoc, yLoc, zLoc);
+	headCurLocation = vec3(xLoc + allscale * 3/4, yLoc + allscale/2, zLoc);
 }
 
 const char *caveStr = "../res/objs/cave.obj";
@@ -352,6 +362,7 @@ mat4 Game::setSnakeNodesAnglesAndGetHead()
 }
 
 void Game::Debug() {
+	isActive = !isActive;
 	sMT->printDS();
 }
 
@@ -404,14 +415,12 @@ mat4 rotPl = glm::rotate(anglePL, zAx);
 mat4 rotNPl = glm::rotate(-anglePL, zAx);
 void Game::changeDirPInput(bool dir){
 	Deactivate();
-	int sign = (dir ? -1 : 1);
-	/*tailDirection = dir ?
-	glm::normalize(b1d.v4to3(b1d.v3to4(tailDirection)*rotPl)) :
-		glm::normalize(b1d.v4to3(b1d.v3to4(tailDirection)*rotNPl));*/
-	arrowKeyPL += sign;
 
+	int sign = (dir ? -1 : 1);
+	arrowKeyPL += sign;
 	sMT->add(sign*anglePL);
 	shapes[snakeNodesShapesEnd]->myRotate(sign*anglePL, vec3(0, 0, 1), zAxis1);
+
 	Activate();
 }
 

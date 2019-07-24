@@ -64,12 +64,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			break;
 		case GLFW_KEY_KP_6:
 			numpadMoveMode ?
-			scn->myRotate(1.f, vec3(0, 0, 1), 0) :
+			scn->myRotate(1.f, vec3(0, 0, 1), 1) :
 			scn->myTranslate(vec3(-1, 0, 0), 0);
 			break;
 		case GLFW_KEY_KP_4:
 			numpadMoveMode ?
-			scn->myRotate(-1.f, vec3(0, 0, 1), 0) :
+			scn->myRotate(-1.f, vec3(0, 0, 1), 1) :
 			scn->myTranslate(vec3(1, 0, 0), 0);
 			break;
 		case GLFW_KEY_KP_2:
@@ -87,8 +87,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			scn->shapeTransformation(scn->zCameraTranslate, 10.f);
 			break;
 		case GLFW_KEY_SPACE:
-			stateActive ? scn->Deactivate():scn->Activate();
-			stateActive = !stateActive;
 			scn->Debug();
 			break;
 		default:

@@ -3,7 +3,7 @@
 
 static const char * levelDirName = "levels";
 static const float allscale = 200;
-static const float zscale = 140;
+static const float zscale = allscale/3;
 
 struct objLocation {
 	float x;

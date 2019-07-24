@@ -5,7 +5,7 @@ int main(int argc,char *argv[])
 {
 	const int DISPLAY_WIDTH = 1200;
 	const int DISPLAY_HEIGHT = 800;
-	const float zFar = 1000.0f;
+	const float zFar = 10000.0f;
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;
 	const float relation = (float)DISPLAY_WIDTH/(float)DISPLAY_HEIGHT;
