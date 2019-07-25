@@ -26,7 +26,6 @@ static const float bigAngleFrame = 2 * angleFrame;
 
 static const float frame = 12.f;
 static const float bigframe = 2*frame;
-
 static const float tolerance = 0.07f;
 static const float bigTolerance = tolerance*3;
 

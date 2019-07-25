@@ -23,6 +23,7 @@ int fileExists(TCHAR * file)
 	return found;
 }
 
+static const char * pathPtr = "%s\\zone%d.csv";
 std::vector<std::string*> * scanDir(const char* path) {
 	std::vector<std::string*> * names = new std::vector<std::string*>();
 	char buf[1024]; int i = 0;
@@ -32,12 +33,12 @@ std::vector<std::string*> * scanDir(const char* path) {
 	printf(pwd);
 	printf("\n");
 
-	sprintf_s(buf, "%s\\zone%d.txt", path, i++);
+	sprintf_s(buf, pathPtr, path, i++);
 	while (fileExists(buf)) {
 		printf("found level %s\n", buf);
 		std::string* name = new std::string(buf);
 		names->push_back(name);
-		sprintf_s(buf, "%s\\zone%d.txt", path, i++);
+		sprintf_s(buf, pathPtr, path, i++);
 	}
 
 	return names;
@@ -51,16 +52,17 @@ void leveGenerator::init(const char * path) {
 	specialObj = new std::vector<struct objLocation>();
 }
 
-int nextDelimeter(char* buf, int current, int del) {
-	if (buf[current] == '\0')
+//Will ensure that the last delimeter was eof 
+int nextDelimeterCSV(char* buf, int current, int del) {
+	if (buf[current-1] == '\0')
 		return -1;
-	while (buf[current] != del)
+	while ((buf[current] != del) & (buf[current] != '\0'))
 		current++;
 	return current;
 }
 
 int nextDelimeter(char* buf, int current, int limit, int del) {
-	while ((buf[current] != del) & (current < limit))
+	while ((buf[current] != del) & (current < limit) & (buf[current] != '\0'))
 		current++;
 	if (current == limit)
 		return -1;
@@ -79,17 +81,20 @@ int getInt(char* buf, int first, int end) {
 int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs) {
 	//printf("<%s>\n", buf);
 	int i = 0, point, del, x = 0;
-	del = nextDelimeter(buf, i, ',');
+	del = nextDelimeterCSV(buf, i, ',');
 	while (del > -1) {
 		struct objLocation obj;
 		point = nextDelimeter(buf, i, del, '.');
 		//printf("%d %d\n", del, point);
 		if (point > -1) {
-			int dash = nextDelimeter(buf, i, '-');
-
-			obj.type = getInt(buf, i, dash);
-			obj.direction = getInt(buf, dash + 1, point);
-			obj.level = getInt(buf, point + 1, del);
+			int dash = nextDelimeter(buf, i, point, '-');
+			if (dash != -1) {
+				obj.type = getInt(buf, i, dash);
+				obj.direction = getInt(buf, dash + 1, point);
+				obj.level = getInt(buf, point + 1, del);
+			}
+			else
+				printf("point at %d does not have dash!\n", point);
 		}
 		else {
 			obj.type = -1;
@@ -100,15 +105,15 @@ int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs)
 		obj.y = float(linenum);
 		Objs->push_back(obj);
 		i = del + 1;
-		del = nextDelimeter(buf, i, ',');
+		del = nextDelimeterCSV(buf, i, ',');
 	}
 	return x;
 }
 
 /*
-	square
-	a	b
-	c	d
+square
+a	b
+c	d
 */
 IndexedModel create_square(vec3 a, vec3 b, vec3 c, vec3 d) {
 	IndexedModel square;
@@ -132,7 +137,7 @@ IndexedModel create_square(vec3 a, vec3 b, vec3 c, vec3 d) {
 
 /*
 triangle
-	a
+a
 c	b
 */
 IndexedModel create_triangle(vec3 a, vec3 b, vec3 c) {
@@ -307,7 +312,7 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 			setStairs(objC, walls, stairs);
 
 		else { //spacial index model (not square :) )
-			//if (obj->type == -1) {//create squere at x and y;
+			   //if (obj->type == -1) {//create squere at x and y;
 			modelWrapper mw;
 			mw.x = obj->x;
 			mw.y = obj->y;
@@ -364,9 +369,11 @@ int leveGenerator::parseLevel(int i) {
 		myfile.getline(buf, maxWidth, '\n');
 		int width = parseFileLine(buf, line++, &vec);
 		while (myfile.getline(buf, maxWidth, '\n')) {
-			int widthT = parseFileLine(buf, line++, &vec);
-			if (width != widthT)
-				printf("bad line %d %d|%d\n", line - 1, widthT, width);
+			if (buf[0] != 0) {
+				int widthT = parseFileLine(buf, line++, &vec);
+				if (width != widthT)
+					printf("bad line %d %d|%d\n", line - 1, widthT, width);
+			}
 		}
 
 		myfile.close();
