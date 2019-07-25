@@ -37,7 +37,7 @@ public:
 	glm::mat4 setSnakeNodesAnglesAndGetHead();
 	void genSnake(float x, float y, float z, int direction);
 	void specialObjHandle(objLocation &obj);
-	void genObj(const char * ptr, int tex, vec3 startLoc, float scale, int direction);
+	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
 	void Init();
 	void playerInput(bool direction);
 	void changeDirPInput(bool dir);

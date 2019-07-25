@@ -134,13 +134,19 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	headCurLocation = vec3(xLoc + allscale * 3/4, yLoc + allscale/2, zLoc);
 }
 
-const char *caveStr = "../res/objs/cave.obj";
-const char *nokiaStr = "../res/objs/Nokia_3310.obj";
-const char *tntStr = "../res/objs/TNT_box.obj";
-const char *appleStr = "../res/objs/apple.obj";
-const char *snake_headStr = "../res/objs/snake_head.obj";
-void Game::genObj(const char * ptr, int tex, vec3 startLoc, float scale, int direction) {
-	addShapeFromFile(ptr, -1, TRIANGLES, tex, 3);
+static const char *filePath[]  
+	{ "../res/objs/cave.obj", "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
+		"../res/objs/apple.obj", "../res/objs/snake_head.obj" };
+Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *),  sizeof(filePath)/sizeof(char*));
+void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
+	if (uploadedFiles[ptrIndx] == nullptr) {
+		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);
+		uploadedFiles[ptrIndx] = shapes[shapes.size() - 1];
+	}
+	else {
+		chainParents.push_back(-1);
+		shapes.push_back(new Shape(*uploadedFiles[ptrIndx], TRIANGLES));
+	}
 	shapes[shapes.size() - 1]->myTranslate(startLoc, 0);
 	if (scale != -1)
 		shapeTransformation(shapes.size() - 1, Scale, vec3(scale, scale, scale));
@@ -174,12 +180,12 @@ void Game::specialObjHandle(objLocation &obj) {
 		break;
 	case 2:;
 		//todo return cave
-		//genObj(caveStr, 2, vec3(x + allscale / 2, y + allscale / 2, z-20), 0.05f * allscale, dir);
-		//addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectPrint, meshelper->getlastInitMeshPositions());
+		genObj(0, 2, vec3(x + allscale / 2, y + allscale / 2, z-20), 0.05f * allscale, dir);
+		addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectPrint, meshelper->getlastInitMeshPositions());
 		printf("added cave %f %f %f\n",x ,y, z);
 		break;
 	case 3:
-		genObj(appleStr, 3, vec3(x + allscale / 2, y + allscale / 2, z), 0.003f * allscale, dir);
+		genObj(3, 3, vec3(x + allscale / 2, y + allscale / 2, z), 0.003f * allscale, dir);
 		addObj(x, y, obj.level, shapes[shapes.size() - 1], onIntersectPrint, meshelper->getlastInitMeshPositions());
 		break;
 	default:
@@ -332,8 +338,6 @@ void Game::WhenTranslate() {}
 
 //speed also depends on user frame rate
 float speed = 1;
-float rollspeed =  0.4f;
-float epsilonAngles = 10;
 int arrowKeyPL = 0;
 Bezier1D b1d; Bezier2D b2d;
 mat4 Game::setSnakeNodesAnglesAndGetHead() 
@@ -389,25 +393,6 @@ float anglePL = 5.f;
 void Game::changeCameraMode() {
 	Deactivate();
 	switchCamMode();
-	//Activate();
-
-	//float angle = b2d.angle_mine_deg(-yAx, tailDirection);
-	//printf("%f\n",angle);
-	//int sign = snakeviewmode ? 1 : -1;
-	//Deactivate();
-	/*printMat(makeTrans());
-	printVec(camLoc);*/
-
-	//TODO
-	//myRotate(sign * -50.f, xAx, 1);
-	//myRotate(sign * angle, zAx, 1);
-	//myTranslate(vec3(sign * -snakeFullLength*1.5, 0, sign * 1.5 * snakeFullLength), 0);
-
-	/*if(snakeviewmode)
-		myRotate(sign*-arrowKeyPL*anglePL, zAx, 0);
-	else*/
-	//	myRotate(sign*arrowKeyPL*anglePL, zAx, 0);
-
 	//Activate();
 }
 

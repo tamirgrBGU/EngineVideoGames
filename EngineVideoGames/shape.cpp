@@ -12,8 +12,8 @@ Shape::Shape(const Shape& shape,unsigned int mode)
 	isCopy = true;
 	this->mode = mode;
 	toRender = true;
-	texID = -1;
-	shaderID = 1;
+	texID = shape.texID;
+	shaderID = shape.shaderID;
 
 }
 

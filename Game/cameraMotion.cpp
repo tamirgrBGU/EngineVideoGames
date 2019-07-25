@@ -21,11 +21,13 @@ static inline float sizeOfVec(glm::vec3 v) {
 }*/
 
 
-static const float frame = 10.f;
 static const float angleFrame = 6.f;
-static const float bigAngleFrame = 2*angleFrame;
+static const float bigAngleFrame = 2 * angleFrame;
+
+static const float frame = 12.f;
 static const float bigframe = 2*frame;
-static const float tolerance = 0.04f;
+
+static const float tolerance = 0.07f;
 static const float bigTolerance = tolerance*3;
 
 bool snakeviewmode = false;
@@ -93,7 +95,6 @@ void rotCam() {
 	lastheadDirection = v4to3(v3to40(lastheadDirection)*rotator);
 	
 	myCam->myTranslate(-v4to3(myCam->getTraslate()), 0);
-	printVec(realcampos);
 	myCam->myTranslate(-v4to3(myCam->GetRot() * v3to4(realcampos)), 0);
 }
 
