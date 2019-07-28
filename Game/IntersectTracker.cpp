@@ -68,6 +68,7 @@ void printFreinds() {
 }
 
 void addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(void), std::vector<glm::vec3> &shape) {
+	return;
 	listNode<levelIntersect> *newFriend = new listNode<levelIntersect>();
 	newFriend->value.x = x;
 	newFriend->value.y = y;
@@ -82,6 +83,7 @@ void addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(void
 
 intersect *snakeHead;
 void addSnakeHead(std::vector<glm::vec3> &shape) {
+	return;
 	snakeHead = new intersect(shape);
 }
 

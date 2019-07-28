@@ -117,8 +117,8 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 
 	getTailSegs(&x, jumpx * rounding, jumpy, ends);
 	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);	
-	//float width = x;
 	getHeadSegs(&x, -jumpx * rounding, jumpy, ends);
+	//genObj(4, 0, vec3(0,25,0), 0.001f * allscale, direction+1);
 
 	snakeNodesShapesEnd = shapes.size() - 1;
 
@@ -140,7 +140,7 @@ static const char *filePath[]
 Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *),  sizeof(filePath)/sizeof(char*));
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
-		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);
+		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);//basic shader
 		uploadedFiles[ptrIndx] = shapes[shapes.size() - 1];
 	}
 	else {
@@ -342,41 +342,19 @@ int arrowKeyPL = 0;
 Bezier1D b1d; Bezier2D b2d;
 mat4 Game::setSnakeNodesAnglesAndGetHead() 
 {
-	mat4 root = shapes[snakeNodesShapesStart]->makeTrans();
-	std::vector<vec4> locs;
-	locs.push_back(root[3]);
-	//printMat(root);	printf("%f %f %f\n", root[3][0], root[3][1], root[3][2]);
+	mat4 root(1);
+	tailDirection = b1d.v4to3(shapes[snakeNodesShapesStart]->makeTrans() * vec4(0, 1, 0, 0));
 	pickedShape = snakeNodesShapesStart;
 
-	float angle = sMT->getAngle(0);
-	tailDirection = b1d.v4to3(root * vec4(0, 1, 0, 0));
-	shapeTransformation(zLocalRotate, angle);
-	pickedShape++;
-	root *= shapes[pickedShape]->makeTrans();
-	locs.push_back(root[3]);
-	shapeTransformation(zLocalRotate, -angle);
-
-	for (int i = 1; i < snakeLength - 1; i++) {
-		angle = sMT->getAngle(i);
+	for (int i = 0; i < snakeLength - 1; i++) {//the last node(head) is turned only by the user
+		float angle = sMT->getAngle(i);
 
 		shapeTransformation(zLocalRotate, angle);
-		pickedShape++;
 		root *= shapes[pickedShape]->makeTrans();
-		locs.push_back(root[3]);
+		pickedShape++;
 		shapeTransformation(zLocalRotate, -angle);
 	}
-	
-	root = mat4(1);
-	vec4 diff(0);
-	pickedShape = snakeNodesShapesStart;
-	for (int i = 0; i < snakeLength; i++) {
-		root *= shapes[pickedShape++]->makeTrans();
-		diff = diff + (root[3] - locs[i]);
-	}
-	diff *= 1.f / snakeLength;
-	printVec(diff);
-	//shapeTransformation(snakeNodesShapesStart, GlobalTranslate, -b1d.v4to3(diff));
-
+	root *= shapes[pickedShape]->makeTrans();
 	return root;
 }
 
@@ -399,7 +377,7 @@ void Game::Motion()
 
 		updateCam();
 
-		isIntersectSnakeHead(head, headCurLocation.x, headCurLocation.y, snakeLevel);
+		//isIntersectSnakeHead(head, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
 	pickedShape = savePicked;
 }
