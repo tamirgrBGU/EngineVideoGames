@@ -83,6 +83,7 @@ float snakeMoveTracker::getSumOfAllAngles(int Node) {
 	return outangle;
 }
 
+//node zero is the first node after tne head
 float snakeMoveTracker::getAngle(int Node) {
 	listNode<motionTracker> *mTnode = firstVec[Node];
 	float outangle = 0;

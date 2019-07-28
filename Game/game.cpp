@@ -343,6 +343,8 @@ Bezier1D b1d; Bezier2D b2d;
 mat4 Game::setSnakeNodesAnglesAndGetHead() 
 {
 	mat4 root = shapes[snakeNodesShapesStart]->makeTrans();
+	std::vector<vec4> locs;
+	locs.push_back(root[3]);
 	//printMat(root);	printf("%f %f %f\n", root[3][0], root[3][1], root[3][2]);
 	pickedShape = snakeNodesShapesStart;
 
@@ -350,24 +352,37 @@ mat4 Game::setSnakeNodesAnglesAndGetHead()
 	tailDirection = b1d.v4to3(root * vec4(0, 1, 0, 0));
 	shapeTransformation(zLocalRotate, angle);
 	pickedShape++;
-	shapeTransformation(zLocalRotate, -angle);
 	root *= shapes[pickedShape]->makeTrans();
+	locs.push_back(root[3]);
+	shapeTransformation(zLocalRotate, -angle);
 
 	for (int i = 1; i < snakeLength - 1; i++) {
 		angle = sMT->getAngle(i);
 
 		shapeTransformation(zLocalRotate, angle);
 		pickedShape++;
-		shapeTransformation(zLocalRotate, -angle);
 		root *= shapes[pickedShape]->makeTrans();
+		locs.push_back(root[3]);
+		shapeTransformation(zLocalRotate, -angle);
 	}
+	
+	root = mat4(1);
+	vec4 diff(0);
+	pickedShape = snakeNodesShapesStart;
+	for (int i = 0; i < snakeLength; i++) {
+		root *= shapes[pickedShape++]->makeTrans();
+		diff = diff + (root[3] - locs[i]);
+	}
+	diff *= 1.f / snakeLength;
+	printVec(diff);
+	//shapeTransformation(snakeNodesShapesStart, GlobalTranslate, -b1d.v4to3(diff));
 
 	return root;
 }
 
 void Game::Debug() {
 	isActive = !isActive;
-	sMT->printDS();
+	//sMT->printDS();
 }
 
 void Game::Motion()
