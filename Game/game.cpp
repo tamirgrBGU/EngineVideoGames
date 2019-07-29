@@ -116,8 +116,10 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	pickedShape = snakeNodesShapesStart;//chaining!
 
 	getTailSegs(&x, jumpx * rounding, jumpy, ends);
-	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);	
+	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);
+	//round head generated here
 	getHeadSegs(&x, -jumpx * rounding, jumpy, ends);
+	//big obj head
 	//genObj(4, 0, vec3(0,25,0), 0.001f * allscale, direction+1);
 
 	snakeNodesShapesEnd = shapes.size() - 1;
@@ -126,6 +128,7 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 		setParent(i, i-1);
 	}
 	
+	//still have direction but make it adapt just to one position to the right - todo FIX THIS (- maybe double d)
 	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc - snakeFullLength + allscale * 3 / 4, yLoc + allscale / 2, zLoc));
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
@@ -140,7 +143,7 @@ static const char *filePath[]
 Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *),  sizeof(filePath)/sizeof(char*));
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
-		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);//basic shader
+		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);//using the basic shader
 		uploadedFiles[ptrIndx] = shapes[shapes.size() - 1];
 	}
 	else {
@@ -165,26 +168,25 @@ void onIntersectStairs(void) {
 	printf("stairs\n");
 }
 
-
+enum MapObjTypes {NOTUSED, Snake, Cave, Apple};
 const MeshConstructor *meshelper = nullptr;
 void Game::specialObjHandle(objLocation &obj) {
 	float x = obj.x, y = obj.y, z = obj.z;
 	int dir = obj.direction;
 	//printf("%f %f %f %d %d\n", x, y, z, dir, obj.type);
 	switch (obj.type) {
-	case 1:
+	case Snake:
 		genSnake(x, y, z, dir);
 		snakeLevel = obj.level;
 		addSnakeHead(meshelper->getlastInitMeshPositions());
 		//printf("added SnakeHead\n");
 		break;
-	case 2:;
-		//todo return cave
-		genObj(0, 2, vec3(x + allscale / 2, y + allscale / 2, z-20), 0.05f * allscale, dir);
+	case Cave:
+		genObj(0, 2, vec3(x + allscale / 2, y + allscale / 2, z-22), 0.05f * allscale, dir);
 		addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectPrint, meshelper->getlastInitMeshPositions());
 		printf("added cave %f %f %f\n",x ,y, z);
 		break;
-	case 3:
+	case Apple:
 		genObj(3, 3, vec3(x + allscale / 2, y + allscale / 2, z), 0.003f * allscale, dir);
 		addObj(x, y, obj.level, shapes[shapes.size() - 1], onIntersectPrint, meshelper->getlastInitMeshPositions());
 		break;
@@ -195,6 +197,7 @@ void Game::specialObjHandle(objLocation &obj) {
 }
 
 void Game::addCubes() {
+	addShape(Bezier2D::genBall(12, 12, 8), -1, TRIANGLES, 4, 3);
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
@@ -204,6 +207,10 @@ void Game::addCubes() {
 	this->shapeTransformation(this->yGlobalTranslate, 20.f);
 	pickedShape--;
 	this->shapeTransformation(this->zGlobalTranslate, 30.f);
+	pickedShape--;
+	//shapes[pickedShape]->myTranslate(vec3(5,5,5), 0);
+	int tempSc = 50;
+	shapeTransformation(pickedShape, Scale, vec3(tempSc, tempSc, tempSc));
 }
 
 //PLAYING THEME MUSIC
@@ -231,7 +238,7 @@ void Game::orderCamera() {
 	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
 }
 
-const int firstLvl = 0;
+const int firstLvl = 4;
 leveGenerator lGen(firstLvl);
 void Game::Init()
 {
@@ -262,8 +269,7 @@ void Game::Init()
 			specialObjHandle(obj);
 	}
 	else
-		printf("level did not been loaded!");	
-	//printFreinds();
+		printf("level did not been loaded!");
 
 	orderCamera();
 	addCubes();
@@ -359,7 +365,8 @@ mat4 Game::setSnakeNodesAnglesAndGetHead()
 }
 
 void Game::Debug() {
-	isActive = !isActive;
+	Deactivate();
+	printDSDebug();
 	//sMT->printDS();
 }
 
@@ -377,7 +384,7 @@ void Game::Motion()
 
 		updateCam();
 
-		//isIntersectSnakeHead(head, headCurLocation.x, headCurLocation.y, snakeLevel);
+		isIntersectSnakeHead(head, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
 	pickedShape = savePicked;
 }
@@ -386,7 +393,7 @@ float anglePL = 5.f;
 void Game::changeCameraMode() {
 	Deactivate();
 	switchCamMode();
-	//Activate();
+	Activate();
 }
 
 mat4 rotPl = glm::rotate(anglePL, zAx);

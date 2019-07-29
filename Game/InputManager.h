@@ -87,6 +87,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			scn->shapeTransformation(scn->zCameraTranslate, 10.f);
 			break;
 		case GLFW_KEY_SPACE:
+			scn->PauseUnpause();
+			break;
+		case GLFW_KEY_GRAVE_ACCENT:
 			scn->Debug();
 			break;
 		default:

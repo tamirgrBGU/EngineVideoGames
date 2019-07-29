@@ -6,10 +6,12 @@
 #include "bezier1D.h"
 #include "stdio.h"
 #define M_double_PI 2*M_PI
+static const vec3 xAxis(1, 0, 0);		static const vec3 yAxis(0, 1, 0);		static const vec3 zAxis(0, 0, 1);
 class Bezier2D
 {
 	int circularSubdivision; //(usualy 4) how many subdivision in circular direction
 	Bezier1D b;
+	glm::vec3 color;
 	vec3 axis;
 	bool axismode = false;
 	vec3 first;
@@ -46,7 +48,7 @@ public:
 	float angle_mine_deg(vec3 v1, vec3 v2) {
 		return glm::degrees(angle_mine_rad(v1, v2));
 	}
-
+	static IndexedModel genBall(int resT, int resS, int circularSubdivision);
 	~Bezier2D(void);
 
 private:
@@ -197,9 +199,6 @@ private:
 	}
 
 	mat4 angleRotator;
-	vec3 xAxis = vec3(1, 0, 0);
-	vec3 yAxis = vec3(0, 1, 0);
-	vec3 zAxis = vec3(0, 0, 1);
 	void initParts(mat4 *parts) {
 		parts[0] = initSegmentPartOfCycle(circularSubdivision);
 		//rotataByAxis(xAxis, axis, &parts[0]);

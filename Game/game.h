@@ -54,8 +54,8 @@ public:
 	void changeCameraMode();
 	void PlayTheme();
 	void PlayPoint();
+	void Debug();
 	void PlayExplosion();
-	void Debug();//will print data of current debbuging
 	void changeMode() {
 		projMode = (projMode + 1) % 6;
 		updateDrawMode(projMode);

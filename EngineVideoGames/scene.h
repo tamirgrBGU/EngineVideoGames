@@ -73,6 +73,7 @@ public:
 	inline float GetAngle(int cameraIndx) {return cameras[cameraIndx]->GetAngle();}
 	inline void Activate() {isActive = true;}
 	inline void Deactivate() {isActive = false;}
+	inline void PauseUnpause() { isActive = !isActive; }//will change motion
 	void HideShape(int shpIndx);
 	//inline void SetMousePosition(double xpos, double ypos){xold =xpos; yold=ypos;}
 	void updatePosition(float xpos, float ypos);

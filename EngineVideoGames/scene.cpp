@@ -470,7 +470,10 @@ using namespace glm;
 		else
 		{
 			pickedShape = pickedID;
-			std::cout<<"picked "<<pickedID<<std::endl;
+			if (pickedShape < (unsigned) shapes.size())
+				printf("picked %d %f %f\n", pickedID, shapes[pickedShape]->makeTrans()[3][0], shapes[pickedShape]->makeTrans()[3][1]);
+			else
+				std::cout << "picked " << pickedID << std::endl;
 			xold = x;
 			yold = y;
 		}

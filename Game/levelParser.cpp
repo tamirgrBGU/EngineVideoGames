@@ -119,7 +119,7 @@ IndexedModel create_square(vec3 a, vec3 b, vec3 c, vec3 d) {
 	IndexedModel square;
 	square.positions.push_back(a);	square.positions.push_back(b);
 	square.positions.push_back(c);	square.positions.push_back(d);
-	vec3 norm = glm::cross(c - a, d - b);
+	vec3 norm = glm::cross(c - b, c - a);
 	square.normals.push_back(norm);	square.normals.push_back(norm);
 	square.normals.push_back(norm);	square.normals.push_back(norm);
 	vec3 color(0.6, 0.6, 0.6);
@@ -143,7 +143,7 @@ c	b
 IndexedModel create_triangle(vec3 a, vec3 b, vec3 c) {
 	IndexedModel triangle;
 	triangle.positions.push_back(a);	triangle.positions.push_back(b);	triangle.positions.push_back(c);
-	vec3 norm = glm::cross(b - a, b - c);
+	vec3 norm = glm::cross(c - a, c - b);
 	triangle.normals.push_back(norm);	triangle.normals.push_back(norm);	triangle.normals.push_back(norm);
 	vec3 color(0.6, 0.6, 0.6);
 	triangle.colors.push_back(color);	triangle.colors.push_back(color);	triangle.colors.push_back(color);
@@ -192,26 +192,30 @@ IndexedModel create_ground_square(float xa, float ya, float xc, float yc, float 
 	return create_square(vec3(xa, ya, z), vec3(xc, ya, z), vec3(xc, yc, z), vec3(xa, yc, z));
 }
 
-void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls) {
-	struct objLocation obj = objC.me;
-	modelWrapper mw;
+inline void genMW(modelWrapper& mw, struct objLocation obj) {
 	mw.x = obj.x;
 	mw.y = obj.y;
 	mw.z = obj.z;
 	mw.level = obj.level;
+}
+
+void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls) {
+	struct objLocation obj = objC.me;
 	if (objC.down != nullptr) {//below wall
 		struct objLocation obj2 = objC.down->me;
 		if ((obj.level != obj2.level) & (obj2.type != 0)) {
-			float sizeZ = (obj2.level - obj.level) * zscale;
-			mw.model = create_Hwall_square(0, allscale, sizeZ, allscale, 0);
+			float sizeZ = (obj.level - obj2.level) * zscale;
+			modelWrapper mw; genMW(mw, obj2);
+			mw.model = create_Hwall_square(0, 0, sizeZ, allscale, 0);
 			walls->push_back(mw);
 		}
 	}
 	if (objC.right != nullptr) {//right wall
 		struct objLocation obj2 = objC.right->me;
 		if ((obj.level != obj2.level) & (obj2.type != 0)) {
-			float sizeZ = (obj2.level - obj.level) * zscale;
-			mw.model = create_Vwall_square(allscale, allscale, sizeZ, 0, 0);
+			float sizeZ = (obj.level - obj2.level) * zscale;
+			modelWrapper mw; genMW(mw, obj2);
+			mw.model = create_Vwall_square(0, allscale, sizeZ, 0, 0);
 			walls->push_back(mw);
 		}
 	}
@@ -288,37 +292,37 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 	std::vector<modelWrapper>* stairs,
 	std::vector<modelWrapper>* walls,
 	std::vector<struct objLocation>* specialObj,
-	const std::vector<struct objConnected> vec) {
+	std::vector<struct objConnected> vec) {
 	levelGround->clear();
 	stairs->clear();
 	walls->clear();
 	specialObj->clear();
 
 	for (unsigned int i = 0; i < vec.size(); i++) {
-		struct objConnected objC = vec[i];
-		struct objLocation *obj = &objC.me;
+		//warning do not edit vector or else or the pointers will blow to hell!
+		struct objConnected *objC = &(vec[i]);
+		struct objLocation *obj = &(objC->me);
 		//fix obj x and y to real location, level represents z
 		obj->x *= allscale;
 		obj->y *= allscale;
 		obj->z = obj->level * zscale;
+	}
+
+	for (unsigned int i = 0; i < vec.size(); i++) {
+		struct objConnected objC = vec[i];
+		struct objLocation *obj = &objC.me;
 
 		//check left and right for vertical squres
 		//add all vertical squeres seperate list so it will be able to avoid coliding with them
-
-		if (obj->type != 0)
-			setWalls(objC, walls);
-
+		
 		if (obj->type == 0)
 			setStairs(objC, walls, stairs);
 
 		else { //spacial index model (not square :) )
+			setWalls(objC, walls);
 			   //if (obj->type == -1) {//create squere at x and y;
-			modelWrapper mw;
-			mw.x = obj->x;
-			mw.y = obj->y;
-			mw.z = obj->z;
-			mw.level = obj->level;
-			mw.model = create_ground_square(0, 0, allscale, allscale, 0);
+			modelWrapper mw; genMW(mw, *obj);
+			mw.model = create_ground_square(0, allscale, allscale, 0, 0);
 			levelGround->push_back(mw);
 			if (obj->type > 0)
 				specialObj->push_back(*obj);

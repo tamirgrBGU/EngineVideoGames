@@ -41,7 +41,7 @@ void main()
 	LightIntensity = clamp(vec3(lightColor)*vec3(0.3,0.3,0.3) + diffuse * color * vec3(lightColor) + spec * vec3(lightColor) *specularContribution,0.0,1.0);
 	TexCoord = texCoords;
 	
-	color0 = weights;
+	color0 = color;
 	normal0 = (Normal * vec4(normal, 0.0)).xyz;
 	
 	//skining

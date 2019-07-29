@@ -139,14 +139,17 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 	printf("size %d max depth %d", plist.size(), max_depth);
 
 	std::list<Kdtree::vecType> xlist, ylist, zlist;
-	cloneList(plist, xlist); cloneList(xlist, ylist); cloneList(xlist, zlist);
-
-	xlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[0] < b[0]; }); 
-	ylist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[1] < b[1]; }); 
+	cloneList(plist, xlist); cloneList(plist, ylist); cloneList(plist, zlist);
+	printf(".");
+	xlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[0] < b[0]; });
+	printf(".");
+	ylist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[1] < b[1]; });
+	printf(".");
 	zlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[2] < b[2]; });
 
 	std::list<Kdtree::vecType> lists[3] = {xlist, ylist, zlist};
-	printf(", sorted\n");
+	printf("\b\b\b, sorted\n");
+	printf("%f %f %f %f %f %f\n", xlist.front().x, xlist.back().x, ylist.front().y, ylist.back().y, zlist.front().z, zlist.back().z);
 	Kdtree::_makeTree(head, lists, 0);
 	Kdtree::root = head;
 }

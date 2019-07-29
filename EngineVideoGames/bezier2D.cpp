@@ -1,13 +1,12 @@
 #include "bezier2D.h"
 
 
-Bezier2D::Bezier2D(void)
-{
-}
+Bezier2D::Bezier2D(void){}
 
-Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision, vec3 shapeaxis, vec3 from) {
+Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision, vec3 shapeaxis, vec3 startPoint) {
 	this->b = b;
-	this->first = from;	this->axis = glm::normalize(shapeaxis);
+	this->color = glm::vec3(1.f, 1.f, 1.f);
+	this->first = startPoint;	this->axis = glm::normalize(shapeaxis);
 	axismode = true;
 	this->circularSubdivision = circularSubdivision;
 	segmentCircleParts = new mat4[circularSubdivision];
@@ -16,6 +15,7 @@ Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision, vec3 shapeaxis, vec3 fr
 
 Bezier2D::Bezier2D(Bezier1D &b, int circularSubdivision) {
 	this->b = b;
+	this->color = glm::vec3(1.f, 1.f, 1.f);
 	updateAxis();
 	this->circularSubdivision = circularSubdivision;
 	segmentCircleParts = new mat4[circularSubdivision];
@@ -31,8 +31,6 @@ Bezier2D::~Bezier2D(void)
 	}
 }
 
-//glm::vec3 color(glm::vec3(0.2f, 0.1f, 0.90f));
-glm::vec3 color(glm::vec3(0.6f, 0.6f, 0.6f));
 IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	IndexedModel model;
 	updateAxis();
@@ -167,4 +165,21 @@ void Bezier2D::gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS) {
 		for (int j = 0; j<SEG_CON_PTS; j++)
 			gen_surface[i][j] = requiredSeg[j];		
 	}
+}
+
+//perfectBall
+IndexedModel Bezier2D::genBall(int resT, int resS, int circularSubdivision) {
+	Bezier1D tempB1;
+	Bezier2D B2(tempB1, circularSubdivision, vec3(1, 0, 0), vec3(0, 0, 0));
+	mat4 rotator = glm::rotate(90.f, vec3(0, 1, 0));
+	mat4 *segmentCircleParts = B2.segmentCircleParts;
+	std::vector<mat4> segs;
+	for (int i = 0; i < circularSubdivision/2; i++) {
+		mat4 temp = segmentCircleParts[i];
+		rotateMat(&temp, &rotator);
+		segs.push_back(temp);
+	}
+	Bezier1D b1(segs);
+	B2.b = b1;
+	return B2.GetSurface(resT, resS);
 }

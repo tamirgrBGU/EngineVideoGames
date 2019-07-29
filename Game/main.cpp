@@ -29,6 +29,7 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/grass3.bmp");//2
 	//scn->AddTexture("../res/textures/snake.jpg");
 	scn->AddTexture("../res/textures/snake1.png");//3
+	scn->AddTexture("../res/textures/snakeEye.bmp");//4
 	/*
 	scn->AddTexture("../res/objs/Apple.mtl");//4
 	scn->AddTexture("../res/objs/cave.mtl");//5
