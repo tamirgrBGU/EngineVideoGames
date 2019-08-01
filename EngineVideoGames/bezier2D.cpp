@@ -44,11 +44,11 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			gen_surface(surfaces[segmentSindx], segmentT, segmentSindx);
 		}
 		for (int t = 0; t < resT; t++) {
-			float tPart = (t + resT*segmentTindx) / float(resT*b.segNo());
+			float tPart = (t + resT*segmentTindx) / float(resT*b.segNo() - 1);
 			float SEGtPart = t / float(resT);
 			for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 				for (int s = 0; s < resS; s++) {
-					float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision-1);
+					float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
 					float SEGsPart = s / float(resS);
 					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], SEGtPart, SEGsPart);
 					vec3 pos3(pos.x, pos.y, pos.z);
@@ -59,7 +59,15 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 					model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
 					model.texCoords.push_back(vec2(tPart, sPart));
 				}
-			}
+			}//we recycled points we need to have the closing points of the cycle again to prevent big diffrent value on texCoords
+			vec4 pos = calc_bezier_point2D(surfaces[circularSubdivision-1], SEGtPart, 1);
+			vec3 pos3(pos.x, pos.y, pos.z);
+
+			model.positions.push_back(pos3);
+			model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
+			model.colors.push_back(color);
+			model.weights.push_back(calcWeight(segmentTindx, circularSubdivision - 1, tPart, 1));
+			model.texCoords.push_back(vec2(tPart, 1));
 		}
 	}
 
@@ -76,14 +84,22 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 			model.weights.push_back(calcWeight(b.segNo() - 1, segmentSindx, 1, sPart));
 			model.texCoords.push_back(vec2(1, sPart));
 		}
-	}
+	}//we recycled points we need to have the closing points of the cycle again to prevent big diffrent value on texCoords
+	vec4 pos = calc_bezier_point2D(surfaces[circularSubdivision - 1], 1, 1);
+	vec3 pos3(pos.x, pos.y, pos.z);
+
+	model.positions.push_back(pos3);
+	model.normals.push_back(calc_bezier_point2D_get_normal(1, pos3, 1));
+	model.colors.push_back(color);
+	model.weights.push_back(calcWeight(1, circularSubdivision - 1, 1, 1));
+	model.texCoords.push_back(vec2(1, 1));
 
 	for (int i = 0; i < circularSubdivision; ++i)
 		delete(surfaces[i]);
 	delete(surfaces);
 
 	int pointIndex = 0;
-	int fullCycle = resS*circularSubdivision;
+	int fullCycle = resS*circularSubdivision + 1;
 	int end = model.positions.size() - 1 - fullCycle;
 	while (pointIndex < end) {
 		int temp = 0;
@@ -151,7 +167,7 @@ void Bezier2D::moveByVector(mat4 *seg, vec3 toAdd) {
 }
 
 void Bezier2D::gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS) {
-	for (int i = 0; i<SEG_CON_PTS; i++) {
+	for (int i = 0; i < SEG_CON_PTS; i++) {
 		vec3 p0 = Bezier1D::v4to3(segmentT[i]);
 
 		vec3 radius = p0 - this->first;
@@ -162,7 +178,7 @@ void Bezier2D::gen_surface(mat4 *gen_surface, mat4 segmentT, int segmentS) {
 		mat4 requiredSeg = segmentCircleParts[segmentS];
 		scaleMat(&requiredSeg, numericRad);
 		moveByVector(&requiredSeg, radius);
-		for (int j = 0; j<SEG_CON_PTS; j++)
+		for (int j = 0; j < SEG_CON_PTS; j++)
 			gen_surface[i][j] = requiredSeg[j];		
 	}
 }
