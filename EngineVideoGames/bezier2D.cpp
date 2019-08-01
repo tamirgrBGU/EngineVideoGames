@@ -31,6 +31,31 @@ Bezier2D::~Bezier2D(void)
 	}
 }
 
+void Bezier2D::prepSegSandPushToModel(IndexedModel& model, mat4**& surfaces, int segmentTindx, float tPart, float SEGtPart, int resS) {
+	for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
+		for (int s = 0; s < resS; s++) {
+			float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
+			float SEGsPart = s / float(resS);
+			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], SEGtPart, SEGsPart);
+			vec3 pos3(pos.x, pos.y, pos.z);
+
+			model.positions.push_back(pos3);
+			model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
+			model.colors.push_back(color);
+			model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
+			model.texCoords.push_back(vec2(tPart, sPart));
+		}
+	}//we recycled points we need to have the closing points of the cycle again to prevent big diffrent value on texCoords
+	vec4 pos = calc_bezier_point2D(surfaces[circularSubdivision - 1], SEGtPart, 1);
+	vec3 pos3(pos.x, pos.y, pos.z);
+
+	model.positions.push_back(pos3);
+	model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
+	model.colors.push_back(color);
+	model.weights.push_back(calcWeight(segmentTindx, circularSubdivision - 1, tPart, 1));
+	model.texCoords.push_back(vec2(tPart, 1));
+}
+
 IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	IndexedModel model;
 	updateAxis();
@@ -43,56 +68,12 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 		for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 			gen_surface(surfaces[segmentSindx], segmentT, segmentSindx);
 		}
-		for (int t = 0; t < resT; t++) {
-			float tPart = (t + resT*segmentTindx) / float(resT*b.segNo() - 1);
-			float SEGtPart = t / float(resT);
-			for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
-				for (int s = 0; s < resS; s++) {
-					float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);
-					float SEGsPart = s / float(resS);
-					vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], SEGtPart, SEGsPart);
-					vec3 pos3(pos.x, pos.y, pos.z);
-
-					model.positions.push_back(pos3);
-					model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
-					model.colors.push_back(color);
-					model.weights.push_back(calcWeight(segmentTindx, segmentSindx, tPart, sPart));
-					model.texCoords.push_back(vec2(tPart, sPart));
-				}
-			}//we recycled points we need to have the closing points of the cycle again to prevent big diffrent value on texCoords
-			vec4 pos = calc_bezier_point2D(surfaces[circularSubdivision-1], SEGtPart, 1);
-			vec3 pos3(pos.x, pos.y, pos.z);
-
-			model.positions.push_back(pos3);
-			model.normals.push_back(calc_bezier_point2D_get_normal(segmentTindx, pos3, tPart));
-			model.colors.push_back(color);
-			model.weights.push_back(calcWeight(segmentTindx, circularSubdivision - 1, tPart, 1));
-			model.texCoords.push_back(vec2(tPart, 1));
-		}
+		for (int t = 0; t < resT; t++)
+			prepSegSandPushToModel(model, surfaces, segmentTindx, 
+				(t + resT*segmentTindx) / float(resT*b.segNo() - 1), t / float(resT), resS);
 	}
 
-	for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
-		for (int s = 0; s < resS; s++) {
-			float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision-1);
-			float SEGsPart = s / float(resS);
-			vec4 pos = calc_bezier_point2D(surfaces[segmentSindx], 1, SEGsPart);
-			vec3 pos3(pos.x, pos.y, pos.z);
-
-			model.positions.push_back(pos3);
-			model.normals.push_back(calc_bezier_point2D_get_normal(b.segNo()-1, pos3, 1));
-			model.colors.push_back(color);
-			model.weights.push_back(calcWeight(b.segNo() - 1, segmentSindx, 1, sPart));
-			model.texCoords.push_back(vec2(1, sPart));
-		}
-	}//we recycled points we need to have the closing points of the cycle again to prevent big diffrent value on texCoords
-	vec4 pos = calc_bezier_point2D(surfaces[circularSubdivision - 1], 1, 1);
-	vec3 pos3(pos.x, pos.y, pos.z);
-
-	model.positions.push_back(pos3);
-	model.normals.push_back(calc_bezier_point2D_get_normal(1, pos3, 1));
-	model.colors.push_back(color);
-	model.weights.push_back(calcWeight(1, circularSubdivision - 1, 1, 1));
-	model.texCoords.push_back(vec2(1, 1));
+	prepSegSandPushToModel(model, surfaces, b.segNo()-1, 1, 1, resS);
 
 	for (int i = 0; i < circularSubdivision; ++i)
 		delete(surfaces[i]);

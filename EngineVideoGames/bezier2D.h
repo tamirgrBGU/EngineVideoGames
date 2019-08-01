@@ -52,6 +52,7 @@ public:
 	~Bezier2D(void);
 
 private:
+	void prepSegSandPushToModel(IndexedModel& model, mat4**& surfaces, int segmentTindx, float tPart, float SEGtPart, int resS);
 	glm::vec3 Bezier2D::calcWeight(int segmentT, int segmentS, float t, float s);
 
 	void dumpMat4(mat4 &a, int name) {
