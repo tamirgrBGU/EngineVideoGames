@@ -57,7 +57,7 @@ void Kdtree::print_data(vecType pt)
 {
 	for( int i = 0; i < N; i++)
 	{
-	    std::cout<< pt[i] << ", ";
+	  std::cout<< pt[i] << ", ";
 	}
 	std::cout<<"\n";
 }
@@ -91,14 +91,14 @@ void Kdtree::printTree( Node* head )
 		if(current.empty())
 		{
 			depth++;
-			std::cout<< "level: "<<  depth <<"\n";
+			std::cout<< "level: "<< depth <<"\n";
 			std::swap(current, next);
 		}
 	}
 }
 
 /*
-*  algorithm is based on http://en.wikipedia.org/wiki/Kd_tree
+* algorithm is based on http://en.wikipedia.org/wiki/Kd_tree
 */
 void Kdtree::makeTree(std::vector<glm::vec3>& pvec)
 {
@@ -131,14 +131,32 @@ void cloneByMed(int axis, float med, std::list<Kdtree::vecType> &plist,
 	}
 }
 
-void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
+//we will use it to avoid box that are point or lines
+inline void completeToBox(std::list<Kdtree::vecType>& xlist, std::list<Kdtree::vecType>& ylist, std::list<Kdtree::vecType>& zlist) {
+	Kdtree::vecType boxCompliter(0);
+	bool needHelp = false;
+	if (xlist.front().x == xlist.back().x) {
+		boxCompliter.x = xlist.back().x + 10;
+		needHelp = true;
+	}
+	if (ylist.front().y == ylist.back().y) {
+		boxCompliter.y = ylist.back().y + 10;
+		needHelp = true;
+	}
+	if (zlist.front().z == zlist.back().z) {
+		boxCompliter.z = zlist.back().z + 10;
+		needHelp = true;
+	}
+	xlist.push_back(boxCompliter);
+	ylist.push_back(boxCompliter);
+	zlist.push_back(boxCompliter);
+	xlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[0] < b[0]; });
+	ylist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[1] < b[1]; });
+	zlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[2] < b[2]; });
+}
+
+inline void prepareLists(std::list<Kdtree::vecType>& plist, std::list<Kdtree::vecType>& xlist, std::list<Kdtree::vecType>& ylist, std::list<Kdtree::vecType>& zlist)
 {
-	Node* head = new Node(3);
-	max_depth = (unsigned int)log2((plist.size() >> 4));
-
-	printf("size %d max depth %d", plist.size(), max_depth);
-
-	std::list<Kdtree::vecType> xlist, ylist, zlist;
 	cloneList(plist, xlist); cloneList(plist, ylist); cloneList(plist, zlist);
 	printf(".");
 	xlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[0] < b[0]; });
@@ -147,9 +165,24 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 	printf(".");
 	zlist.sort([&](Kdtree::vecType& a, Kdtree::vecType& b) {return a[2] < b[2]; });
 
-	std::list<Kdtree::vecType> lists[3] = {xlist, ylist, zlist};
+	completeToBox(xlist, ylist, zlist);
+
 	printf("\b\b\b, sorted\n");
-	printf("%f %f %f %f %f %f\n", xlist.front().x, xlist.back().x, ylist.front().y, ylist.back().y, zlist.front().z, zlist.back().z);
+	//printf("%f %f %f %f %f %f\n", xlist.front().x, xlist.back().x, ylist.front().y, ylist.back().y, zlist.front().z, zlist.back().z);
+}
+
+
+void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
+{
+	Node* head = new Node(3);
+	max_depth = (unsigned int)log2((plist.size() >> 4));
+
+	printf("size %d max depth %d", plist.size(), max_depth);
+
+	std::list<Kdtree::vecType> xlist, ylist, zlist;
+	prepareLists(plist, xlist, ylist, zlist);
+
+	std::list<Kdtree::vecType> lists[3] = { xlist, ylist, zlist };
 	Kdtree::_makeTree(head, lists, 0);
 	Kdtree::root = head;
 }

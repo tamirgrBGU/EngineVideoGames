@@ -30,7 +30,7 @@ class Node
 	 Node* right; //( new Node(3));
 	 vecType data; 
 	 
-     //default constructor
+   //default constructor
 	 Node(int _n);
 	 
 	 //copy constructor
@@ -39,7 +39,7 @@ class Node
 	 //default deconstructor
 	 ~Node();
 	 
-	     
+	   
 
 };
 
@@ -47,7 +47,7 @@ class Kdtree
 {
 
  public:
-	//typedef float                numType;
+	//typedef float        numType;
 	typedef Node::vecType vecType;
 		
 	//default constructor
@@ -57,7 +57,7 @@ class Kdtree
 	~Kdtree();
 	
 	/* 
-	*   Return the tree root node
+	*  Return the tree root node
 	*/
 	Node* getRoot() const { return root; };
 	/*
@@ -65,10 +65,10 @@ class Kdtree
 	*/
 	void print_data(vecType pt);
 		
-	/*  prints the tree
-	*   and really works best for small trees 
-	*   as a test of tree construction.
-	*/  
+	/* prints the tree
+	*  and really works best for small trees 
+	*  as a test of tree construction.
+	*/ 
 	void printTree( Node* head );
 	
 	//function for finding the median of a list of points
