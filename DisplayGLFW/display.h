@@ -13,7 +13,7 @@ public:
 	void Clear(float r, float g, float b, float a);
 	void SwapBuffers();
 	void PollEvents();
-	bool IsFullscreen(  );
+	bool IsFullscreen();
 	void* getScene();
 	void addKeyCallBack(void(*func)(GLFWwindow *,int,int,int,int));
 	void addMouseCallBacks(void (* mousebuttonfun)(GLFWwindow*,int,int,int),void(* scrollfun)(GLFWwindow*,double,double),void (* cursorposfun)(GLFWwindow*,double,double));

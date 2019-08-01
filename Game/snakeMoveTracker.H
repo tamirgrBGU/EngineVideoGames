@@ -22,7 +22,7 @@ public:
 	~snakeMoveTracker(void);
 
 private:
-	void  transferToNextNode(int Node);
+	void transferToNextNode(int Node);
 	void add(int Node, listNode<motionTracker> *a);
 	int nodesLen;
 	std::vector<listNode<motionTracker> *> firstVec;

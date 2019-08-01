@@ -218,7 +218,7 @@ using namespace glm;
 	 }
 	void Scene::shapeTransformation(int type,float amt)
 	{
-		   vec3 newAxis;
+		  vec3 newAxis;
 		if(glm::abs(amt)>1e-5)
 		{
 			switch (type)
@@ -415,7 +415,7 @@ using namespace glm;
 		glm::mat4 globalMat = glm::mat4(1)*shapes[pickedShape+1]->GetRot();
 		glm::mat4 localMat = glm::mat4(1)*shapes[pickedShape+1]->GetRot();
 		for (; chainParents[i] >= 0; i = chainParents[i])
-			localMat =  shapes[i]->GetRot() * localMat;
+			localMat = shapes[i]->GetRot() * localMat;
 		i=1;
 		std::cout<<"vec1 ("<<vec.x <<", "<<vec.y<<", "<<vec.z<<")"<<std::endl;
 		glm::mat4 rotMat = localMat*glm::rotate(glm::mat4(1),angle,vec)*glm::transpose(localMat); 
@@ -455,7 +455,7 @@ using namespace glm;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Draw(0,0,false); 
 						
-		GLint viewport[4];  
+		GLint viewport[4]; 
 		unsigned char data[4];
 		glGetIntegerv(GL_VIEWPORT, viewport); //reading viewport parameters
 		glReadPixels(x,viewport[3] - y,1,1, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -470,7 +470,7 @@ using namespace glm;
 		else
 		{
 			pickedShape = pickedID;
-			if (pickedShape < (unsigned) shapes.size())
+			if (pickedShape < (signed) shapes.size())
 				printf("picked %d %f %f\n", pickedID, shapes[pickedShape]->makeTrans()[3][0], shapes[pickedShape]->makeTrans()[3][1]);
 			else
 				std::cout << "picked " << pickedID << std::endl;
@@ -488,7 +488,7 @@ using namespace glm;
 		{
 			int j = indx;
 			glm::vec3 vec = glm::vec3(0);
-			for (;  chainParents[j] > 0; j = chainParents[j])
+			for (; chainParents[j] > 0; j = chainParents[j])
 			{
 				vec = shapes[j]->getVectorInSystem(glm::mat4(1),vec + glm::vec3(0,0,2));
 			}
@@ -509,7 +509,7 @@ using namespace glm;
 		mat4 Normal1 = mat4(1);
 		if(indx>-1)
 		{
-			for (int j = indx;  chainParents[j] > -1; j = chainParents[j])
+			for (int j = indx; chainParents[j] > -1; j = chainParents[j])
 			{
 				Normal1 = shapes[chainParents[j]]->makeTrans() * Normal1;
 			}
