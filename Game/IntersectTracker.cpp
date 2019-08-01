@@ -65,7 +65,7 @@ void printDSDebug() {
 	}
 }
 
-inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *myShape, void(*onIntersect)(void), std::vector<glm::vec3> &shape) {
+inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol), std::vector<glm::vec3> &shape) {
 	listNode<levelIntersect> *newNode = new listNode<levelIntersect>();
 	newNode->value.x = x;
 	newNode->value.y = y;
@@ -85,8 +85,8 @@ inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *my
 	return newNode;
 }
 
-void addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(void), std::vector<glm::vec3> &shape) {
-	addNode(genNode(x,y,level,myShape, onIntersect,shape));
+void addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol), std::vector<glm::vec3> &shape) {
+	addNode(genNode(x,y,level,myShape, onIntersect, shape));
 }
 
 intersect *snakeHead;
@@ -114,11 +114,11 @@ std::vector<listNode<levelIntersect> *> collect(listNode<levelIntersect> * head,
 void isIntersectSnakeHead(glm::mat4 tranSnake, float x, float y, int level) {
 	std::vector<listNode<levelIntersect> *> closeObjects = collect(findNode(levels[level], x - radiusLenToCheckIntersects), x, y);
 	//printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-	//printf("<%f, %f> %d size %d", x,  y, level, closeObjects.size());
+	//printf("<%f, %f> %d size %d", x, y, level, closeObjects.size());
 	for (unsigned int i = 0; i < closeObjects.size(); i++) {
 		glm::mat4 myshapetrans = closeObjects[i]->value.myShape->makeTransScale();
 		std::vector<IndexedModel> sol = snakeHead->isIntersect(&tranSnake, &myshapetrans, *closeObjects[i]->value.model);
 		if (sol.size() > 0)
-			closeObjects[i]->value.onIntersect();
+			closeObjects[i]->value.onIntersect(sol);
 	}
 }

@@ -33,7 +33,7 @@ bool snakeviewmode = false;
 bool animateMovement = false;
 
 Game *myCam = nullptr;
-MovableGLM *tail  = nullptr;
+MovableGLM *tail = nullptr;
 
 inline glm::vec3 getMid() {
 	return snakeviewmode ? myCam->headCurLocation : (myCam->headCurLocation + v4to3(tail->makeTrans()[3]))*0.5f;
@@ -49,6 +49,16 @@ void initCameraMotion(Game *obj, MovableGLM *tailp, float z) {
 	tail = tailp;
 	myCam->snakeMid = getMid();
 	heightTop = z;
+}
+
+void setCameraTopView() {
+	snakeviewmode = true;
+	switchCamMode();
+}
+
+void setCameraBottomView() {
+	snakeviewmode = false;
+	switchCamMode();
 }
 
 float mypi = 3.14159265358979323846264338327950288f;
@@ -157,11 +167,7 @@ void userInputRotHead() {
 	myCam->myTranslate(-camLoc, 0);
 }
 
-void switchCamMode() {
-	snakeviewmode = !snakeviewmode;
-	vec3 camLoc;
-	myCam->snakeMid = getMid();
-
+inline void getCamCorrection(vec3& camLoc) {
 	if (snakeviewmode) {
 		camLoc = orderCamSnakeEyeMode();
 	}
@@ -171,6 +177,14 @@ void switchCamMode() {
 		camLoc = myCam->snakeMid;
 		camLoc.z += heightTop;
 	}
+}
+
+void switchCamMode() {
+	snakeviewmode = !snakeviewmode;
+	vec3 camLoc;
+	myCam->snakeMid = getMid();
+	getCamCorrection(camLoc);
+	
 	//reset camera to (0,0,0) position, view from z to xy plane
 	myCam->myTranslate(-v4to3(myCam->getTraslate()), 0);
 	//repositioning

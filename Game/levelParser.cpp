@@ -199,22 +199,41 @@ inline void genMW(modelWrapper& mw, struct objLocation obj) {
 	mw.level = obj.level;
 }
 
+inline void setTheSmallOnObj(struct objLocation &obj, struct objLocation &obj2) {
+	if (obj.level > obj2.level) {
+		struct objLocation t = obj;
+		obj = obj2;
+		obj2 = t;
+	}
+}
+
+inline bool setUpMw(modelWrapper &mw, struct objLocation &obj, struct objLocation &obj2) {
+	if ((obj.level != obj2.level) & (obj2.type != 0)) {
+		genMW(mw, obj2);
+		setTheSmallOnObj(obj, obj2);
+		mw.z = obj.z;
+		mw.level = obj.level;
+		return true;
+	}
+	return false;
+}
+
 void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls) {
-	struct objLocation obj = objC.me;
+	struct objLocation obj;	modelWrapper mw;
 	if (objC.down != nullptr) {//below wall
-		struct objLocation obj2 = objC.down->me;
-		if ((obj.level != obj2.level) & (obj2.type != 0)) {
-			float sizeZ = (obj.level - obj2.level) * zscale;
-			modelWrapper mw; genMW(mw, obj2);
+		obj = objC.me;
+		struct objLocation obj2 = objC.down->me; 
+		if (setUpMw(mw, obj, obj2)) {
+			float sizeZ = (obj2.level - obj.level) * zscale;
 			mw.model = create_Hwall_square(0, 0, sizeZ, allscale, 0);
 			walls->push_back(mw);
 		}
 	}
 	if (objC.right != nullptr) {//right wall
+		obj = objC.me;
 		struct objLocation obj2 = objC.right->me;
-		if ((obj.level != obj2.level) & (obj2.type != 0)) {
-			float sizeZ = (obj.level - obj2.level) * zscale;
-			modelWrapper mw; genMW(mw, obj2);
+		if (setUpMw(mw, obj, obj2)) {
+			float sizeZ = (obj2.level - obj.level) * zscale;
 			mw.model = create_Vwall_square(0, allscale, sizeZ, 0, 0);
 			walls->push_back(mw);
 		}
@@ -320,7 +339,7 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 
 		else { //spacial index model (not square :) )
 			setWalls(objC, walls);
-			   //if (obj->type == -1) {//create squere at x and y;
+			  //if (obj->type == -1) {//create squere at x and y;
 			modelWrapper mw; genMW(mw, *obj);
 			mw.model = create_ground_square(0, allscale, allscale, 0, 0);
 			levelGround->push_back(mw);
@@ -391,8 +410,10 @@ int leveGenerator::parseLevel(int i) {
 
 struct objMap leveGenerator::getLevel(int i) {
 	if (currentLevel != i) {
-		if (parseLevel(i))
+		if (parseLevel(i)) {
+			printf("WARNing!! no such level\n");
 			return struct objMap() = { 0, 0, 0, 0 };
+		}
 		currentLevel = i;
 	}
 	struct objMap out = {

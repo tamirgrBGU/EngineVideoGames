@@ -4,3 +4,5 @@
 void initCameraMotion(Game *obj, MovableGLM *tail, float z);
 void updateCam();
 void switchCamMode();
+void setCameraTopView();
+void setCameraBottomView();

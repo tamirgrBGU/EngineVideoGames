@@ -5,7 +5,7 @@
 #include "IntersectTracker.h"
 #include "cameraMotion.h"
 #include <windows.h>
-#include <iostream>  
+#include <iostream> 
 #include <thread>
 
 
@@ -129,18 +129,23 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	}
 	
 	//still have direction but make it adapt just to one position to the right - todo FIX THIS (- maybe double d)
-	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc - snakeFullLength + allscale * 3 / 4, yLoc + allscale / 2, zLoc));
+	if (direction == 0)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, snakeFullLength, 0));
+	else if (direction == 1)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(- snakeFullLength, 0, 0));
+	else if (direction == 2)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, - snakeFullLength, 0));
+	else// if (direction == 3)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(snakeFullLength, 0, 0));
+	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc + allscale * .5f, yLoc + allscale * .5f, zLoc));
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
-	tailDirection = myDir(direction);
-	headDirection = tailDirection;
-	headCurLocation = vec3(xLoc + allscale * 3/4, yLoc + allscale/2, zLoc);
 }
 
-static const char *filePath[]  
+static const char *filePath[] 
 	{ "../res/objs/cave.obj", "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
 		"../res/objs/apple.obj", "../res/objs/snake_head.obj" };
-Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *),  sizeof(filePath)/sizeof(char*));
+Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *), sizeof(filePath)/sizeof(char*));
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
 		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);//using the basic shader
@@ -156,20 +161,44 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 	shapes[shapes.size() - 1]->myRotate(90.f * direction, zAx, zAxis1);
 }
 
-void onIntersectPrint(void) {
-	printf("hey man\n");
+void onIntersectPrint(std::vector<IndexedModel> sol) {
+	printf("\r");
+	printf("hey man");
+}
+void printIM(std::vector<IndexedModel> sol) {
+	for (int i = 0; i < (signed)sol.size(); i++) {
+		printf("box[%d]\n",i);
+		for (int j = 0; j < (signed)sol[i].positions.size(); j++)
+			printVec(sol[i].positions[j]);
+	}
 }
 
-void onIntersectWalls(void) {
-	printf("wall\n");
+void onIntersectCave(std::vector<IndexedModel> sol) {
+	printf("reach to seafty END GAME\n");
+	printIM(sol);
+	printf("||\n\n");
 }
 
-void onIntersectStairs(void) {
+void onIntersectWalls(std::vector<IndexedModel> sol) {
+	printf("wall  \n");
+	printIM(sol);
+	printf("||\n\n");
+}
+
+void onIntersectStairs(std::vector<IndexedModel> sol) {
 	printf("stairs\n");
+	printIM(sol);
+	printf("||\n\n");
 }
 
 enum MapObjTypes {NOTUSED, Snake, Cave, Apple};
 const MeshConstructor *meshelper = nullptr;
+/*
+direction map
+	0
+3		1
+	2
+*/
 void Game::specialObjHandle(objLocation &obj) {
 	float x = obj.x, y = obj.y, z = obj.z;
 	int dir = obj.direction;
@@ -183,7 +212,7 @@ void Game::specialObjHandle(objLocation &obj) {
 		break;
 	case Cave:
 		genObj(0, 2, vec3(x + allscale / 2, y + allscale / 2, z-22), 0.05f * allscale, dir);
-		addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectPrint, meshelper->getlastInitMeshPositions());
+		addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectCave, meshelper->getlastInitMeshPositions());
 		printf("added cave %f %f %f\n",x ,y, z);
 		break;
 	case Apple:
@@ -208,37 +237,59 @@ void Game::addCubes() {
 	pickedShape--;
 	this->shapeTransformation(this->zGlobalTranslate, 30.f);
 	pickedShape--;
-	//shapes[pickedShape]->myTranslate(vec3(5,5,5), 0);
 	int tempSc = 50;
 	shapeTransformation(pickedShape, Scale, vec3(tempSc, tempSc, tempSc));
 }
 
 //PLAYING THEME MUSIC
 void Game::configSound() {
-	//std::thread t1(&Game::PlayTheme, this);
-	//t1.detach();
-	//PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	/*
+	std::thread t1(&Game::PlayTheme, this);
+	t1.detach();
+	PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	*/
+
 	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	//std::thread t2(&Game::PlayPoint, this);
 	//t2.detach();
 }
 
-void Game::orderCamera() {
-	//translate all scene away from camera
-	//myTranslate(vec3(0, 0, -20), 0);
-
-	vec3 midSnake = tailDirection;
-	int halfS = (int) snakeFullLength / 2;
-	float zView = -1.5f*snakeFullLength;
-	midSnake = vec3(midSnake.x*halfS, midSnake.y*halfS, zView);	
-	midSnake = headCurLocation - midSnake;
-	myTranslate(-midSnake, 0);
-
-	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
+void Game::PlayTheme()
+{
+	PlaySound("../res/sounds/theme.wav", NULL, SND_FILENAME | SND_LOOP);
 }
 
-const int firstLvl = 4;
+void Game::PlayPoint()
+{
+	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+}
+
+void Game::PlayExplosion()
+{
+	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+}
+
+void Game::calcSnakeHead()
+{
+	int pShape = snakeNodesShapesStart;
+	mat4 root = shapes[pShape++]->makeTrans();
+	tailDirection = Bezier1D::v4to3(root * vec4(0, 1, 0, 0));
+
+	for (; pShape < snakeNodesShapesStart + snakeLength; pShape++)
+		root *= shapes[pShape]->makeTrans();
+	headCurLocation = Bezier1D::v4to3(root[3]);
+	headDirection = Bezier1D::v4to3(root * vec4(0, 1, 0, 0));
+}
+
+void Game::orderCamera() {
+	calcSnakeHead();
+	float zView = -1.5f*snakeFullLength;
+	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
+	setCameraTopView();
+}
+
+const int firstLvl = 5;
 leveGenerator lGen(firstLvl);
 void Game::Init()
 {
@@ -280,22 +331,7 @@ void Game::Init()
 	pickedShape = -1;
 }
 
-void Game::PlayTheme()
-{
-	//PlaySound("../res/sounds/theme.wav", NULL,  SND_FILENAME | SND_LOOP);
-}
-
-void Game::PlayPoint()
-{
-	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
-}
-
-void Game::PlayExplosion()
-{
-	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
-}
-
-void finUpdate(Shader *s, const int  shaderIndx, const int pickedShape) {
+void finUpdate(Shader *s, const int shaderIndx, const int pickedShape) {
 	int r = ((pickedShape + 1) & 0x000000FF) >> 0;
 	int g = ((pickedShape + 1) & 0x0000FF00) >> 8;
 	int b = ((pickedShape + 1) & 0x00FF0000) >> 16;
@@ -308,7 +344,7 @@ void finUpdate(Shader *s, const int  shaderIndx, const int pickedShape) {
 }
 
 
-void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx) {
+void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx) {
 	Shader *s = shaders[shaderIndx];
 	s->Bind();
 	s->SetUniformMat4f("MVP", MVP);
@@ -318,7 +354,7 @@ void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const gl
 	finUpdate(s, shaderIndx, pickedShape);
 }
 
-void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4 &Quaternion, const glm::mat2x4 &nextQuaternion, const glm::mat4 &Normal, const int  shaderIndx) {
+void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4 &Quaternion, const glm::mat2x4 &nextQuaternion, const glm::mat4 &Normal, const int shaderIndx) {
 	//printf("<%f %f %f %f>", Quaternion[0].x, Quaternion[0].y, Quaternion[0].z, Quaternion[0].w);
 	//printf(" <%f %f %f %f>\n", Quaternion[1].x, Quaternion[1].y, Quaternion[1].z, Quaternion[1].w);
 	Shader *s = shaders[shaderIndx];
@@ -330,7 +366,7 @@ void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4
 	finUpdate(s, shaderIndx, pickedShape);
 }
 
-void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int  shaderIndx)
+void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int shaderIndx)
 {
 	Shader *s = shaders[shaderIndx];
 	s->Bind();
@@ -345,11 +381,10 @@ void Game::WhenTranslate() {}
 //speed also depends on user frame rate
 float speed = 1;
 int arrowKeyPL = 0;
-Bezier1D b1d; Bezier2D b2d;
 mat4 Game::setSnakeNodesAnglesAndGetHead() 
 {
 	mat4 root(1);
-	tailDirection = b1d.v4to3(shapes[snakeNodesShapesStart]->makeTrans() * vec4(0, 1, 0, 0));
+	tailDirection = Bezier1D::v4to3(shapes[snakeNodesShapesStart]->makeTrans() * vec4(0, 1, 0, 0));
 	pickedShape = snakeNodesShapesStart;
 
 	for (int i = 0; i < snakeLength - 1; i++) {//the last node(head) is turned only by the user
@@ -379,7 +414,7 @@ void Game::Motion()
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
 		mat4 head = setSnakeNodesAnglesAndGetHead();
-		headDirection = b1d.v4to3(head * vec4(0, 1, 0, 0));
+		headDirection = Bezier1D::v4to3(head * vec4(0, 1, 0, 0));
 		headCurLocation = vec3(head[3][0], head[3][1], head[3][2]);
 
 		updateCam();

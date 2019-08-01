@@ -42,7 +42,7 @@ public:
 	void zeroTrans();
 	void zeroRot(bool generalRot);
 	void copyTranslations(MovableGLM *mGLM);
-	void translateInSystem(const MovableGLM  &system,glm::vec3 &vec, int indx, bool toScale);
+	void translateInSystem(const MovableGLM &system,glm::vec3 &vec, int indx, bool toScale);
 	void mergeRot2Euler();
 	void printRot(bool generalRot);
 

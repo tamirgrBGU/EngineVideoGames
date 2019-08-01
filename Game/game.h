@@ -25,7 +25,7 @@ static void printMat(const glm::mat4 mat4)
 static const vec3 xAx(1, 0, 0);		static const vec3 yAx(0, 1, 0);		static const vec3 zAx(0, 0, 1);
 class Game : public Scene
 {
-	const int snakeLength = 25, segs = 5, ends = 10;
+	const int snakeLength = 30, segs = 5, ends = 10;
 	int projMode = -1;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
@@ -35,6 +35,7 @@ public:
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	~Game(void);
 	glm::mat4 setSnakeNodesAnglesAndGetHead();
+	void calcSnakeHead();
 	void genSnake(float x, float y, float z, int direction);
 	void specialObjHandle(objLocation &obj);
 	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
@@ -44,10 +45,10 @@ public:
 	void addShape(int type, int parent, unsigned int mode);
 	void addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader);
 	void updateDrawMode(unsigned int mode);
-	//	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int  shaderIndx);
-	void UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx);
-	void UpdateQuaternion(const glm::mat2x4 &lastMVP, const glm::mat2x4 &MVP, const glm::mat2x4 &nextMVP, const glm::mat4 &Normal, const int  shaderIndx);
-	void Update(const glm::mat4 &MVP, const glm::mat4 &Normal, const int  shaderIndx);
+	//	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int shaderIndx);
+	void UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx);
+	void UpdateQuaternion(const glm::mat2x4 &lastMVP, const glm::mat2x4 &MVP, const glm::mat2x4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx);
+	void Update(const glm::mat4 &MVP, const glm::mat4 &Normal, const int shaderIndx);
 	void WhenRotate();
 	void WhenTranslate();
 	void Motion();
