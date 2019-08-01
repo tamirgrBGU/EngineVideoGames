@@ -56,6 +56,30 @@ void Bezier2D::prepSegSandPushToModel(IndexedModel& model, mat4**& surfaces, int
 	model.texCoords.push_back(vec2(tPart, 1));
 }
 
+void addIndicies(IndexedModel& model, int fullCycle) {
+	int pointIndex = 0;
+	int end = model.positions.size() - 1 - fullCycle;
+	while (pointIndex < end) {
+		int temp = 0;
+		while (++temp < fullCycle) {
+			int a = pointIndex, b = pointIndex++ + fullCycle, c = pointIndex, d = b + 1;
+			model.indices.push_back(a);
+			model.indices.push_back(b);
+			model.indices.push_back(c);
+			model.indices.push_back(c);
+			model.indices.push_back(d);
+			model.indices.push_back(b);
+		}
+		int a = pointIndex, b = pointIndex++ + fullCycle, d = pointIndex, c = d - fullCycle;
+		model.indices.push_back(a);
+		model.indices.push_back(b);
+		model.indices.push_back(c);
+		model.indices.push_back(c);
+		model.indices.push_back(d);
+		model.indices.push_back(b);
+	}
+}
+
 IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	IndexedModel model;
 	updateAxis();
@@ -79,28 +103,7 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 		delete(surfaces[i]);
 	delete(surfaces);
 
-	int pointIndex = 0;
-	int fullCycle = resS*circularSubdivision + 1;
-	int end = model.positions.size() - 1 - fullCycle;
-	while (pointIndex < end) {
-		int temp = 0;
-		while (++temp < fullCycle) {
-			int a = pointIndex, b = pointIndex++ + fullCycle, c = pointIndex, d = b + 1;
-			model.indices.push_back(a);
-			model.indices.push_back(b);
-			model.indices.push_back(c);
-			model.indices.push_back(c);
-			model.indices.push_back(d);
-			model.indices.push_back(b);
-		}
-		int a = pointIndex, b = pointIndex++ + fullCycle, d = pointIndex, c = d - fullCycle;
-		model.indices.push_back(a);
-		model.indices.push_back(b);
-		model.indices.push_back(c);
-		model.indices.push_back(c);
-		model.indices.push_back(d);
-		model.indices.push_back(b);
-	}
+	addIndicies(model, resS*circularSubdivision + 1);
 
 	return model;
 }
