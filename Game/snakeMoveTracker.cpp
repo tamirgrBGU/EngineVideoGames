@@ -15,9 +15,10 @@ listNode<motionTracker> *getLast(listNode<motionTracker> *node) {
 	return prev;
 }
 
-inline listNode<motionTracker> *genNode(int ticks, float angleTurn) {
+inline listNode<motionTracker> *genNode(int ticks, glm::vec3 rotationAxis, float angleTurn) {
 	listNode<motionTracker> *mTnode = new listNode<motionTracker>();
 	mTnode->value.ticks = ticks;
+	mTnode->value.rotationAxis = rotationAxis;
 	mTnode->value.angleTurn = angleTurn;
 	mTnode->next = nullptr;
 	return mTnode;
@@ -45,8 +46,8 @@ void snakeMoveTracker::add(int Node, listNode<motionTracker> *newNode) {
 	}
 }
 
-void snakeMoveTracker::add(float angleTurn) {
-	add(nodesLen, genNode(baseTicks, angleTurn));
+void snakeMoveTracker::add(glm::vec3 rotationAxis, float angleTurn) {
+	add(nodesLen, genNode(baseTicks, rotationAxis, angleTurn));
 }
 
 void snakeMoveTracker::printDS() {
@@ -83,20 +84,21 @@ float snakeMoveTracker::getSumOfAllAngles(int Node) {
 	return outangle;
 }
 
+glm::vec3 zeros(glm::vec3(0));
 //node zero is the first node after tne head
-float snakeMoveTracker::getAngle(int Node) {
+motionTracker snakeMoveTracker::getAngleAndAxis(int Node) {
 	listNode<motionTracker> *mTnode = firstVec[Node];
-	float outangle = 0;
+	motionTracker outMT = { 0, zeros, 0 };
 	if (mTnode) {
 		motionTracker *mTval = (motionTracker *) mTnode;
 
 		if (mTval->ticks-- <= 0) {
-			outangle = mTval->angleTurn;
+			outMT = *mTval;
 			transferToNextNode(Node);
 		}
 	}
 
-	return outangle;
+	return outMT;
 }
 
 snakeMoveTracker::~snakeMoveTracker(void) {

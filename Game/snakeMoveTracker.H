@@ -1,12 +1,14 @@
 #pragma once
 
 #include <vector>
+#include <glm\vec3.hpp>
 #include "listNode.h"
 
 static float mTepsilon = 15;
 static int baseTicks = 5;
 struct motionTracker {
 	int ticks;
+	glm::vec3 rotationAxis;
 	float angleTurn;
 };
 
@@ -15,8 +17,8 @@ class snakeMoveTracker
 
 public:
 	snakeMoveTracker(int size);
-	void add(float angle);
-	float getAngle(int Node);
+	void add(glm::vec3 rotationAxis, float angle);
+	motionTracker getAngleAndAxis(int Node);
 	float getSumOfAllAngles(int Node);
 	void printDS();//for debugging
 	~snakeMoveTracker(void);

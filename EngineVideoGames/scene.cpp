@@ -179,6 +179,7 @@ using namespace glm;
 	 void Scene::shapeTransformation(int pickedShape, int type, vec3 amt)
 	 {
 		 vec3 newAxis;
+		 if (amt.x == 0 && amt.y == 0 && amt.z == 0) return;
 		 if (glm::length(amt) > 1e-5)
 		 {
 			 switch (type)

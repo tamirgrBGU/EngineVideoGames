@@ -46,13 +46,14 @@ int snakeLevel;
 int snakeNodesShapesStart = -1;
 int snakeNodesShapesEnd = -1;
 float snakeFullLength = 0;
-float jumpy = 0.4f, jumpx = 0.32f;
+float jumpy = 0.4f, jumpx = 0.38f;
 float lastYext = 0;
 static const int bezierRes = 10, cirSubdiv = 4;
 void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs) {
 	std::vector<glm::mat4> segments;
 	float lastY = 0;
 	mat4 seg0 = mat4(0);
+	float segPart = 1 / float(segs);
 	for (int i = 0; i < segs; i++) {
 		seg0[0] = vec4(*lastX, lastY, 0, 1);
 		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
@@ -61,13 +62,13 @@ void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jump
 		seg0[2] = vec4(*lastX, lastY, 0, 1);
 		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
 		seg0[3] = vec4(*lastX, lastY, 0, 1);
-		mult += sign*1 / float(segs);
+		mult += sign * segPart;
 		segments.push_back(seg0);
 	}
 	Bezier1D body(segments);
 	vec3 axisFrom = *(body.GetControlPoint(0, 0).GetPos());
 	Bezier2D b(body, cirSubdiv, yAx, vec3(0, axisFrom.y, 0)); 
-	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 3, 1);
+	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 8, 1);
 	orderSegPart(lastY);
 }
 
@@ -137,7 +138,7 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, - snakeFullLength, 0));
 	else// if (direction == 3)
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(snakeFullLength, 0, 0));
-	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc + allscale * .5f, yLoc + allscale * .5f, zLoc));
+	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc + allscale * .5f, yLoc + allscale * .5f, zLoc + 5.f));
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 }
@@ -148,7 +149,7 @@ static const char *filePath[]
 Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *), sizeof(filePath)/sizeof(char*));
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
-		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 3);//using the basic shader
+		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 4);//using the basic shader
 		uploadedFiles[ptrIndx] = shapes[shapes.size() - 1];
 	}
 	else {
@@ -179,6 +180,7 @@ void onIntersectCave(std::vector<IndexedModel> sol) {
 	printf("||\n\n");
 }
 
+float climbAngle = glm::atan(zscale / allscale);
 void onIntersectWalls(std::vector<IndexedModel> sol) {
 	printf("wall  \n");
 	printIM(sol);
@@ -270,20 +272,25 @@ void Game::PlayExplosion()
 	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
-void Game::calcSnakeHead()
+void Game::updateSnakePosition()
 {
 	int pShape = snakeNodesShapesStart;
 	mat4 root = shapes[pShape++]->makeTrans();
 	tailDirection = Bezier1D::v4to3(root * vec4(0, 1, 0, 0));
 
+	for (; pShape < snakeNodesShapesStart + snakeLength/2; pShape++)
+		root *= shapes[pShape]->makeTrans();
+	midCurLocation = Bezier1D::v4to3(root[3]);
 	for (; pShape < snakeNodesShapesStart + snakeLength; pShape++)
 		root *= shapes[pShape]->makeTrans();
+
 	headCurLocation = Bezier1D::v4to3(root[3]);
 	headDirection = Bezier1D::v4to3(root * vec4(0, 1, 0, 0));
+	headTransMAT = root;
 }
 
 void Game::orderCamera() {
-	calcSnakeHead();
+	updateSnakePosition();
 	float zView = -1.5f*snakeFullLength;
 	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
 	setCameraTopView();
@@ -301,17 +308,17 @@ void Game::Init()
 
 	if (map.levelGround != nullptr) {
 		for (modelWrapper &obj : *map.levelGround) {
-			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addShape(obj.model, -1, TRIANGLES, 2, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 		}
 		for (modelWrapper &obj : *map.walls) {
-			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addShape(obj.model, -1, TRIANGLES, 2, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
 				onIntersectWalls, meshelper->getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.stairs) {
-			addShape(obj.model, -1, TRIANGLES, 2, 3);
+			addShape(obj.model, -1, TRIANGLES, 2, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
 				onIntersectStairs, meshelper->getlastInitMeshPositions());
@@ -381,22 +388,22 @@ void Game::WhenTranslate() {}
 //speed also depends on user frame rate
 float speed = 1;
 int arrowKeyPL = 0;
-mat4 Game::setSnakeNodesAnglesAndGetHead() 
+void Game::setSnakeNodesAngles() 
 {
-	mat4 root(1);
-	tailDirection = Bezier1D::v4to3(shapes[snakeNodesShapesStart]->makeTrans() * vec4(0, 1, 0, 0));
 	pickedShape = snakeNodesShapesStart;
 
 	for (int i = 0; i < snakeLength - 1; i++) {//the last node(head) is turned only by the user
-		float angle = sMT->getAngle(i);
-
-		shapeTransformation(zLocalRotate, angle);
-		root *= shapes[pickedShape]->makeTrans();
-		pickedShape++;
-		shapeTransformation(zLocalRotate, -angle);
+		motionTracker mT = sMT->getAngleAndAxis(i);
+		float angle = mT.angleTurn;
+		if (angle != 0) {
+			vec3 axis = mT.rotationAxis;
+			shapes[pickedShape]->myRotate(angle, axis, 4);
+			pickedShape++;
+			shapes[pickedShape]->myRotate(-angle, axis, 4);		
+		}
+		else
+			pickedShape++;
 	}
-	root *= shapes[pickedShape]->makeTrans();
-	return root;
 }
 
 void Game::Debug() {
@@ -413,13 +420,12 @@ void Game::Motion()
 		vec3 temp(tailDirection.x * speed, tailDirection.y * speed, tailDirection.z * speed);
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
-		mat4 head = setSnakeNodesAnglesAndGetHead();
-		headDirection = Bezier1D::v4to3(head * vec4(0, 1, 0, 0));
-		headCurLocation = vec3(head[3][0], head[3][1], head[3][2]);
+		setSnakeNodesAngles();
+		updateSnakePosition();
 
 		updateCam();
 
-		isIntersectSnakeHead(head, headCurLocation.x, headCurLocation.y, snakeLevel);
+		isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
 	pickedShape = savePicked;
 }
@@ -438,8 +444,8 @@ void Game::changeDirPInput(bool dir){
 
 	int sign = (dir ? -1 : 1);
 	arrowKeyPL += sign;
-	sMT->add(sign*anglePL);
-	shapes[snakeNodesShapesEnd]->myRotate(sign*anglePL, vec3(0, 0, 1), zAxis1);
+	sMT->add(zAx, sign*anglePL);
+	shapes[snakeNodesShapesEnd]->myRotate(sign*anglePL, zAx, zAxis1);
 
 	Activate();
 }

@@ -36,7 +36,7 @@ Game *myCam = nullptr;
 MovableGLM *tail = nullptr;
 
 inline glm::vec3 getMid() {
-	return snakeviewmode ? myCam->headCurLocation : (myCam->headCurLocation + v4to3(tail->makeTrans()[3]))*0.5f;
+	return snakeviewmode ? myCam->headCurLocation : myCam->midCurLocation;
 }
 
 
@@ -44,10 +44,11 @@ static float const heightDown = 7;
 float heightTop;
 vec3 lastheadDirection;
 vec3 realcampos;
+vec3 snakeMid;
 void initCameraMotion(Game *obj, MovableGLM *tailp, float z) {
 	myCam = obj;
 	tail = tailp;
-	myCam->snakeMid = getMid();
+	snakeMid = getMid();
 	heightTop = z;
 }
 
@@ -111,7 +112,7 @@ void animate() {
 	if (snakeviewmode) {
 		rotCam();
 	}
-	glm::vec3 diff = getMid() - myCam->snakeMid;
+	glm::vec3 diff = getMid() - snakeMid;
 	if (sizeOfVec(diff) > bigframe)
 		diff = diff * bigTolerance;
 	else {
@@ -120,7 +121,7 @@ void animate() {
 		diff = diff * tolerance;
 	}
 
-	myCam->snakeMid = myCam->snakeMid + diff;
+	snakeMid = snakeMid + diff;
 	realcampos = realcampos + diff;
 	myCam->myTranslate(-v4to3(myCam->GetRot()*v3to4(diff)), 0);	
 }
@@ -131,7 +132,7 @@ void updateCam() {
 	}
 	else {
 		glm::vec3 newMid = getMid();
-		glm::vec3 diff = myCam->snakeMid - newMid;
+		glm::vec3 diff = snakeMid - newMid;
 		if (sizeOfVec(diff) > frame)
 			animateMovement = true;		
 	}
@@ -174,7 +175,7 @@ inline void getCamCorrection(vec3& camLoc) {
 	else {
 		myCam->resetEuler();
 		myCam->doRotate(mat4(1));
-		camLoc = myCam->snakeMid;
+		camLoc = snakeMid;
 		camLoc.z += heightTop;
 	}
 }
@@ -182,7 +183,7 @@ inline void getCamCorrection(vec3& camLoc) {
 void switchCamMode() {
 	snakeviewmode = !snakeviewmode;
 	vec3 camLoc;
-	myCam->snakeMid = getMid();
+	snakeMid = getMid();
 	getCamCorrection(camLoc);
 	
 	//reset camera to (0,0,0) position, view from z to xy plane

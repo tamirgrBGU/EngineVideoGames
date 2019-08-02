@@ -29,13 +29,14 @@ class Game : public Scene
 	int projMode = -1;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
-	glm::vec3 headCurLocation;	glm::vec3 snakeMid;
+	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
+	glm::mat4 headTransMAT;
 	bool cameramode = false;
 	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	~Game(void);
-	glm::mat4 setSnakeNodesAnglesAndGetHead();
-	void calcSnakeHead();
+	void setSnakeNodesAngles();
+	void updateSnakePosition();
 	void genSnake(float x, float y, float z, int direction);
 	void specialObjHandle(objLocation &obj);
 	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
