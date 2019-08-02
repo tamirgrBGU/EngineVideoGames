@@ -1,6 +1,7 @@
 #include "InputManager.h"
 #include "glm\glm.hpp"
 #pragma comment(lib, "legacy_stdio_definitions.lib")
+
 int main(int argc,char *argv[])
 {
 	const int DISPLAY_WIDTH = 1200;

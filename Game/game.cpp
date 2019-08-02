@@ -144,9 +144,18 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 }
 
 static const char *filePath[] 
-	{ "../res/objs/cave.obj", "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
+	{ "../res/objs/cave.obj", nullptr, nullptr, nullptr, "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
 		"../res/objs/apple.obj", "../res/objs/snake_head.obj" };
 Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *), sizeof(filePath)/sizeof(char*));
+intersect **computedKDtrees = (intersect **)calloc(sizeof(intersect *), sizeof(filePath) / sizeof(char*));
+void loadTheme() {
+	//TODO
+	//flush uploadedFiles, computedKDtrees
+	//open dir and find names
+	//load texture for walls and floor
+	//future - combine with MTL
+}
+
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
 		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 4);//using the basic shader
@@ -193,9 +202,8 @@ void onIntersectStairs(std::vector<IndexedModel> sol) {
 	printf("||\n\n");
 }
 
-enum MapObjTypes { NOTUSED, Snake, Cave, Apple };
+enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
 const MeshConstructor *meshelper = nullptr;
-intersect **computedKDtrees = (intersect **)calloc(sizeof(intersect *), sizeof(filePath) / sizeof(char*));
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
 	genObj(myIndex, tex, pos, scale, dir);
 	if (computedKDtrees[myIndex])
@@ -224,8 +232,11 @@ void Game::specialObjHandle(objLocation &obj) {
 	case Cave:
 		addShapeAndKD(0, 2, x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
 		break;
-	case Apple:
-		addShapeAndKD(3, 3, x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+	case Obstecle:
+		addShapeAndKD(1, 3, x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		break;
+	case Fruit:
+		addShapeAndKD(2, 3, x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -234,7 +245,6 @@ void Game::specialObjHandle(objLocation &obj) {
 }
 
 void Game::addCubes() {
-	addShape(Bezier2D::genBall(12, 12, 8), -1, TRIANGLES, 4, 3);
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
 	addShape(Cube, -1, TRIANGLES);
@@ -244,9 +254,6 @@ void Game::addCubes() {
 	this->shapeTransformation(this->yGlobalTranslate, 20.f);
 	pickedShape--;
 	this->shapeTransformation(this->zGlobalTranslate, 30.f);
-	pickedShape--;
-	int tempSc = 50;
-	shapeTransformation(pickedShape, Scale, vec3(tempSc, tempSc, tempSc));
 }
 
 //PLAYING THEME MUSIC

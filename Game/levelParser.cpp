@@ -2,6 +2,8 @@
 #include "windows.h"
 #include <fstream>
 #include <iostream>
+#include <random>
+#include <iostream>
 
 leveGenerator::leveGenerator(int i) {
 	currentLevel = i;
@@ -228,6 +230,8 @@ inline void pushWall(modelWrapper& mw, struct objLocation& highObj, IndexedModel
 	fallWalls->push_back(mw);
 }
 
+//will build visible and invisible walls
+//warning the visible walls are used as invisible walls, if the level diff is too high it can be invisible long wall (high z scale)!
 void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls, std::vector<modelWrapper>* fallWalls) {
 	struct objLocation obj;	modelWrapper mw;
 	if (objC.down != nullptr) {//below wall
@@ -337,6 +341,14 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 	}
 }
 
+std::random_device rd;   // non-deterministic generator
+std::mt19937 gen(rd());  // to seed mersenne twister.
+						 // replace the call to rd() with a
+						 // constant value to get repeatable
+						 // results.
+static const int maxObjToChooseFrom = 2;
+static const int probToGet = 4 * maxObjToChooseFrom;
+
 void initGroundModel(std::vector<modelWrapper>* levelGround,
 	std::vector<modelWrapper>* stairs,
 	std::vector<modelWrapper>* stairsWalls,
@@ -378,6 +390,15 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 			levelGround->push_back(mw);
 			if (obj->type > 0)
 				specialObj->push_back(*obj);
+			else
+			{
+				unsigned int x = gen();
+				x = x % probToGet;
+				if (x < maxObjToChooseFrom) {
+					obj->type = 2 + x;
+					specialObj->push_back(*obj);
+				}
+			}
 		}
 	}
 }
