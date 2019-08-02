@@ -6,7 +6,7 @@
 #include <ctime>
 
 leveGenerator::leveGenerator(int i) {
-	srand(time(NULL));
+	srand((unsigned int) time(NULL));
 	currentLevel = i;
 	init(levelDirName);
 	parseLevel(i);

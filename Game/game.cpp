@@ -329,14 +329,13 @@ void Game::orderCamera() {
 	setCameraTopView();
 }
 
-leveGenerator lGen(firstLvl);
 void Game::Init()
 {
 	meshelper = new MeshConstructor(100);
 	//addShape(Axis, -1, LINES);
 
 	loadThemes();
-	struct objMap map = lGen.getLevel(firstLvl);//todo - level -1 is random
+	struct objMap map = lGen->getLevel(firstLvl);//todo - level -1 is random
 	printf("level:%d walls:%d stairs:%d\n", firstLvl, map.walls->size(), map.stairs->size());
 
 	if (map.levelGround != nullptr) {

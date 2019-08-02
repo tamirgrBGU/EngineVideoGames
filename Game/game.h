@@ -70,6 +70,7 @@ private:
 	void updateThemeArrays();
 	const int firstTheme = 3;
 	const int firstLvl = 2;
+	leveGenerator *lGen = new leveGenerator(firstLvl);
 
 	void loadThemes();
 	void changeTheme(int nextTheme);
