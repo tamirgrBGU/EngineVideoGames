@@ -7,6 +7,13 @@ intersect::intersect(std::vector<glm::vec3> &shape) {
 	boundboxvec = bound_vec_to_boundbox(boundbox);
 }
 
+//copy constructor
+intersect::intersect(intersect& other) {
+	kd = other.kd;
+	boundbox = other.kd.getRoot()->boundbox;
+	boundboxvec = bound_vec_to_boundbox(boundbox);
+}
+
 //default constructor
 IndexedModel intersect::getBoundingBox() {
 	return boxVertexesToIndexModel(boundboxvec, glm::vec3(0,0,0));

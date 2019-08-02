@@ -25,7 +25,7 @@ class MeshConstructor
 	static const unsigned int VEC2_ATTRIB_NUM = 1;
 	
 public:
-	static std::vector<glm::vec3> getlastInitMeshPositions();
+	static std::vector<glm::vec3>& getlastInitMeshPositions();
 
 	//TO DO: add collision detection function which get other MeshConstructor and Mat4 of related transformasions. The function may return a pointer to the relevant Bounding Box when collide
 	enum SimpleShapes

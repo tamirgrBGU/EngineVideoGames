@@ -10,6 +10,7 @@ class intersect
 public:
 	//constructor
 	intersect(std::vector<glm::vec3> &shape);
+	intersect(intersect& other);
 
 	/*
 	* Return the tree root node

@@ -124,12 +124,11 @@ void animate() {
 }
 
 void updateCam() {
-	if (snakeviewmode) {
+	if (snakeviewmode)
 		rotCam();
-	}
-	if (animateMovement) {
-		animate();
-	}
+	
+	if (animateMovement)
+		animate();	
 	else {
 		glm::vec3 newMid = getMid();
 		glm::vec3 diff = snakeMid - newMid;

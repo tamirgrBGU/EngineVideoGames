@@ -42,7 +42,9 @@ class leveGenerator
 private:
 	std::vector<modelWrapper>* levelGround;
 	std::vector<modelWrapper>* stairs;
+	std::vector<modelWrapper>* stairsWalls;
 	std::vector<modelWrapper>* walls;
+	std::vector<modelWrapper>* fallWalls;
 	std::vector<std::string*>* levelName;
 	std::vector<struct objLocation>* specialObj;
 	int parseLevel(int i);

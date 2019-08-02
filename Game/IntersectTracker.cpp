@@ -65,15 +65,13 @@ void printDSDebug() {
 	}
 }
 
-inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol), std::vector<glm::vec3> &shape) {
+inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol)) {
 	listNode<levelIntersect> *newNode = new listNode<levelIntersect>();
 	newNode->value.x = x;
 	newNode->value.y = y;
 	newNode->value.level = level;
 	newNode->value.myShape = myShape;
 	newNode->value.onIntersect = onIntersect;
-	intersect *model = new intersect(shape);
-	newNode->value.model = model;
 	newNode->next = 0;
 
 	/*if (levelObjSize.size() > level) {
@@ -85,8 +83,19 @@ inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *my
 	return newNode;
 }
 
-void addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol), std::vector<glm::vec3> &shape) {
-	addNode(genNode(x,y,level,myShape, onIntersect, shape));
+void addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol), intersect *comutedTree) {
+	listNode<levelIntersect> *node = genNode(x, y, level, myShape, onIntersect);
+	intersect *model = new intersect(*comutedTree);
+	node->value.model = model;
+	addNode(node);
+}
+
+intersect *addObj(float x, float y, int level, Shape *myShape, void(*onIntersect)(std::vector<IndexedModel> sol), std::vector<glm::vec3> &shape) {
+	listNode<levelIntersect> *node = genNode(x, y, level, myShape, onIntersect);
+	intersect *model = new intersect(shape);
+	node->value.model = model;
+	addNode(node);
+	return node->value.model;
 }
 
 intersect *snakeHead;

@@ -96,7 +96,7 @@ void MeshConstructor::InitLine(IndexedModel &model){
 	
 }
 
-std::vector<glm::vec3> MeshConstructor::getlastInitMeshPositions() {
+std::vector<glm::vec3>& MeshConstructor::getlastInitMeshPositions() {
 	//printf("%d meakss!\n", lastInitMeshPositions.size());
 	return lastInitMeshPositions;
 }

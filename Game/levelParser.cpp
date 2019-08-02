@@ -48,6 +48,8 @@ void leveGenerator::init(const char * path) {
 	levelName = scanDir(path);
 	levelGround = new std::vector<modelWrapper>();
 	walls = new std::vector<modelWrapper>();
+	fallWalls = new std::vector<modelWrapper>();
+	stairsWalls = new std::vector<modelWrapper>();
 	stairs = new std::vector<modelWrapper>();
 	specialObj = new std::vector<struct objLocation>();
 }
@@ -218,29 +220,49 @@ inline bool setUpMw(modelWrapper &mw, struct objLocation &obj, struct objLocatio
 	return false;
 }
 
-void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls) {
+inline void pushWall(modelWrapper& mw, struct objLocation& highObj, IndexedModel& model, std::vector<modelWrapper>* walls, std::vector<modelWrapper>* fallWalls) {
+	mw.model = model;
+	walls->push_back(mw);
+	mw.z = highObj.z;
+	mw.level = highObj.level;
+	fallWalls->push_back(mw);
+}
+
+void setWalls(const struct objConnected objC, std::vector<modelWrapper>* walls, std::vector<modelWrapper>* fallWalls) {
 	struct objLocation obj;	modelWrapper mw;
 	if (objC.down != nullptr) {//below wall
 		obj = objC.me;
 		struct objLocation obj2 = objC.down->me; 
-		if (setUpMw(mw, obj, obj2)) {
-			float sizeZ = (obj2.level - obj.level) * zscale;
-			mw.model = create_Hwall_square(0, 0, sizeZ, allscale, 0);
-			walls->push_back(mw);
-		}
+		if (setUpMw(mw, obj, obj2))
+			pushWall(mw, obj2,
+				create_Hwall_square(0, 0, (obj2.level - obj.level) * zscale, allscale, 0), walls, fallWalls);
 	}
 	if (objC.right != nullptr) {//right wall
 		obj = objC.me;
 		struct objLocation obj2 = objC.right->me;
-		if (setUpMw(mw, obj, obj2)) {
-			float sizeZ = (obj2.level - obj.level) * zscale;
-			mw.model = create_Vwall_square(0, allscale, sizeZ, 0, 0);
-			walls->push_back(mw);
-		}
+		if (setUpMw(mw, obj, obj2)) 
+			pushWall(mw, obj2, 
+				create_Vwall_square(0, allscale, (obj2.level - obj.level) * zscale, 0, 0), walls, fallWalls);
 	}
 }
 
-void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls, std::vector<modelWrapper>* stairs)
+//invisible walls to identify that the snake is on the stairs
+inline void pushInvWalls(modelWrapper& mw, float xBoost, float yBoost, const struct objConnected *nobjC, std::vector<modelWrapper>* stairWalls, IndexedModel& im) {
+	mw.model = im;
+	mw.x += xBoost;
+	mw.y += yBoost;
+	stairWalls->push_back(mw);
+	if (nobjC) {
+		struct objLocation obj = nobjC->me;
+		mw.x = obj.x + xBoost;
+		mw.y = obj.y + yBoost;
+		mw.z = obj.z;
+		mw.level = obj.level;
+	}
+	stairWalls->push_back(mw);
+}
+
+void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls, std::vector<modelWrapper>* stairs, std::vector<modelWrapper>* stairWalls)
 {
 	struct objLocation obj = objC.me;
 	modelWrapper mw;
@@ -252,6 +274,7 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 	if (obj.direction == 0) {//up ^ ||
 		mw.model = create_wall_square(allscale, allscale, 0, 0, 0, zscale);
 		stairs->push_back(mw);
+		//side walls to the stairs
 		if (objC.right != nullptr && (objC.right->me.level > obj.level))
 			mw.model = create_UVtriangle(0, 0, zscale, allscale, 0);
 		else
@@ -262,10 +285,12 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 		else
 			mw.model = create_Vtriangle(allscale, 0, zscale, allscale, 0);
 		walls->push_back(mw);
+		pushInvWalls(mw, 0, allscale, objC.up, stairWalls, create_wall_square(0, 0, zscale, allscale, 0, 0));
 	}
 	else if (obj.direction == 1) {//right > =
 		mw.model = create_Hstairs_square(allscale, allscale, zscale, 0, 0, 0);
 		stairs->push_back(mw);
+		//side walls to the stairs
 		if (objC.up != nullptr && (objC.up->me.level > obj.level))
 			mw.model = create_UHtriangle(allscale, 0, zscale, 0, 0);
 		else
@@ -276,10 +301,12 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 		else
 			mw.model = create_Htriangle(allscale, allscale, zscale, 0, 0);
 		walls->push_back(mw);
+		pushInvWalls(mw, 0, 0, objC.right, stairWalls, create_Vwall_square(0, allscale, zscale, 0, 0));
 	}
 	else if (obj.direction == 2) {//down u ||
 		mw.model = create_wall_square(0, allscale, zscale, allscale, 0, 0);
 		stairs->push_back(mw);
+		//side walls to the stairs
 		if (objC.right != nullptr && (objC.right->me.level > obj.level))
 			mw.model = create_UVtriangle(0, allscale, zscale, 0, 0);
 		else
@@ -290,10 +317,12 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 		else
 			mw.model = create_Vtriangle(allscale, allscale, zscale, 0, 0);
 		walls->push_back(mw);
+		pushInvWalls(mw, 0, 0, objC.down, stairWalls, create_wall_square(0, 0, zscale, allscale, 0, 0));
 	}
 	else {//left < =
 		mw.model = create_Hstairs_square(0, 0, zscale, allscale, allscale, 0);
 		stairs->push_back(mw);
+		//side walls to the stairs
 		if (objC.up != nullptr && (objC.up->me.level > obj.level))
 			mw.model = create_UHtriangle(0, 0, zscale, allscale, 0);
 		else
@@ -304,23 +333,27 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 		else
 			mw.model = create_Htriangle(0, allscale, zscale, allscale, 0);
 		walls->push_back(mw);
+		pushInvWalls(mw, allscale, 0, objC.left, stairWalls, create_Vwall_square(0, allscale, zscale, 0, 0));
 	}
 }
 
 void initGroundModel(std::vector<modelWrapper>* levelGround,
 	std::vector<modelWrapper>* stairs,
+	std::vector<modelWrapper>* stairsWalls,
 	std::vector<modelWrapper>* walls,
+	std::vector<modelWrapper>* fallWalls,
 	std::vector<struct objLocation>* specialObj,
 	std::vector<struct objConnected> vec) {
 	levelGround->clear();
 	stairs->clear();
+	stairsWalls->clear();
 	walls->clear();
 	specialObj->clear();
 
 	for (unsigned int i = 0; i < vec.size(); i++) {
 		//warning do not edit vector or else or the pointers will blow to hell!
 		struct objConnected *objC = &(vec[i]);
-		struct objLocation *obj = &(objC->me);
+		struct objLocation  *obj  = &(objC->me);
 		//fix obj x and y to real location, level represents z
 		obj->x *= allscale;
 		obj->y *= allscale;
@@ -329,16 +362,16 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 
 	for (unsigned int i = 0; i < vec.size(); i++) {
 		struct objConnected objC = vec[i];
-		struct objLocation *obj = &objC.me;
+		struct objLocation *obj  = &objC.me;
 
 		//check left and right for vertical squres
 		//add all vertical squeres seperate list so it will be able to avoid coliding with them
 		
 		if (obj->type == 0)
-			setStairs(objC, walls, stairs);
+			setStairs(objC, walls, stairs, stairs);
 
 		else { //spacial index model (not square :) )
-			setWalls(objC, walls);
+			setWalls(objC, walls, walls);
 			  //if (obj->type == -1) {//create squere at x and y;
 			modelWrapper mw; genMW(mw, *obj);
 			mw.model = create_ground_square(0, allscale, allscale, 0, 0);
@@ -400,7 +433,7 @@ int leveGenerator::parseLevel(int i) {
 		}
 
 		myfile.close();
-		initGroundModel(levelGround, stairs, walls, specialObj, toConnectedVec(width, vec));
+		initGroundModel(levelGround, stairs, stairsWalls, walls, fallWalls, specialObj, toConnectedVec(width, vec));
 		return 0;
 	}
 	printf("Unable to open file <%s>\n", buf);
@@ -425,8 +458,10 @@ struct objMap leveGenerator::getLevel(int i) {
 
 leveGenerator::~leveGenerator(void) {
 	levelGround->clear();	delete levelGround;
-	stairs->clear();
-	walls->clear();
+	stairs->clear();		delete stairs;
+	walls->clear();			delete walls;
+	stairsWalls->clear();	delete stairsWalls;
+	fallWalls->clear();		delete fallWalls;
 	specialObj->clear();	delete specialObj;
 
 	for (auto &obj : *levelName) delete obj;

@@ -193,8 +193,17 @@ void onIntersectStairs(std::vector<IndexedModel> sol) {
 	printf("||\n\n");
 }
 
-enum MapObjTypes {NOTUSED, Snake, Cave, Apple};
+enum MapObjTypes { NOTUSED, Snake, Cave, Apple };
 const MeshConstructor *meshelper = nullptr;
+intersect **computedKDtrees = (intersect **)calloc(sizeof(intersect *), sizeof(filePath) / sizeof(char*));
+inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
+	genObj(myIndex, tex, pos, scale, dir);
+	if (computedKDtrees[myIndex])
+		addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, computedKDtrees[0]);
+	else
+		computedKDtrees[myIndex] = addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, meshelper->getlastInitMeshPositions());
+}
+
 /*
 direction map
 	0
@@ -213,13 +222,10 @@ void Game::specialObjHandle(objLocation &obj) {
 		//printf("added SnakeHead\n");
 		break;
 	case Cave:
-		genObj(0, 2, vec3(x + allscale / 2, y + allscale / 2, z-22), 0.05f * allscale, dir);
-		addObj(x, y, obj.level, shapes[shapes.size()-1], onIntersectCave, meshelper->getlastInitMeshPositions());
-		printf("added cave %f %f %f\n",x ,y, z);
+		addShapeAndKD(0, 2, x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
 		break;
 	case Apple:
-		genObj(3, 3, vec3(x + allscale / 2, y + allscale / 2, z), 0.003f * allscale, dir);
-		addObj(x, y, obj.level, shapes[shapes.size() - 1], onIntersectPrint, meshelper->getlastInitMeshPositions());
+		addShapeAndKD(3, 3, x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -296,7 +302,7 @@ void Game::orderCamera() {
 	setCameraTopView();
 }
 
-const int firstLvl = 5;
+const int firstLvl = 0;
 leveGenerator lGen(firstLvl);
 void Game::Init()
 {

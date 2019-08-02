@@ -64,7 +64,7 @@ public:
 	}
 private:
 	snakeMoveTracker *sMT;
-
+	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
 	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
 	void getTailSegs(float *lastX, float jumpX, float jumpY, int segs);
