@@ -1,11 +1,12 @@
-#include "levelParser.h"
+﻿#include "levelParser.h"
 #include "windows.h"
 #include <fstream>
 #include <iostream>
-#include <random>
-#include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 leveGenerator::leveGenerator(int i) {
+	srand(time(NULL));
 	currentLevel = i;
 	init(levelDirName);
 	parseLevel(i);
@@ -341,13 +342,9 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 	}
 }
 
-std::random_device rd;   // non-deterministic generator
-std::mt19937 gen(rd());  // to seed mersenne twister.
-						 // replace the call to rd() with a
-						 // constant value to get repeatable
-						 // results.
+
 static const int maxObjToChooseFrom = 2;
-static const int probToGet = 4 * maxObjToChooseFrom;
+static const int probToGet = 8 * maxObjToChooseFrom;
 
 void initGroundModel(std::vector<modelWrapper>* levelGround,
 	std::vector<modelWrapper>* stairs,
@@ -392,10 +389,10 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 				specialObj->push_back(*obj);
 			else
 			{
-				unsigned int x = gen();
+				unsigned int x = std::rand(); // rand() return a number between ​0​ and RAND_MAX;
 				x = x % probToGet;
 				if (x < maxObjToChooseFrom) {
-					obj->type = 2 + x;
+					obj->type = 3 + x;
 					specialObj->push_back(*obj);
 				}
 			}

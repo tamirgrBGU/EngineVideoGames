@@ -122,10 +122,18 @@ void cloneList(std::list<Kdtree::vecType>& plist, std::list<Kdtree::vecType>& wr
 void cloneByMed(int axis, float med, std::list<Kdtree::vecType> &plist,
 	std::list<Kdtree::vecType> &left,	std::list<Kdtree::vecType> &right)
 {
+	bool flipflop = true;
 	for (Kdtree::vecType x : plist)
 	{
 		if (x[axis] < med)
 			left.push_back(x);
+		else if (x[axis] == med) {
+			if (flipflop)
+				left.push_back(x);
+			else
+				right.push_back(x);
+			flipflop = !flipflop;
+		}
 		else
 			right.push_back(x);
 	}

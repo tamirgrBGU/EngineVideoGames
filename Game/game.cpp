@@ -20,6 +20,7 @@ Game::Game(vec3 position,float angle,float hwRelation,float near1, float far1):
 
 Game::~Game(void) {
 	delete sMT;
+	delete themes;
 }
 
 void Game::addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader)
@@ -143,17 +144,33 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 }
 
+/*
 static const char *filePath[] 
 	{ "../res/objs/cave.obj", nullptr, nullptr, nullptr, "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
 		"../res/objs/apple.obj", "../res/objs/snake_head.obj" };
-Shape **uploadedFiles = (Shape **) calloc(sizeof(Shape *), sizeof(filePath)/sizeof(char*));
+Shape **uploadedFiles = (Shape **)calloc(sizeof(Shape *), sizeof(filePath) / sizeof(char*));
 intersect **computedKDtrees = (intersect **)calloc(sizeof(intersect *), sizeof(filePath) / sizeof(char*));
-void loadTheme() {
-	//TODO
-	//flush uploadedFiles, computedKDtrees
-	//open dir and find names
-	//load texture for walls and floor
-	//future - combine with MTL
+*/
+
+char	  **filePath;
+Shape	  **uploadedFiles;
+intersect **computedKDtrees;
+inline void Game::updateThemeArrays()
+{
+	theme *tempTheme = themes->getCurrentTheme();
+	filePath	    = tempTheme->filepath;
+	uploadedFiles   = (Shape **) tempTheme->uploadedObj;
+	computedKDtrees = (intersect **) tempTheme->computedKDtrees;
+}
+
+void Game::loadThemes() {
+	themes = new ThemeHolder(this, 3, firstTheme);
+	updateThemeArrays();
+}
+
+void Game::changeTheme(int nextTheme) {
+	themes->swapThemes(nextTheme);
+	updateThemeArrays();
 }
 
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
@@ -205,11 +222,14 @@ void onIntersectStairs(std::vector<IndexedModel> sol) {
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
 const MeshConstructor *meshelper = nullptr;
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
+	theme *tempTheme = themes->getCurrentTheme();
 	genObj(myIndex, tex, pos, scale, dir);
+	tempTheme = themes->getCurrentTheme();
 	if (computedKDtrees[myIndex])
-		addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, computedKDtrees[0]);
+		addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, computedKDtrees[myIndex]);
 	else
 		computedKDtrees[myIndex] = addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, meshelper->getlastInitMeshPositions());
+	tempTheme = themes->getCurrentTheme();
 }
 
 /*
@@ -309,29 +329,30 @@ void Game::orderCamera() {
 	setCameraTopView();
 }
 
-const int firstLvl = 0;
 leveGenerator lGen(firstLvl);
 void Game::Init()
 {
 	meshelper = new MeshConstructor(100);
 	//addShape(Axis, -1, LINES);
-	
+
+	loadThemes();
 	struct objMap map = lGen.getLevel(firstLvl);//todo - level -1 is random
 	printf("level:%d walls:%d stairs:%d\n", firstLvl, map.walls->size(), map.stairs->size());
 
 	if (map.levelGround != nullptr) {
+		theme *tempTheme = themes->getCurrentTheme();
 		for (modelWrapper &obj : *map.levelGround) {
-			addShape(obj.model, -1, TRIANGLES, 2, 4);
+			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 		}
 		for (modelWrapper &obj : *map.walls) {
-			addShape(obj.model, -1, TRIANGLES, 2, 4);
+			addShape(obj.model, -1, TRIANGLES, tempTheme->wallTex, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
 				onIntersectWalls, meshelper->getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.stairs) {
-			addShape(obj.model, -1, TRIANGLES, 2, 4);
+			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
 				onIntersectStairs, meshelper->getlastInitMeshPositions());

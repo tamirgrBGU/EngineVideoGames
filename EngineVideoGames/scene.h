@@ -86,6 +86,7 @@ public:
 	glm::vec3 GetVectorInSystem(int indx,glm::vec3 vec);
 	//void Scene::OpositeDirectionRot(glm::vec3 vec,float angle);
 	std::vector<Shape*> shapes;
+	std::vector<Texture*> textures;
 	void OpositeDirectionRot(glm::vec3 vec,float angle);
 	inline void PrintShapeRotations(int indx){shapes[indx]->printRot(true);}
 	inline void SetShapeTex(int shpIndx,int texIndx){shapes[shpIndx]->SetTexture(texIndx);} 
@@ -107,7 +108,6 @@ protected:
 	
 	std::vector<Shader*> shaders;
 	std::vector<int> chainParents;
-	std::vector<Texture*> textures;
 
 	int pickedShape;
 	int direction;

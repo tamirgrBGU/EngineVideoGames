@@ -17,8 +17,6 @@ int main(int argc,char *argv[])
 	
 	init(display);
 	
-	scn->Init();
-	
 	scn->addShader("../res/shaders/pickingShader");//0
 	scn->addShader("../res/shaders/linearShader");//1
 	scn->addShader("../res/shaders/dualQShader");//2
@@ -35,6 +33,8 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/snake3.jpg");//6
 	scn->AddTexture("../res/textures/snake4.jpg");//7
 	scn->AddTexture("../res/textures/snake5.jpg");//8
+	
+	scn->Init();
 	/*
 	scn->AddTexture("../res/objs/Apple.mtl");//4
 	scn->AddTexture("../res/objs/cave.mtl");//5

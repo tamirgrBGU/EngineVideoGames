@@ -1,6 +1,7 @@
 #pragma once
 #include "scene.h"
 #include "snakeMoveTracker.H"
+#include "levelTheme.h"
 #include "levelParser.h"
 
 static inline void printVec(const glm::vec3 vec)
@@ -65,6 +66,13 @@ public:
 	}
 private:
 	snakeMoveTracker *sMT;
+	ThemeHolder *themes;
+	void updateThemeArrays();
+	const int firstTheme = 3;
+	const int firstLvl = 2;
+
+	void loadThemes();
+	void changeTheme(int nextTheme);
 	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
 	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
