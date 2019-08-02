@@ -22,7 +22,7 @@ static inline float sizeOfVec(glm::vec3 v) {
 
 
 static const float angleFrame = 6.f;
-static const float bigAngleFrame = 2 * angleFrame;
+static const float bigAngleFrame = 1.5f * angleFrame;
 
 static const float frame = 12.f;
 static const float bigframe = 2*frame;
@@ -108,10 +108,7 @@ void rotCam() {
 	myCam->myTranslate(-v4to3(myCam->GetRot() * v3to4(realcampos)), 0);
 }
 
-void animate() {	
-	if (snakeviewmode) {
-		rotCam();
-	}
+void animate() {
 	glm::vec3 diff = getMid() - snakeMid;
 	if (sizeOfVec(diff) > bigframe)
 		diff = diff * bigTolerance;
@@ -127,6 +124,9 @@ void animate() {
 }
 
 void updateCam() {
+	if (snakeviewmode) {
+		rotCam();
+	}
 	if (animateMovement) {
 		animate();
 	}
@@ -154,18 +154,6 @@ vec3 orderCamSnakeEyeMode() {
 
 	realcampos = camLoc;
 	return v4to3(myCam->GetRot()*v3to4(camLoc));
-}
-
-//TODO optimize
-void userInputRotHead() {
-	if (!snakeviewmode) return;
-	vec3 camLoc = v4to3(myCam->getTraslate());
-	//go back to mid
-	myCam->myTranslate(-camLoc, 0);
-	myCam->doRotate(mat4(1));
-	camLoc = orderCamSnakeEyeMode();
-
-	myCam->myTranslate(-camLoc, 0);
 }
 
 inline void getCamCorrection(vec3& camLoc) {

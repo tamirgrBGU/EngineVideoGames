@@ -31,7 +31,7 @@ Bezier2D::~Bezier2D(void)
 	}
 }
 
-void Bezier2D::prepSegSandPushToModel(IndexedModel& model, mat4**& surfaces, int segmentTindx, float tPart, float SEGtPart, int resS) {
+inline void Bezier2D::prepSegSandPushToModel(IndexedModel& model, mat4**& surfaces, int segmentTindx, float tPart, float SEGtPart, int resS) {
 	for (int segmentSindx = 0; segmentSindx < circularSubdivision; segmentSindx++) {
 		for (int s = 0; s < resS; s++) {
 			float sPart = (s + resS*segmentSindx) / float(resS*circularSubdivision);

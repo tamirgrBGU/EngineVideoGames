@@ -116,10 +116,10 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	snakeNodesShapesStart = shapes.size();
 	pickedShape = snakeNodesShapesStart;//chaining!
 
-	getTailSegs(&x, jumpx * rounding, jumpy, ends);
+	getTailSegs(&x, jumpx * rounding, 2.f*jumpy, ends);
 	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);
 	//round head generated here
-	getHeadSegs(&x, -jumpx * rounding, jumpy, ends);
+	getHeadSegs(&x, -jumpx * rounding, 2.5f*jumpy, ends);
 	//big obj head
 	//genObj(4, 0, vec3(0,25,0), 0.001f * allscale, direction+1);
 
