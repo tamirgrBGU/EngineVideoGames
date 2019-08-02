@@ -33,7 +33,9 @@ struct modelWrapper {
 struct objMap {
 	std::vector<modelWrapper>* levelGround;
 	std::vector<modelWrapper>* stairs;
+	std::vector<modelWrapper>* stairsWalls;
 	std::vector<modelWrapper>* walls;
+	std::vector<modelWrapper>* fallWalls;
 	std::vector<struct objLocation>* specialObj;
 };
 

@@ -368,10 +368,10 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 		//add all vertical squeres seperate list so it will be able to avoid coliding with them
 		
 		if (obj->type == 0)
-			setStairs(objC, walls, stairs, stairs);
+			setStairs(objC, walls, stairs, stairsWalls);
 
 		else { //spacial index model (not square :) )
-			setWalls(objC, walls, walls);
+			setWalls(objC, walls, fallWalls);
 			  //if (obj->type == -1) {//create squere at x and y;
 			modelWrapper mw; genMW(mw, *obj);
 			mw.model = create_ground_square(0, allscale, allscale, 0, 0);
@@ -445,13 +445,15 @@ struct objMap leveGenerator::getLevel(int i) {
 	if (currentLevel != i) {
 		if (parseLevel(i)) {
 			printf("WARNing!! no such level\n");
-			return struct objMap() = { 0, 0, 0, 0 };
+			return struct objMap() = { 0, 0, 0, 0, 0, 0 };
 		}
 		currentLevel = i;
 	}
 	struct objMap out = {
-		levelGround, stairs,
-		walls, specialObj };
+		levelGround,
+		stairs,	stairsWalls, 
+		walls,	fallWalls, 
+		specialObj };
 
 	return out;
 }
