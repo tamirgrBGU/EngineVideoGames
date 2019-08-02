@@ -121,6 +121,8 @@ std::vector<listNode<levelIntersect> *> collect(listNode<levelIntersect> * head,
 }
 
 void isIntersectSnakeHead(glm::mat4 tranSnake, float x, float y, int level) {
+	if (levelObjSize.size() <= level || levelObjSize[level] == 0)
+		return;
 	std::vector<listNode<levelIntersect> *> closeObjects = collect(findNode(levels[level], x - radiusLenToCheckIntersects), x, y);
 	//printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
 	//printf("<%f, %f> %d size %d", x, y, level, closeObjects.size());

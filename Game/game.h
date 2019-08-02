@@ -27,6 +27,7 @@ class Game : public Scene
 {
 	const int snakeLength = 30, segs = 5, ends = 10;
 	int projMode = -1;
+	const float speed = 1.5f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;

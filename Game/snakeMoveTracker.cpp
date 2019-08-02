@@ -1,6 +1,8 @@
 #include "snakeMoveTracker.H"
 
-snakeMoveTracker::snakeMoveTracker(int size) {
+snakeMoveTracker::snakeMoveTracker(int size, float speed) {
+	baseTicks = (int) (float(baseTicksForSpeed1) / speed);
+	printf("%f %d\n", speed, baseTicks);
 	nodesLen = size-2;
 	for (int i = 0; i < size-1; i++)
 		firstVec.push_back(nullptr);

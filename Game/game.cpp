@@ -10,12 +10,12 @@
 
 
 Game::Game():Scene(){
-	sMT = new snakeMoveTracker(snakeLength);
+	sMT = new snakeMoveTracker(snakeLength, speed);
 }
 
 Game::Game(vec3 position,float angle,float hwRelation,float near1, float far1): 
 	Scene(position,angle,hwRelation,near1,far1){
-	sMT = new snakeMoveTracker(snakeLength);
+	sMT = new snakeMoveTracker(snakeLength, speed);
 }
 
 Game::~Game(void) {
@@ -392,7 +392,6 @@ void Game::WhenRotate() {}
 void Game::WhenTranslate() {}
 
 //speed also depends on user frame rate
-float speed = 1;
 int arrowKeyPL = 0;
 void Game::setSnakeNodesAngles() 
 {

@@ -5,7 +5,7 @@
 #include "listNode.h"
 
 static float mTepsilon = 15;
-static int baseTicks = 5;
+static int baseTicksForSpeed1 = 5;
 struct motionTracker {
 	int ticks;
 	glm::vec3 rotationAxis;
@@ -15,8 +15,9 @@ struct motionTracker {
 class snakeMoveTracker
 {
 
+int baseTicks;
 public:
-	snakeMoveTracker(int size);
+	snakeMoveTracker(int size, float speed);
 	void add(glm::vec3 rotationAxis, float angle);
 	motionTracker getAngleAndAxis(int Node);
 	float getSumOfAllAngles(int Node);
