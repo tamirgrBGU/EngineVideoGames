@@ -34,7 +34,6 @@ public:
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
 	glm::mat4 headTransMAT;
 	bool cameramode = false;
-	Game(void);
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	~Game(void);
 	void setSnakeNodesAngles();
@@ -69,7 +68,7 @@ public:
 
 private:
 	snakeMoveTracker *sMT;
-
+	int fruitCounter;
 	void onIntersectCave	(Shape *s);
 	void onIntersectObstecle(Shape *s);
 	void onIntersectFruit	(Shape *s);
@@ -80,10 +79,12 @@ private:
 	ThemeHolder *themes;
 	void updateThemeArrays();
 	const int firstTheme = 3;
-	const int firstLvl = 2;
-	leveGenerator *lGen = new leveGenerator(firstLvl);
+	const int currentLvl = 2;
+	leveGenerator *lGen;
+	void Game::setupEnvironment();
 
 	void loadThemes();
+	void setupCurrentLevel();
 	void changeTheme(int nextTheme);
 	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
