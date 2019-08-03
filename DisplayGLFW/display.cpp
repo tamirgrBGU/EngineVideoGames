@@ -67,6 +67,11 @@ void* Display::getScene()
 	return glfwGetWindowUserPointer(m_window);
 }
 
+GLFWwindow* Display::getWindow()
+{
+	return m_window;
+}
+
 int Display::closeWindow()
 {
 	return glfwWindowShouldClose(m_window);

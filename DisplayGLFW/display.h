@@ -20,7 +20,7 @@ public:
 	void addResizeCallBack(void (*windowsizefun)(GLFWwindow*,int,int));
 	
 	void setScene(void *userPointer);
-
+	GLFWwindow* getWindow();
 	void mouseProccessing(int button);
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 	//static void mouse_callback(GLFWwindow* window,int button, int action, int mods) ;
