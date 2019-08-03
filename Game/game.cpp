@@ -144,14 +144,6 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 }
 
-/*
-static const char *filePath[] 
-	{ "../res/objs/cave.obj", nullptr, nullptr, nullptr, "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
-		"../res/objs/apple.obj", "../res/objs/snake_head.obj" };
-Shape **uploadedFiles = (Shape **)calloc(sizeof(Shape *), sizeof(filePath) / sizeof(char*));
-intersect **computedKDtrees = (intersect **)calloc(sizeof(intersect *), sizeof(filePath) / sizeof(char*));
-*/
-
 char	  **filePath;
 Shape	  **uploadedFiles;
 intersect **computedKDtrees;
@@ -190,6 +182,10 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 
 void Game::onIntersectCave(Shape *s) {
 	printf("reach to seafty END GAME\n");
+	if (fruitCounter == 0) {
+		Deactivate();
+		PlayWin();
+	}
 }
 
 void Game::onIntersectFruit(Shape *s) {
@@ -197,6 +193,7 @@ void Game::onIntersectFruit(Shape *s) {
 	s->Hide();
 	IT->remove(s);
 	PlayPoint();
+	fruitCounter--;
 }
 
 void Game::onIntersectObstecle(Shape *s) {
@@ -303,7 +300,7 @@ void Game::addCubes() {
 
 //PLAYING THEME MUSIC
 void Game::configSound() {
-	PlayTheme();
+	//PlayTheme();
 }
 
 void Game::PlayTheme()
@@ -314,13 +311,16 @@ void Game::PlayTheme()
 void Game::PlayPoint()
 {
 	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
-	PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+}
+
+void Game::PlayWin()
+{
+	PlaySound("../res/sounds/Cheering.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
 }
 
 void Game::PlayExplosion()
 {
 	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
-	PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
 void Game::updateSnakePosition()

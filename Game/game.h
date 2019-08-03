@@ -28,7 +28,7 @@ class Game : public Scene
 {
 	const int snakeLength = 30, segs = 5, ends = 10;
 	int projMode = -1;
-	const float speed = 1.f;
+	const float speed = 3.f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
@@ -57,6 +57,7 @@ public:
 	void changeCameraMode();
 	void PlayTheme();
 	void PlayPoint();
+	void PlayWin();
 	void Debug();
 	void PlayExplosion();
 	void changeMode() {
@@ -78,8 +79,8 @@ private:
 
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	const int firstTheme = 3;
-	const int currentLvl = 2;
+	const int firstTheme = 2;
+	const int currentLvl = 7;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
 
