@@ -8,7 +8,7 @@
 #include <iostream> 
 #include <thread>
 
-
+IntersectTracker *IT;
 Game::Game():Scene(){
 	sMT = new snakeMoveTracker(snakeLength, speed);
 }
@@ -200,35 +200,44 @@ void printIM(std::vector<IndexedModel> sol) {
 	}
 }
 
-void onIntersectCave(std::vector<IndexedModel> sol) {
+void Game::onIntersectCave(Shape *s) {
 	printf("reach to seafty END GAME\n");
-	printIM(sol);
-	printf("||\n\n");
+}
+
+void Game::onIntersectFruit(Shape *s) {
+	printf("got fruit\n");
+
+}
+
+void Game::onIntersectObstecle(Shape *s) {
+	printf("bump into obstecle\n");
+
 }
 
 float climbAngle = glm::atan(zscale / allscale);
-void onIntersectWalls(std::vector<IndexedModel> sol) {
+void Game::onIntersectWalls(Shape *s) {
 	printf("wall  \n");
-	printIM(sol);
-	printf("||\n\n");
 }
 
-void onIntersectStairs(std::vector<IndexedModel> sol) {
+void Game::onIntersectFallWall(Shape *s) {
+
+}
+
+void Game::onIntersectStairs(Shape *s) {
 	printf("stairs\n");
-	printIM(sol);
-	printf("||\n\n");
 }
 
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
+enum IntersectFuncTypes { WallF, FallWallF, CaveF, ObstecleF, FruitF, StairF };
 const MeshConstructor *meshelper = nullptr;
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
 	theme *tempTheme = themes->getCurrentTheme();
 	genObj(myIndex, tex, pos, scale, dir);
 	tempTheme = themes->getCurrentTheme();
 	if (computedKDtrees[myIndex])
-		addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, computedKDtrees[myIndex]);
+		IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, computedKDtrees[myIndex]);
 	else
-		computedKDtrees[myIndex] = addObj(x, y, level, shapes[shapes.size() - 1], onIntersectCave, meshelper->getlastInitMeshPositions());
+		computedKDtrees[myIndex] = IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, meshelper->getlastInitMeshPositions());
 	tempTheme = themes->getCurrentTheme();
 }
 
@@ -246,7 +255,7 @@ void Game::specialObjHandle(objLocation &obj) {
 	case Snake:
 		genSnake(x, y, z, dir);
 		snakeLevel = obj.level;
-		addSnakeHead(meshelper->getlastInitMeshPositions());
+		IT->addSnakeHead(meshelper->getlastInitMeshPositions());
 		//printf("added SnakeHead\n");
 		break;
 	case Cave:
@@ -263,6 +272,33 @@ void Game::specialObjHandle(objLocation &obj) {
 		break;
 	}
 }
+
+void Game::onIntersectSnakeHead(int type, Shape *myShape) {
+	enum IntersectFuncTypes { WallF, FallWallF, CaveF, ObstecleF, FruitF, StairF };
+	switch (type) {
+		case WallF:
+			Game::onIntersectWalls(myShape);
+			break;
+		case FallWallF:
+			Game::onIntersectFallWall(myShape);
+			break;
+		case CaveF:
+			Game::onIntersectCave(myShape);
+			break;
+		case ObstecleF:
+			Game::onIntersectObstecle(myShape);
+			break;
+		case FruitF:
+			Game::onIntersectFruit(myShape);
+			break;
+		case StairF:
+			Game::onIntersectStairs(myShape);
+			break;
+		default:
+			printf("unknown special obj <%d>\n", type);
+			break;
+	}
+};
 
 void Game::addCubes() {
 	addShape(Cube, -1, TRIANGLES);
@@ -335,6 +371,7 @@ void Game::Init()
 	//addShape(Axis, -1, LINES);
 
 	loadThemes();
+	IT = new IntersectTracker(this);
 	struct objMap map = lGen->getLevel(firstLvl);//todo - level -1 is random
 	printf("level:%d walls:%d stairs:%d\n", firstLvl, map.walls->size(), map.stairs->size());
 
@@ -347,14 +384,26 @@ void Game::Init()
 		for (modelWrapper &obj : *map.walls) {
 			addShape(obj.model, -1, TRIANGLES, tempTheme->wallTex, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
-			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
-				onIntersectWalls, meshelper->getlastInitMeshPositions());
+			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+				WallF, meshelper->getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.stairs) {
 			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
-			addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
-				onIntersectStairs, meshelper->getlastInitMeshPositions());
+		}
+		for (modelWrapper &obj : *map.stairsWalls) {
+			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
+			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			shapes[shapes.size() - 1]->Hide();
+			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+				StairF, meshelper->getlastInitMeshPositions());
+		}
+		for (modelWrapper &obj : *map.fallWalls) {
+			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
+			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			shapes[shapes.size() - 1]->Hide();
+			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+				FallWallF, meshelper->getlastInitMeshPositions());
 		}
 		for (objLocation &obj : *map.specialObj)
 			specialObjHandle(obj);
@@ -440,7 +489,7 @@ void Game::setSnakeNodesAngles()
 
 void Game::Debug() {
 	Deactivate();
-	printDSDebug();
+	//IT->printDSDebug();
 	//sMT->printDS();
 }
 
@@ -457,7 +506,7 @@ void Game::Motion()
 
 		updateCam();
 
-		isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
+		IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
 	pickedShape = savePicked;
 }

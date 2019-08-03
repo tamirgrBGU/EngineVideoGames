@@ -63,9 +63,20 @@ public:
 	void changeMode() {
 		projMode = (projMode + 1) % 6;
 		updateDrawMode(projMode);
-	}
+	};
+
+	void onIntersectSnakeHead(int type, Shape *myShape);
+
 private:
 	snakeMoveTracker *sMT;
+
+	void onIntersectCave	(Shape *s);
+	void onIntersectObstecle(Shape *s);
+	void onIntersectFruit	(Shape *s);
+	void onIntersectWalls	(Shape *s);
+	void onIntersectFallWall(Shape *s);
+	void onIntersectStairs	(Shape *s);
+
 	ThemeHolder *themes;
 	void updateThemeArrays();
 	const int firstTheme = 3;
