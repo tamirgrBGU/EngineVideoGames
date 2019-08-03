@@ -1,5 +1,6 @@
 #include "InputManager.h"
 #include "glm\glm.hpp"
+#include "Menu.h"
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
 int main(int argc,char *argv[])
@@ -32,11 +33,24 @@ int main(int argc,char *argv[])
 
 	display.setScene(scn);
 
+	Menu* menu = new Menu(&display, scn, 0); //start menu
+	Menu* menu2 = new Menu(&display, scn, 1); //fruits count
+	Menu* menu3 = new Menu(&display, scn, 2); //option menu
+
+
+
 	while(!display.closeWindow())
 	{
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 		scn->Draw(1,0,true);
 		scn->Motion();
+		if (!menu->created)
+		{
+			menu->create();
+			init(display);
+		}
+		menu->DrawMenu();
+
 		display.SwapBuffers();
 		display.PollEvents();
 	}
