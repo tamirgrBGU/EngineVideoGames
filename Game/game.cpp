@@ -188,39 +188,29 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 	shapes[shapes.size() - 1]->myRotate(90.f * direction, zAx, zAxis1);
 }
 
-void onIntersectPrint(std::vector<IndexedModel> sol) {
-	printf("\r");
-	printf("hey man");
-}
-void printIM(std::vector<IndexedModel> sol) {
-	for (int i = 0; i < (signed)sol.size(); i++) {
-		printf("box[%d]\n",i);
-		for (int j = 0; j < (signed)sol[i].positions.size(); j++)
-			printVec(sol[i].positions[j]);
-	}
-}
-
 void Game::onIntersectCave(Shape *s) {
 	printf("reach to seafty END GAME\n");
 }
 
 void Game::onIntersectFruit(Shape *s) {
 	printf("got fruit\n");
-
+	s->Hide();
+	IT->remove(s);
 }
 
 void Game::onIntersectObstecle(Shape *s) {
 	printf("bump into obstecle\n");
-
+	Deactivate();
 }
 
 float climbAngle = glm::atan(zscale / allscale);
 void Game::onIntersectWalls(Shape *s) {
 	printf("wall  \n");
+	Deactivate();
 }
 
-void Game::onIntersectFallWall(Shape *s) {
-
+void Game::onIntersectFallWall(Shape *s){
+	printf("fall wall\n");
 }
 
 void Game::onIntersectStairs(Shape *s) {
@@ -228,7 +218,7 @@ void Game::onIntersectStairs(Shape *s) {
 }
 
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
-enum IntersectFuncTypes { WallF, FallWallF, CaveF, ObstecleF, FruitF, StairF };
+enum IntersectFuncTypes { CaveF, ObstecleF, FruitF, StairF, WallF, FallWallF };
 const MeshConstructor *meshelper = nullptr;
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
 	theme *tempTheme = themes->getCurrentTheme();
@@ -259,13 +249,13 @@ void Game::specialObjHandle(objLocation &obj) {
 		//printf("added SnakeHead\n");
 		break;
 	case Cave:
-		addShapeAndKD(0, themes->getTex(1), x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
+		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
 		break;
 	case Obstecle:
-		addShapeAndKD(1, themes->getTex(2), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.01f * allscale, dir);
 		break;
 	case Fruit:
-		addShapeAndKD(2, themes->getTex(3), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		addShapeAndKD(FruitF, themes->getTex(3), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -274,7 +264,6 @@ void Game::specialObjHandle(objLocation &obj) {
 }
 
 void Game::onIntersectSnakeHead(int type, Shape *myShape) {
-	enum IntersectFuncTypes { WallF, FallWallF, CaveF, ObstecleF, FruitF, StairF };
 	switch (type) {
 		case WallF:
 			Game::onIntersectWalls(myShape);

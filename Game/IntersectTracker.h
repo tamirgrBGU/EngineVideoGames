@@ -20,6 +20,9 @@ class IntersectTracker
 	Game *mygame;
 	std::vector<int> levelObjSize;
 	std::vector<listNode<levelIntersect> *> levels;
+	//we will save the last occurence of the shape we want to remove
+	listNode<levelIntersect> *chacheShape;
+	int chacheLvl;
 public:
 	IntersectTracker(Game *game);
 	~IntersectTracker();
@@ -28,10 +31,12 @@ public:
 	intersect *addObj(float x, float y, int level, Shape *myShape, int type, std::vector<glm::vec3> &shape);
 	void addSnakeHead(std::vector<glm::vec3> &shape);
 	void isIntersectSnakeHead(glm::mat4 tranSnake, float x, float y, int level);
+	void remove(Shape *s);
 	void printDSDebug();
 private:
 	inline void appendNode(listNode<levelIntersect> *toAdd);
-	void prinLevel(int lvl);
+	void printLevel(int lvl);
+	void IntersectTracker::printLevelR(int lvl);
 	void addNode(listNode<levelIntersect> *node);
 	std::vector<listNode<levelIntersect> *> collect(listNode<levelIntersect> * head, float x, float y);
 	listNode<levelIntersect> *findNode(listNode<levelIntersect> *head, float x);

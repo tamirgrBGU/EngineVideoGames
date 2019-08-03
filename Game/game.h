@@ -79,8 +79,8 @@ private:
 
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	const int firstTheme = 3;
-	const int firstLvl = 2;
+	const int firstTheme = 2;
+	const int firstLvl = 5;
 	leveGenerator *lGen = new leveGenerator(firstLvl);
 
 	void loadThemes();

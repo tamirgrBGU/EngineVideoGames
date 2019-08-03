@@ -16,6 +16,7 @@ class ThemeHolder
 {
 	std::vector<struct theme *> themes;
 	int size;	int current;
+	Scene *scn;
 public:
 	ThemeHolder(Scene *scn, int size, int firstTheme);
 	~ThemeHolder();
@@ -30,5 +31,5 @@ public:
 private:
 	struct theme *genTheme(char *name);
 	int readInitFile();
-	void loadTex(Scene *scn);
+	void loadTex();
 };

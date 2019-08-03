@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <random>
 
-static const char *TexImg[] = { "floor.jpg", "wall.jpg", "fruit.png", "tree.png" };
+static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.png" };
 static const int TexImgSize = sizeof(TexImg) / sizeof(char*);
 static const char *sharedObjNames[] = { "../res/objs/cave.obj" };
 static const int sharedSize = sizeof(sharedObjNames) / sizeof(char*);
-static const char *objNames[] = { "fruit.obj", "tree.obj" };
+static const char *objNames[] = { "tree.obj", "fruit.obj" };
 static const char *path = "../res/objs-ordered/levels/%s/%s";
 static const int subNameSize = 256;
 struct theme *ThemeHolder::genTheme(char *name) {
@@ -57,22 +57,25 @@ int ThemeHolder::readInitFile() {
 	return -1;
 }
 
-void ThemeHolder::loadTex(Scene *scn)
+void ThemeHolder::loadTex()
 {
+	if (0 < (signed)themes[current]->texNo.size())
+		return;
 	int texId = scn->textures.size();
 	for (int i = 0; i < (signed)themes.size(); i++)
 		for (int j = 0; j < TexImgSize; j++) {
-			sprintf_s(buf, maxWidth, path, themes[i]->themeName, TexImg[j]);
+			sprintf_s(buf, maxWidth, path, themes[current]->themeName, TexImg[j]);
 			scn->AddTexture(buf);
-			themes[i]->texNo.push_back(texId++);
+			themes[current]->texNo.push_back(texId++);
 		}	
 }
 
 ThemeHolder::ThemeHolder(Scene *scn, int size, int firstTheme) {
 	current = firstTheme;
+	this->scn = scn;
 	this->size = size;
 	readInitFile();
-	loadTex(scn);
+	loadTex();
 
 	printf("%d themes loaded\n", themes.size());
 }
@@ -83,6 +86,7 @@ void ThemeHolder::swapThemes(int next) {
 		themes[next]->computedKDtrees[i] = themes[current]->computedKDtrees[i];
 	}
 	current = next;
+	loadTex();
 }
 
 ThemeHolder::~ThemeHolder(){

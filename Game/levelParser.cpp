@@ -390,7 +390,7 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 			else
 			{
 				unsigned int x = std::rand(); // rand() return a number between ​0​ and RAND_MAX;
-				x = x % probToGet;
+				x = x % 2;
 				if (x < maxObjToChooseFrom) {
 					obj->type = 3 + x;
 					specialObj->push_back(*obj);

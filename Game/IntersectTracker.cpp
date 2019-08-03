@@ -18,11 +18,17 @@ listNode<levelIntersect> *IntersectTracker::findNode(listNode<levelIntersect> *h
 
 inline void IntersectTracker::appendNode(listNode<levelIntersect> *toAdd) {
 	int i = toAdd->value.level;
-	toAdd->next = levels[i];
+	listNode<levelIntersect> *curHead = levels[i];
+	toAdd->next = curHead;
+	if(curHead)
+		curHead->prev = toAdd;
 	levels[i] = toAdd;
 }
 
 inline void addNodeAfter(listNode<levelIntersect> *node, listNode<levelIntersect> *toAdd) {
+	if(node->next)
+		node->next->prev = toAdd;
+	toAdd->prev = node;
 	toAdd->next = node->next;
 	node->next = toAdd;
 }
@@ -32,7 +38,7 @@ void IntersectTracker::addNodeHelper(listNode<levelIntersect> *first, listNode<l
 		appendNode(node);
 	else {
 		listNode<levelIntersect> *foundNode = findNode(first, node->value.x);
-		addNodeAfter(foundNode,	node);
+		addNodeAfter(foundNode, node);
 	}
 }
 
@@ -51,7 +57,7 @@ void IntersectTracker::addNode(listNode<levelIntersect> *node) {
 	levelObjSize[lvl]++;
 }
 
-void IntersectTracker::prinLevel(int lvl) {
+void IntersectTracker::printLevel(int lvl) {
 	listNode<levelIntersect> *head = levels[lvl];
 	printf("[");
 	while (head) {
@@ -61,10 +67,29 @@ void IntersectTracker::prinLevel(int lvl) {
 	printf("]\n");
 }
 
+void IntersectTracker::printLevelR(int lvl) {
+	listNode<levelIntersect> *head = levels[lvl];
+	listNode<levelIntersect> *prev = head;
+	printf("[\n");
+	while (head) {
+		prev = head;
+		printf("<%f %f %d> ", head->value.x, head->value.y, head->value.level);
+		head = head->next;
+	}
+	printf("]\n");
+	head = prev;
+	printf("R[\n");
+	while (head) {
+		printf("<%f %f %d> ", head->value.x, head->value.y, head->value.level);
+		head = head->prev;
+	}
+	printf("]\n");
+}
+
 void IntersectTracker::printDSDebug() {
 	for (unsigned int i = 0; i < levels.size(); i++) {
 		printf("%d size %d\n", i, levelObjSize[i]);
-		prinLevel(i);
+		printLevel(i);
 	}
 }
 
@@ -76,6 +101,7 @@ inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *my
 	newNode->value.myShape = myShape;
 	newNode->value.type = type;
 	newNode->next = 0;
+	newNode->prev = 0;
 
 	/*if (levelObjSize.size() > level) {
 		printf("<%f %f %d %d>\n", x, y, level, levelObjSize[level]);
@@ -123,18 +149,45 @@ std::vector<listNode<levelIntersect> *> IntersectTracker::collect(listNode<level
 	return out;
 }
 
+
+void IntersectTracker::remove(Shape *s) {
+	std::vector<listNode<levelIntersect> *> out;	
+
+	listNode<levelIntersect> * head = chacheShape;
+
+	//printLevelR(chacheLvl);
+	//printf("%p %p %d\n", s, head->value.myShape, chacheLvl);
+
+	if (head->prev) {
+		head->prev->next = head->next;
+		if (head->next)
+			head->next->prev = head->prev;
+	}
+	else {
+		levels[chacheLvl] = head->next;
+		if(head->next)
+			head->next->prev = 0;
+	}
+	delete head->value.model;
+	delete head;
+
+	//printLevelR(chacheLvl);
+}
+
 void IntersectTracker::isIntersectSnakeHead(glm::mat4 tranSnake, float x, float y, int level) {
 	if ((signed) levelObjSize.size() <= level || levelObjSize[level] == 0)
 		return;
 	std::vector<listNode<levelIntersect> *> closeObjects = collect(findNode(levels[level], x - radiusLenToCheckIntersects), x, y);
-	//printf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-	//printf("<%f, %f> %d size %d", x, y, level, closeObjects.size());
 	for (unsigned int i = 0; i < closeObjects.size(); i++) {
 		Shape *myShape = closeObjects[i]->value.myShape;
 		int type = closeObjects[i]->value.type;
 		glm::mat4 myshapetrans = myShape->makeTransScale();
 		std::vector<IndexedModel> sol = snakeHead->isIntersect(&tranSnake, &myshapetrans, *closeObjects[i]->value.model);
-		if (sol.size() > 0)
+		if (sol.size() > 0) {
+			printf("%d\n", i);
+			chacheShape = closeObjects[i];
+			chacheLvl = level;
 			mygame->onIntersectSnakeHead(type, myShape);
+		}
 	}
 }
