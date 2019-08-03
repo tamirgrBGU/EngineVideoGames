@@ -64,26 +64,34 @@ void setCameraBottomView() {
 
 float mypi = 3.14159265358979323846264338327950288f;
 inline static void completeAngle(float &angle) {
-	angle = 2 * mypi - angle;
+	if(angle > 0)
+		angle = 2 * mypi - angle;
+	else
+		angle = -(2 * mypi + angle);
 }
 
 //both vecs are normalized: (a*b)/(|a|*|b|) = cos(ang) -> ang = acos(a*b)
 static float anglewNonAbs(const vec3& a, const vec3& b) {
-	float angleA = glm::angle(yAx, a);
-	float angleB = glm::angle(yAx, b);
-	//printf("%f - %f\n", glm::degrees(angleB), glm::degrees(angleA));
+	//unormalized vec3 can cause nans...	//vec3 normA = glm::normalize(a);	//vec3 normB = glm::normalize(b);
+	//for normalized vectors - v*u/(|v|*|u|) = v*u
+	float angleA = glm::acos(glm::clamp(glm::dot(yAx, a), -1.f, 1.f));
+	float angleB = glm::acos(glm::clamp(glm::dot(yAx, b), -1.f, 1.f));
+
 	if (a.x < 0)
 		completeAngle(angleA);
 	if (b.x < 0)
 		completeAngle(angleB);
+
+	/*printf("%f %f ", angleA, angleB);
+	printVec(a);
+	printVec(b);*/
+
 	float angle = angleB - angleA;
-	if ((angle > mypi) | (angle < -mypi)){
+	if (angle > mypi || angle < -mypi){
 		completeAngle(angle);
 		angle = -angle;
 	}
-	/*printVec(b);
-	printVec(a);
-	printf("%f = %f - %f\n", glm::degrees(angle), glm::degrees(angleB), glm::degrees(angleA));*/
+
 	return angle;
 }
 
@@ -91,9 +99,8 @@ void rotCam() {
 	float dirAngle = glm::degrees(anglewNonAbs(lastheadDirection, myCam->headDirection));
 	float angle = abs(dirAngle);
 	mat4 rotator(1);
-	//printVec(myCam->headDirection);
-	//printVec(lastheadDirection);
-	//printf("%f %f\n", glm::degrees(glm::angle(lastheadDirection, myCam->headDirection)), dirAngle);
+
+	//printf("%f\n", dirAngle);
 	if (angle > bigAngleFrame) {
 		myCam->myRotate(dirAngle*bigTolerance, zAx, 4);
 		rotator = glm::rotate(dirAngle*bigTolerance, zAx);
@@ -102,8 +109,10 @@ void rotCam() {
 		myCam->myRotate(dirAngle*tolerance, zAx, 4);
 		rotator = glm::rotate(dirAngle*tolerance, zAx);
 	}
+	else
+		return;
 	lastheadDirection = v4to3(v3to40(lastheadDirection)*rotator);
-	
+
 	myCam->myTranslate(-v4to3(myCam->getTraslate()), 0);
 	myCam->myTranslate(-v4to3(myCam->GetRot() * v3to4(realcampos)), 0);
 }

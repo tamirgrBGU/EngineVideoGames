@@ -9,17 +9,17 @@
 #include <thread>
 
 IntersectTracker *IT;
-Game::Game():Scene(){
-	sMT = new snakeMoveTracker(snakeLength, speed);
-}
-
 Game::Game(vec3 position,float angle,float hwRelation,float near1, float far1): 
 	Scene(position,angle,hwRelation,near1,far1){
+	IT = new IntersectTracker(this);
+	lGen = new leveGenerator(currentLvl);
 	sMT = new snakeMoveTracker(snakeLength, speed);
 }
 
 Game::~Game(void) {
 	delete sMT;
+	delete lGen;
+	delete IT;
 	delete themes;
 }
 
@@ -144,14 +144,6 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 }
 
-/*
-static const char *filePath[] 
-	{ "../res/objs/cave.obj", nullptr, nullptr, nullptr, "../res/objs/Nokia_3310.obj", "../res/objs/TNT_box.obj",
-		"../res/objs/apple.obj", "../res/objs/snake_head.obj" };
-Shape **uploadedFiles = (Shape **)calloc(sizeof(Shape *), sizeof(filePath) / sizeof(char*));
-intersect **computedKDtrees = (intersect **)calloc(sizeof(intersect *), sizeof(filePath) / sizeof(char*));
-*/
-
 char	  **filePath;
 Shape	  **uploadedFiles;
 intersect **computedKDtrees;
@@ -190,22 +182,30 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 
 void Game::onIntersectCave(Shape *s) {
 	printf("reach to seafty END GAME\n");
+	if (fruitCounter == 0) {
+		Deactivate();
+		PlayWin();
+	}
 }
 
 void Game::onIntersectFruit(Shape *s) {
 	printf("got fruit\n");
 	s->Hide();
 	IT->remove(s);
+	PlayPoint();
+	fruitCounter--;
 }
 
 void Game::onIntersectObstecle(Shape *s) {
 	printf("bump into obstecle\n");
+	PlayExplosion();
 	Deactivate();
 }
 
 float climbAngle = glm::atan(zscale / allscale);
 void Game::onIntersectWalls(Shape *s) {
 	printf("wall  \n");
+	PlayExplosion();
 	Deactivate();
 }
 
@@ -219,16 +219,12 @@ void Game::onIntersectStairs(Shape *s) {
 
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
 enum IntersectFuncTypes { CaveF, ObstecleF, FruitF, StairF, WallF, FallWallF };
-const MeshConstructor *meshelper = nullptr;
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
-	theme *tempTheme = themes->getCurrentTheme();
 	genObj(myIndex, tex, pos, scale, dir);
-	tempTheme = themes->getCurrentTheme();
 	if (computedKDtrees[myIndex])
 		IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, computedKDtrees[myIndex]);
 	else
-		computedKDtrees[myIndex] = IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, meshelper->getlastInitMeshPositions());
-	tempTheme = themes->getCurrentTheme();
+		computedKDtrees[myIndex] = IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, MeshConstructor::getlastInitMeshPositions());
 }
 
 /*
@@ -245,7 +241,7 @@ void Game::specialObjHandle(objLocation &obj) {
 	case Snake:
 		genSnake(x, y, z, dir);
 		snakeLevel = obj.level;
-		IT->addSnakeHead(meshelper->getlastInitMeshPositions());
+		IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
 		//printf("added SnakeHead\n");
 		break;
 	case Cave:
@@ -255,6 +251,7 @@ void Game::specialObjHandle(objLocation &obj) {
 		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.01f * allscale, dir);
 		break;
 	case Fruit:
+		fruitCounter++;
 		addShapeAndKD(FruitF, themes->getTex(3), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
 		break;
 	default:
@@ -303,31 +300,27 @@ void Game::addCubes() {
 
 //PLAYING THEME MUSIC
 void Game::configSound() {
-	/*
-	std::thread t1(&Game::PlayTheme, this);
-	t1.detach();
-	PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
-	*/
-
-	//PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
-	//PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
-	//std::thread t2(&Game::PlayPoint, this);
-	//t2.detach();
+	//PlayTheme();
 }
 
 void Game::PlayTheme()
 {
-	PlaySound("../res/sounds/theme.wav", NULL, SND_FILENAME | SND_LOOP);
+	PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
 void Game::PlayPoint()
 {
-	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+}
+
+void Game::PlayWin()
+{
+	PlaySound("../res/sounds/Cheering.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
 }
 
 void Game::PlayExplosion()
 {
-	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
 }
 
 void Game::updateSnakePosition()
@@ -354,15 +347,11 @@ void Game::orderCamera() {
 	setCameraTopView();
 }
 
-void Game::Init()
-{
-	meshelper = new MeshConstructor(100);
-	//addShape(Axis, -1, LINES);
-
-	loadThemes();
-	IT = new IntersectTracker(this);
-	struct objMap map = lGen->getLevel(firstLvl);//todo - level -1 is random
-	printf("level:%d walls:%d stairs:%d\n", firstLvl, map.walls->size(), map.stairs->size());
+void Game::setupCurrentLevel() {
+	printf("parsing files");
+	struct objMap map = lGen->getLevel(currentLvl);
+	fruitCounter = 0;
+	printf("level:%d walls:%d stairs:%d\n", currentLvl, map.walls->size(), map.stairs->size());
 
 	if (map.levelGround != nullptr) {
 		for (modelWrapper &obj : *map.levelGround) {
@@ -373,7 +362,7 @@ void Game::Init()
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(1), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
-				WallF, meshelper->getlastInitMeshPositions());
+				WallF, MeshConstructor::getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.stairs) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
@@ -384,28 +373,36 @@ void Game::Init()
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			shapes[shapes.size() - 1]->Hide();
 			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
-				StairF, meshelper->getlastInitMeshPositions());
+				StairF, MeshConstructor::getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.fallWalls) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			shapes[shapes.size() - 1]->Hide();
 			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
-				FallWallF, meshelper->getlastInitMeshPositions());
+				FallWallF, MeshConstructor::getlastInitMeshPositions());
 		}
 		for (objLocation &obj : *map.specialObj)
 			specialObjHandle(obj);
 	}
 	else
 		printf("level did not been loaded!");
+}
 
+void Game::setupEnvironment() {
+	setupCurrentLevel();
 	orderCamera();
-	addCubes();
 	configSound();
-
-	ReadPixel();
-	//Activate();
 	pickedShape = -1;
+}
+
+void Game::Init()
+{
+	loadThemes();
+	setupEnvironment();
+
+	//addCubes();
+	ReadPixel();
 }
 
 void finUpdate(Shader *s, const int shaderIndx, const int pickedShape) {

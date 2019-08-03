@@ -89,6 +89,13 @@ int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs)
 	del = nextDelimeterCSV(buf, i, ',');
 	while (del > -1) {
 		struct objLocation obj;
+		//EMPTY GROUND RANDOM OBJECT SHOULD NOT SPAWN UPON
+		if (buf[i] == '!') {
+			obj.type = -2;
+			i++;
+		}
+		else
+			obj.type = -1;
 		point = nextDelimeter(buf, i, del, '.');
 		//printf("%d %d\n", del, point);
 		if (point > -1) {
@@ -102,7 +109,6 @@ int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs)
 				printf("point at %d does not have dash!\n", point);
 		}
 		else {
-			obj.type = -1;
 			obj.direction = -1;
 			obj.level = getInt(buf, i, del);
 		}
@@ -346,6 +352,12 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 static const int maxObjToChooseFrom = 2;
 static const int probToGet = 8 * maxObjToChooseFrom;
 
+//-2 is non spawnable ground
+//-1 is bare ground
+//0 is stairs
+//1 is snake
+//2 is cave
+//>2 is special object for each theme of the map
 void initGroundModel(std::vector<modelWrapper>* levelGround,
 	std::vector<modelWrapper>* stairs,
 	std::vector<modelWrapper>* stairsWalls,
@@ -389,11 +401,16 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 				specialObj->push_back(*obj);
 			else
 			{
-				unsigned int x = std::rand(); // rand() return a number between ​0​ and RAND_MAX;
-				x = x % 2;
-				if (x < maxObjToChooseFrom) {
-					obj->type = 3 + x;
-					specialObj->push_back(*obj);
+				if (obj->type == -2) {
+					obj->type = -1;
+				}
+				else {
+					unsigned int x = std::rand(); // rand() return a number between ​0​ and RAND_MAX;
+					x = x % probToGet;
+					if (x < maxObjToChooseFrom) {
+						obj->type = 3 + x;
+						specialObj->push_back(*obj);
+					}
 				}
 			}
 		}
