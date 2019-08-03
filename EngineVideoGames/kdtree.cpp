@@ -198,7 +198,7 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType> plist[], unsigned int depth )
 {	
 	int axis = depth % N;
-	if( !plist[axis].empty())
+	if( 2 < plist[axis].size())
 	{
 		std::list<Kdtree::vecType> plistNEXT[2][3];
 		std::list<Kdtree::vecType> l1, l2, l3, l4, l5, l6;
