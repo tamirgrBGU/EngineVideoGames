@@ -5,8 +5,7 @@
 
 struct theme {
 	char *themeName;
-	int floorTex;
-	int wallTex;
+	std::vector<int> texNo;
 	//game will use the following two variables to chache objects
 	char **filepath;
 	void **uploadedObj;
@@ -20,7 +19,13 @@ class ThemeHolder
 public:
 	ThemeHolder(Scene *scn, int size, int firstTheme);
 	~ThemeHolder();
-	struct theme *getCurrentTheme();
+	int getTex(int type) {
+		return themes[current]->texNo[type];
+	};
+	struct theme *getCurrentTheme() {
+		//printf("theme %d \n", current);
+		return themes[current];
+	}
 	void swapThemes(int next);
 private:
 	struct theme *genTheme(char *name);

@@ -5,11 +5,12 @@
 #include <stdio.h>
 #include <random>
 
-char *floorTexImg = "floor.jpg";	char *wallTexImg  = "wall.jpg";
-char *sharedObjNames[] = { "../res/objs/cave.obj" };
-const int sharedSize = sizeof(sharedObjNames) / sizeof(char*);
-char *objNames[] = { "fruit.obj", "tree.obj" };
-const char *path = "../res/objs-ordered/levels/%s/%s";
+static const char *TexImg[] = { "floor.jpg", "wall.jpg", "fruit.png", "tree.png" };
+static const int TexImgSize = sizeof(TexImg) / sizeof(char*);
+static const char *sharedObjNames[] = { "../res/objs/cave.obj" };
+static const int sharedSize = sizeof(sharedObjNames) / sizeof(char*);
+static const char *objNames[] = { "fruit.obj", "tree.obj" };
+static const char *path = "../res/objs-ordered/levels/%s/%s";
 static const int subNameSize = 256;
 struct theme *ThemeHolder::genTheme(char *name) {
 	struct theme *out = new theme();
@@ -18,7 +19,7 @@ struct theme *ThemeHolder::genTheme(char *name) {
 
 	out->filepath = (char **)calloc(sizeof(void *), size);
 
-	unsigned int i = 0;
+	int i = 0;
 	for (; i < sharedSize; i++) {
 		out->filepath[i] = (char *)malloc(subNameSize);
 		strcpy_s(out->filepath[i], subNameSize, sharedObjNames[i]);
@@ -58,15 +59,13 @@ int ThemeHolder::readInitFile() {
 
 void ThemeHolder::loadTex(Scene *scn)
 {
-	for (int i = 0; i < (signed)themes.size(); i++) {
-		int texId = scn->textures.size();
-		sprintf_s(buf, maxWidth, path, themes[i]->themeName, floorTexImg);
-		scn->AddTexture(buf);
-		themes[i]->floorTex = texId;
-		sprintf_s(buf, maxWidth, path, themes[i]->themeName, wallTexImg);
-		scn->AddTexture(buf);
-		themes[i]->wallTex = texId+1;
-	}
+	int texId = scn->textures.size();
+	for (int i = 0; i < (signed)themes.size(); i++)
+		for (int j = 0; j < TexImgSize; j++) {
+			sprintf_s(buf, maxWidth, path, themes[i]->themeName, TexImg[j]);
+			scn->AddTexture(buf);
+			themes[i]->texNo.push_back(texId++);
+		}	
 }
 
 ThemeHolder::ThemeHolder(Scene *scn, int size, int firstTheme) {
@@ -76,11 +75,6 @@ ThemeHolder::ThemeHolder(Scene *scn, int size, int firstTheme) {
 	loadTex(scn);
 
 	printf("%d themes loaded\n", themes.size());
-}
-
-struct theme *ThemeHolder::getCurrentTheme() {
-	//printf("theme %d \n", current);
-	return themes[current];
 }
 
 void ThemeHolder::swapThemes(int next) {

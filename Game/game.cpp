@@ -259,13 +259,13 @@ void Game::specialObjHandle(objLocation &obj) {
 		//printf("added SnakeHead\n");
 		break;
 	case Cave:
-		addShapeAndKD(0, 2, x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
+		addShapeAndKD(0, themes->getTex(1), x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
 		break;
 	case Obstecle:
-		addShapeAndKD(1, 3, x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		addShapeAndKD(1, themes->getTex(2), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
 		break;
 	case Fruit:
-		addShapeAndKD(2, 3, x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		addShapeAndKD(2, themes->getTex(3), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -376,30 +376,29 @@ void Game::Init()
 	printf("level:%d walls:%d stairs:%d\n", firstLvl, map.walls->size(), map.stairs->size());
 
 	if (map.levelGround != nullptr) {
-		theme *tempTheme = themes->getCurrentTheme();
 		for (modelWrapper &obj : *map.levelGround) {
-			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
+			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 		}
 		for (modelWrapper &obj : *map.walls) {
-			addShape(obj.model, -1, TRIANGLES, tempTheme->wallTex, 4);
+			addShape(obj.model, -1, TRIANGLES, themes->getTex(1), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
 				WallF, meshelper->getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.stairs) {
-			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
+			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 		}
 		for (modelWrapper &obj : *map.stairsWalls) {
-			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
+			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			shapes[shapes.size() - 1]->Hide();
 			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
 				StairF, meshelper->getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.fallWalls) {
-			addShape(obj.model, -1, TRIANGLES, tempTheme->floorTex, 4);
+			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
 			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 			shapes[shapes.size() - 1]->Hide();
 			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
