@@ -128,7 +128,7 @@ int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs)
 /*
 square
 a	b
-c	d
+d	c
 */
 IndexedModel leveGenerator::create_square(vec3 a, vec3 b, vec3 c, vec3 d) {
 	IndexedModel square;

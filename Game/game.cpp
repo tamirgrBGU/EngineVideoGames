@@ -449,15 +449,15 @@ void Game::loadNextLevel() {
 //1 4 -> 5 8
 void Game::genSkyCubeHelper(vec3 a1, vec3 a2, vec3 a3, vec3 a4,
 						vec3 a5, vec3 a6, vec3 a7, vec3 a8) {
-	addShape(leveGenerator::create_square(a2, a3, a6, a7),
+	addShape(leveGenerator::create_square(a2, a3, a7, a6),
 		-1, TRIANGLES, 1, 4);//top
-	addShape(leveGenerator::create_square(a2, a3, a1, a4),
+	addShape(leveGenerator::create_square(a2, a3, a4, a1),
 		-1, TRIANGLES, 1, 4);//front
-	addShape(leveGenerator::create_square(a2, a6, a1, a5),
+	addShape(leveGenerator::create_square(a2, a6, a5, a1),
 		-1, TRIANGLES, 1, 4);//left
-	addShape(leveGenerator::create_square(a3, a7, a4, a8),
+	addShape(leveGenerator::create_square(a3, a7, a8, a4),
 		-1, TRIANGLES, 1, 4);//right
-	addShape(leveGenerator::create_square(a6, a7, a5, a8),
+	addShape(leveGenerator::create_square(a6, a7, a8, a5),
 		-1, TRIANGLES, 1, 4);//back
 }
 
@@ -469,7 +469,7 @@ inline void Game::genSkyHelper(float xl, float xh, float yl, float yh, float zl,
 }
 
 void Game::genSky(float widthOfMap) {
-	genSkyHelper(-widthOfMap, 2 * widthOfMap, -widthOfMap, 2 * widthOfMap, -zscale, 4 * zscale);
+	genSkyHelper(-widthOfMap, 2 * widthOfMap, -widthOfMap, 2 * widthOfMap, -zscale, 10 * zscale);
 }
 void Game::setupCurrentLevel() {
 	printf("parsing file\n");
