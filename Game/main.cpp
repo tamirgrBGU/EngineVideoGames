@@ -41,9 +41,9 @@ int main(int argc,char *argv[])
 
 	display.setScene(scn);
 
-	//Menu* menu = new Menu(&display, scn, 0, &allow_sounds); //start menu
-	//Menu* menu2 = new Menu(&display, scn, 1, &allow_sounds); //fruits count  - his name is fruitCounter in game.h private
-	//Menu* menu3 = new Menu(&display, scn, 2, &allow_sounds); //option menu
+	Menu* menu = new Menu(&display, scn, 0, &allow_sounds); //start menu
+	Menu* menu2 = new Menu(&display, scn, 1, &allow_sounds); //fruits count  - his name is fruitCounter in game.h private
+	Menu* menu3 = new Menu(&display, scn, 2, &allow_sounds); //option menu
 
 
 
@@ -53,7 +53,7 @@ int main(int argc,char *argv[])
 		scn->Draw(1,0,true);
 		scn->Motion();
 
-		/*if (!menu->created)
+		if (!menu->created)
 		{
 			menu->create();
 			init(display);
@@ -67,7 +67,7 @@ int main(int argc,char *argv[])
 			//init(display);
 		}
 		if (!menu->show_window)
-			menu2->DrawMenu();*/
+			menu2->DrawMenu();
 
 		display.SwapBuffers();
 		display.PollEvents();
