@@ -75,7 +75,7 @@ public:
 	void PlayTheme() {
 		PlaySoundGame(Theme);
 	}
-	int currentTheme = 0;
+	int currentTheme = 3;
 
 private:
 	bool soundEnable = true;
