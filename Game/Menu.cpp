@@ -32,7 +32,7 @@ void Menu::DrawMenu()
 	if (this->show_window) {
 		ImGui_ImplGlfwGL3_NewFrame();
 
-		if (type == 0) {
+		if (type != 1) {
 			ImVec2 windowSize = ImVec2(ImGui::GetIO().DisplaySize.x - 50, ImGui::GetIO().DisplaySize.y - 60); // My ImGui window as fullscreen - padding (x=50, y=60)
 			ImVec2 buttonSize(60, 30); // My button size
 		}
@@ -67,7 +67,7 @@ void Menu::DrawMenu()
 				this->extra_options ? this->scn->Activate() : this->scn->Deactivate();
 				this->extra_options = !this->extra_options;
 			}
-			if (this->extra_options) {
+			if (this->extra_options || !this->scn->IsActive()) {
 				this->sound = this->scn->getSoundVar();
 				if (ImGui::Checkbox("Mute sounds", &this->sound)) {
 					this->scn->switchSoundEnable();
@@ -90,6 +90,19 @@ void Menu::DrawMenu()
 			ImGui::TextColored(ImVec4(0.28f, 0.79f, 0.52f,1.0f),"%d / %d", this->scn->getTotalFruitCount(), this->scn->getCurrentFruitCount());
 
 			
+			ImGui::End();
+			ImGui::Render();
+			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+			break;
+		case 2:
+			ImGui::Begin("winWindow", &show_window, ImVec2((float)1200, (float)800), -1.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
+			ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - 615)*0.5f, (ImGui::GetWindowSize().y - 252)* 0.2f));
+			if (scn->wonGame)
+				ImGui::Image((GLuint*)20, ImVec2(615, 252));
+			else
+				ImGui::Image((GLuint*)21, ImVec2(615, 252));
+			ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - 800)*0.5f, (ImGui::GetWindowSize().y - 89)* 0.6f));
+			ImGui::Image((GLuint*)12, ImVec2(800, 89));
 			ImGui::End();
 			ImGui::Render();
 			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
