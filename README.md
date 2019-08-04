@@ -17,6 +17,8 @@ the menu buttons need a long click to get your input.
 the snake is hunting food for his lover snake
 you should get all the available food in the map and touch the cave wall to proceed to next level.
 if you touch a wall or an obstecle - you will start the level from the begining.
+you must not fail.. or you will become the meal.
+In addition you may not come home before you collected all the food, or your wife will be angry.
 
 coolFeatures-
 1. snake can crawl and interact with the map
@@ -28,3 +30,6 @@ coolFeatures-
 7. skybox
 8. snake animations
 9. menu and in game options
+
+known bugs-
+1. sometimes when you come in 90 degrees to a surface the intersection detection is not working

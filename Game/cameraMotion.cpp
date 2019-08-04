@@ -40,7 +40,7 @@ inline glm::vec3 getMid() {
 }
 
 
-static float const heightDown = 7;
+static float const heightDown = 10;
 float heightTop;
 vec3 lastheadDirection;
 vec3 realcampos;
