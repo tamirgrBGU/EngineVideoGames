@@ -31,6 +31,8 @@ class Game : public Scene
 	bool rotRecently = false;
 	const float slowSpeed = 2.f;
 	const float speed = 3.f;
+	float superSpeedTicks = 0;
+	const float superSpeed = 4.f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
@@ -72,10 +74,8 @@ public:
 private:
 	bool soundEnable = true;
 
-	void PlayTheme();
-	void PlayPoint();
-	void PlayWin();
-	void PlayExplosion();
+	enum Sounds { ObstecleSound, FruitSound, Win, Hiss, Theme };
+	void PlaySoundGame(int type);
 
 	snakeMoveTracker *sMT;
 	void onIntersectCave	(Shape *s);
@@ -85,18 +85,22 @@ private:
 	void onIntersectFallWall(Shape *s);
 	void onIntersectStairs	(Shape *s);
 
-	ThemeHolder *themes;
-	void updateThemeArrays();
-	const int currentTheme = 0;
-	const int currentLvl = 0;
-	const int maxLvl = 5;
+	int currentLvl = 0;
+	const int maxGameLvl = 5;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
 
+	void resetCurrentLevel();
+	void resetSnake();
+	void loadNextLevel();
+
 	void loadThemes();
 	void setupCurrentLevel();
-	void changeTheme(int nextTheme);
-
+	void changeTheme();
+	ThemeHolder *themes;
+	void updateThemeArrays();
+	int currentTheme = 0;
+	
 	int fruitCounter;
 	std::vector<Shape *> fruitsVec;
 	void fruitMotion();
@@ -114,6 +118,7 @@ private:
 	void updateSnakePosition();
 
 	void genSnake(float x, float y, float z, int direction);
+	void putSnakeInPlace(float xLoc, float yLoc, float zLoc, int direction);
 	void specialObjHandle(objLocation &obj);
 	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
 

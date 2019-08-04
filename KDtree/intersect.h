@@ -10,7 +10,7 @@ class intersect
 public:
 	//constructor
 	intersect(std::vector<glm::vec3> &shape);
-	intersect(intersect& other);
+	intersect::intersect(Node *Node);
 
 	/*
 	* Return the tree root node
@@ -30,6 +30,10 @@ public:
 
 	inline static vec3 v4to3(vec4 v) {
 		return vec3(v.x, v.y, v.z);
+	}
+
+	Node* getKdNode() {
+		return kd.getRoot();
 	}
 protected:
 	std::vector<float> boundbox;

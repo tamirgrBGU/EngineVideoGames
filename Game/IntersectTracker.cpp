@@ -112,19 +112,19 @@ inline listNode<levelIntersect> * genNode(float x, float y, int level, Shape *my
 	return newNode;
 }
 
-void IntersectTracker::addObj(float x, float y, int level, Shape *myShape, int type, intersect *comutedTree) {
+void IntersectTracker::addObj(float x, float y, int level, Shape *myShape, int type, void *comutedTree) {
 	listNode<levelIntersect> *node = genNode(x, y, level, myShape, type);
-	intersect *model = new intersect(*comutedTree);
+	intersect *model = new intersect((Node *) comutedTree);
 	node->value.model = model;
 	addNode(node);
 }
 
-intersect *IntersectTracker::addObj(float x, float y, int level, Shape *myShape, int type, std::vector<glm::vec3> &shape) {
+void *IntersectTracker::addObj(float x, float y, int level, Shape *myShape, int type, std::vector<glm::vec3> &shape) {
 	listNode<levelIntersect> *node = genNode(x, y, level, myShape, type);
 	intersect *model = new intersect(shape);
 	node->value.model = model;
 	addNode(node);
-	return node->value.model;
+	return (void *) node->value.model->getKdNode();
 }
 
 intersect *snakeHead;
@@ -190,4 +190,12 @@ void IntersectTracker::isIntersectSnakeHead(glm::mat4 tranSnake, float x, float 
 			mygame->onIntersectSnakeHead(type, myShape);
 		}
 	}
+}
+
+bool IntersectTracker::exist(int level, Shape *myShape) {
+	listNode<levelIntersect> *head = levels[level];
+
+	if (head && (head->value.myShape != myShape))
+		head = head->next;
+	return head && head->value.myShape == myShape;
 }

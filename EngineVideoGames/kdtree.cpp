@@ -21,8 +21,26 @@ Node::~Node(){}
 // implementation of kdtree
 
 Kdtree::Kdtree(){}
-Kdtree::~Kdtree(){}
+Kdtree::Kdtree(Node *outsider) { Kdtree::root = outsider; }
+Kdtree::~Kdtree(){/*kiil()*/}
 
+void kill(Node* head) {
+	if (head) {
+		kill(head->left);
+		kill(head->right);
+
+		delete head;
+	}
+}
+
+void Kdtree::kiil() {
+	Node* head = root;
+
+	kill(head->left);
+	kill(head->right);
+
+	delete root;
+}
 /*
 *
 *

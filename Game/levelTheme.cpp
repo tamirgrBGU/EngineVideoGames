@@ -69,7 +69,7 @@ int ThemeHolder::readInitFile() {
 
 void ThemeHolder::loadTex()
 {
-	if (0 < (signed)themes[current]->texNo.size())
+	if (sharedSize < (signed)themes[current]->texNo.size())
 		return;
 	int texId = scn->textures.size();
 	//for (int i = 0; i < (signed)themes.size(); i++)

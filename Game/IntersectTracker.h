@@ -27,8 +27,9 @@ public:
 	IntersectTracker(Game *game);
 	~IntersectTracker();
 	void addNodeHelper(listNode<levelIntersect> *first, listNode<levelIntersect> *node);
-	void addObj(float x, float y, int level, Shape *myShape, int type, intersect *comutedTree);
-	intersect *addObj(float x, float y, int level, Shape *myShape, int type, std::vector<glm::vec3> &shape);
+	void addObj(float x, float y, int level, Shape *myShape, int type, void *comutedTree);
+	bool exist(int level, Shape *myShape);
+	void *addObj(float x, float y, int level, Shape *myShape, int type, std::vector<glm::vec3> &shape);
 	void addSnakeHead(std::vector<glm::vec3> &shape);
 	void isIntersectSnakeHead(glm::mat4 tranSnake, float x, float y, int level);
 	void remove(Shape *s);

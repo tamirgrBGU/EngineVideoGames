@@ -125,6 +125,19 @@ vec3 myDir(int direction) {
 	return -xAx;
 }
 
+void Game::putSnakeInPlace(float xLoc, float yLoc, float zLoc, int direction){
+	if (direction == 0)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, snakeFullLength, 0));
+	else if (direction == 1)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(-snakeFullLength, 0, 0));
+	else if (direction == 2)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, -snakeFullLength, 0));
+	else// if (direction == 3)
+		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(snakeFullLength, 0, 0));
+	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc + allscale * .5f, yLoc + allscale * .5f, zLoc + 5.f));
+	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
+}
+
 /*The vertebral column of a snake consists of anywhere between 200 and 400 (or more) vertebrae.*/
 void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	std::vector<Bezier2D> b1vec;
@@ -146,28 +159,18 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 		setParent(i, i-1);
 	}
 	
-	//still have direction but make it adapt just to one position to the right - todo FIX THIS (- maybe double d)
-	if (direction == 0)
-		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, snakeFullLength, 0));
-	else if (direction == 1)
-		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(- snakeFullLength, 0, 0));
-	else if (direction == 2)
-		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, - snakeFullLength, 0));
-	else// if (direction == 3)
-		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(snakeFullLength, 0, 0));
-	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc + allscale * .5f, yLoc + allscale * .5f, zLoc + 5.f));
-	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
+	putSnakeInPlace(xLoc, yLoc, zLoc, direction);
 }
 
 char	  **filePath;
 Shape	  **uploadedFiles;
-intersect **computedKDtrees;
+void	  **computedKDtrees;
 inline void Game::updateThemeArrays()
 {
 	theme *tempTheme = themes->getCurrentTheme();
 	filePath	    = tempTheme->filepath;
 	uploadedFiles   = (Shape **) tempTheme->uploadedObj;
-	computedKDtrees = (intersect **) tempTheme->computedKDtrees;
+	computedKDtrees = (void  **) tempTheme->computedKDtrees;
 }
 
 void Game::loadThemes() {
@@ -175,8 +178,8 @@ void Game::loadThemes() {
 	updateThemeArrays();
 }
 
-void Game::changeTheme(int nextTheme) {
-	themes->swapThemes(nextTheme);
+void Game::changeTheme() {
+	themes->swapThemes(currentTheme);
 	updateThemeArrays();
 }
 
@@ -200,10 +203,15 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 }
 
 void Game::onIntersectCave(Shape *s) {
-	printf("reach to seafty END GAME\n");
+	printf("reach to seafty END Level\n");
 	if (fruitCounter == 0) {
 		Deactivate();
-		PlayWin();
+		PlaySoundGame(Win);
+		loadNextLevel();
+	}
+	else {
+		resetSnake();
+		PlaySoundGame(Hiss);
 	}
 }
 
@@ -211,20 +219,23 @@ void Game::onIntersectFruit(Shape *s) {
 	printf("got fruit\n");
 	s->Hide();
 	IT->remove(s);
-	PlayPoint();
+	PlaySoundGame(FruitSound);
+	superSpeedTicks = 10;
 	fruitCounter--;
 }
 
 void Game::onIntersectObstecle(Shape *s) {
 	printf("bump into obstecle\n");
-	PlayExplosion();
+	PlaySoundGame(ObstecleSound);
+	resetCurrentLevel();
 	Deactivate();
 }
 
 float climbAngle = glm::atan(zscale / allscale);
 void Game::onIntersectWalls(Shape *s) {
 	printf("wall  \n");
-	PlayExplosion();
+	PlaySoundGame(ObstecleSound);
+	resetCurrentLevel();
 	Deactivate();
 }
 
@@ -319,31 +330,30 @@ void Game::addCubes() {
 
 //PLAYING THEME MUSIC
 void Game::configSound() {
-	//PlayTheme();
+	//PlaySoundGame(Theme);
 }
 
-void Game::PlayTheme()
+void Game::PlaySoundGame(int type)
 {
 	if (soundEnable)
-		PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
-}
+		switch (type) {
+			case ObstecleSound:
+				PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+			break;
+			case FruitSound:
+				PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+			break;
+			case Win:
+				PlaySound("../res/sounds/Cheering.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+			break;
+			case Hiss:
+				PlaySound("../res/sounds/snakehiss.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+			break;
+			case Theme:
+				PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+			break;
 
-void Game::PlayPoint()
-{
-	if (soundEnable)
-		PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
-}
-
-void Game::PlayWin()
-{
-	if(soundEnable)
-		PlaySound("../res/sounds/Cheering.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
-}
-
-void Game::PlayExplosion()
-{
-	if (soundEnable)
-		PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+		}
 }
 
 void Game::updateSnakePosition()
@@ -368,6 +378,55 @@ void Game::orderCamera() {
 	float zView = -1.5f*snakeFullLength;
 	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
 	setCameraTopView();
+}
+
+void Game::resetSnake() {
+	struct objMap map = lGen->getLevel(currentLvl);
+	
+	for (objLocation &obj : *map.specialObj) {
+		switch (obj.type) {
+			case Snake:
+				shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 0);
+				shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 1);
+				putSnakeInPlace(obj.x, obj.y, obj.z, obj.direction);
+				break;
+		}
+	}
+}
+
+void Game::resetCurrentLevel(){
+	struct objMap map = lGen->getLevel(currentLvl);
+
+	fruitCounter = fruitsVec.size();
+	for (int i = 0; i < (signed)fruitsVec.size(); i++) {
+		vec4 obj = fruitsVec[i]->makeTransScale()[3];
+		fruitsVec[i]->Unhide();
+		if (!IT->exist((int) obj.z / zscale, fruitsVec[i]))
+			IT->addObj(obj.x, obj.y, (int) obj.z / zscale, shapes.back(), FruitF, computedKDtrees[FruitF]);
+		
+	}
+
+	for (objLocation &obj : *map.specialObj) {
+		switch (obj.type) {
+		case Snake:
+			shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 0);
+			shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 1);
+			putSnakeInPlace(obj.x, obj.y, obj.z, obj.direction);
+			break;
+		}
+	}	
+}
+
+void Game::loadNextLevel() {
+	if (++currentLvl < maxGameLvl) {
+		for (int i = 0; i < (signed) shapes.size(); i++) {
+			delete shapes[i];
+		}
+		currentTheme++;
+		changeTheme();
+		shapes.clear();
+		setupCurrentLevel();
+	}
 }
 
 void Game::setupCurrentLevel() {
@@ -530,12 +589,14 @@ void Game::Motion()
 	if (isActive)
 	{	
 		vec3 temp;
-		if (rotRecently) {
+		if(superSpeedTicks > 0)
+			temp = superSpeed*tailDirection;
+		else if (rotRecently) {
 			rotRecently = false;
-			temp = vec3(tailDirection.x * slowSpeed, tailDirection.y * slowSpeed, tailDirection.z * slowSpeed);
+			temp = slowSpeed*tailDirection;
 		}
 		else
-			temp = vec3(tailDirection.x * speed, tailDirection.y * speed, tailDirection.z * speed);
+			temp = speed*tailDirection;
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
 		setSnakeNodesAngles();

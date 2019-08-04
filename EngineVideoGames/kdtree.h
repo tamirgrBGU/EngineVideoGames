@@ -52,10 +52,16 @@ class Kdtree
 		
 	//default constructor
 	Kdtree();
+	Kdtree(Node *ousider);
 
 	//default deconstructor
 	~Kdtree();
-	
+
+	Node *getRoot() {
+		return root;
+	}
+	void kiil();
+
 	/* 
 	*  Return the tree root node
 	*/
