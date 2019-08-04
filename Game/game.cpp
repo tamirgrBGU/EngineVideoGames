@@ -209,13 +209,11 @@ bool Game::onIntersectCave(Shape *s) {
 		loadNextLevel();
 		orderCameraTop();
 		Deactivate();
-		pickedShape = -1;
 		return 1;
 	}
 	resetSnake();
 	PlaySoundGame(Hiss);
 	Deactivate();
-	pickedShape = -1;	
 	return 0;
 }
 
@@ -233,7 +231,6 @@ void Game::onIntersectObstecle(Shape *s) {
 	PlaySoundGame(ObstecleSound);
 	resetCurrentLevel();
 	Deactivate();
-	pickedShape = -1;
 }
 
 float climbAngle = glm::atan(zscale / allscale);
@@ -242,7 +239,6 @@ void Game::onIntersectWalls(Shape *s) {
 	PlaySoundGame(ObstecleSound);
 	resetCurrentLevel();
 	Deactivate();
-	pickedShape = -1;
 }
 
 void Game::onIntersectFallWall(Shape *s){
@@ -434,15 +430,15 @@ void Game::resetCurrentLevel(){
 
 	resetSnake();
 }
-
+int;
 void Game::loadNextLevel() {
 	if (++currentLvl < maxGameLvl) {
 		for (int i = 0; i < (signed) shapes.size(); i++) {
 			delete shapes[i];
 		}
+		shapes.clear();
 		currentTheme++;
 		changeTheme();
-		shapes.clear();
 		setupCurrentLevel();
 	}
 }

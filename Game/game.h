@@ -72,10 +72,13 @@ public:
 	int getCurrentFruitCount();
 	int getTotalFruitCount();
 	bool getSoundVar();
+	void playWelcome() {
+		PlaySoundGame(Hiss);
+	}
 	void PlayTheme() {
 		PlaySoundGame(Theme);
 	}
-	int currentTheme = 3;
+	int currentTheme = 0;
 
 private:
 	bool soundEnable = true;

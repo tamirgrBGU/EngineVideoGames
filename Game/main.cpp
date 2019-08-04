@@ -58,7 +58,6 @@ int main(int argc,char *argv[])
 	if (!menu->created)
 	{
 		menu->create();
-
 		init(display);
 		scn->PlayTheme();
 	}
@@ -66,20 +65,19 @@ int main(int argc,char *argv[])
 	if (!menu->created)
 	{
 		menu2->create();
-		//init(display);
 	}
 
 	while(!display.closeWindow() && !display.quit_game)
 	{
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 		scn->Draw(1,0,true);
-		scn->Motion();
-		if (menu->show_window)
-			menu->DrawMenu();
 
-		if (!menu->show_window)
+		if (menu->show_window)
+			menu ->DrawMenu();
+		else
 			menu2->DrawMenu();
 
+		scn->Motion();
 		display.SwapBuffers();
 		display.PollEvents();
 	}
