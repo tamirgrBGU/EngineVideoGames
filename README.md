@@ -21,5 +21,10 @@ if you touch a wall or an obstecle - you will start the level from the begining.
 coolFeatures-
 1. snake can crawl and interact with the map
 2. multiple levels
-3. multiple themes
+3. multiple themes - which include unique snake skin, walls, food and obstacles for each level
 4. shadow shader
+5. maps are saved as csv
+6. food and obstacles are random generated
+7. skybox
+8. snake animations
+9. menu and in game options

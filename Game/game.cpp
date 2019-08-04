@@ -439,8 +439,10 @@ void Game::loadNextLevel() {
 		IT->flush();
 		setupCurrentLevel();
 		orderCameraTop();
-		printVec(shapes[snakeNodesShapesStart]->makeTransScale()[3]);
  		Deactivate();
+	}
+	else {
+		Deactivate();
 	}
 }
 //2 3 -> 6 7
