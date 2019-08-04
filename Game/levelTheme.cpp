@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <random>
 
-float scale1[] = { 0.1f, 0.0007f };
-float scale2[] = { 0.1f, 0.001f };
-float scale3[] = { 0.005f, 0.002f };
+float scale1[] = { 0.004f, 0.0007f };
+float scale2[] = { 0.004f, 0.001f };
+float scale3[] = { 0.003f, 0.002f };
 float scale4[] = { 0.01f, 0.004f };
 float scale5[] = { 0.008f, 0.002f };
 float *scales[] = { scale1, scale2, scale3, scale4, scale5 };
