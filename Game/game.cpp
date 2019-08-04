@@ -47,7 +47,7 @@ int snakeLevel;
 int snakeNodesShapesStart = -1;
 int snakeNodesShapesEnd = -1;
 float snakeFullLength = 0;
-float jumpy = 0.5f, jumpx = 0.47f;
+float jumpy = 0.4f, jumpx = 0.38f;
 float lastYext = 0;
 static const int bezierRes = 10, cirSubdiv = 4;
 void Game::getSegs(float& lastX, float mult, float sign, float jumpX, float jumpY, int segs) {

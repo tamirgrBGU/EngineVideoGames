@@ -26,7 +26,7 @@ static void printMat(const glm::mat4 mat4)
 static const vec3 xAx(1, 0, 0);		static const vec3 yAx(0, 1, 0);		static const vec3 zAx(0, 0, 1);
 class Game : public Scene
 {
-	const int snakeLength = 25, segs = 5, ends = 10;
+	const int snakeLength = 30, segs = 5, ends = 10;
 	int projMode = -1;
 	bool rotRecently = false;
 	const float slowSpeed = 2.f;
