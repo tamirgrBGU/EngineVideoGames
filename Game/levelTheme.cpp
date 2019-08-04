@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <random>
 
-static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.png" };
+static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.jpg" };
 static const int TexImgSize = sizeof(TexImg) / sizeof(char*);
 static const char *sharedObjNames[] = { "../res/objs/cave.obj" };
 static const int sharedSize = sizeof(sharedObjNames) / sizeof(char*);

@@ -24,6 +24,7 @@ Display::Display(int width, int height, const std::string& title)
     }
 	isFullScreen = false;
 	glEnable(GL_DEPTH_TEST);
+	quit_game = false;
 	//glEnable(GL_SMOOTH);
 	//glEnable(GL_CULL_FACE);
 	//glCullFace(GL_FRONT_AND_BACK);
