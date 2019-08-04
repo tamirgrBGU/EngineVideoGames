@@ -144,14 +144,22 @@ using namespace glm;
 			{
 				if (shaderIndx > 0)
 				{
-					if (i<shapes.size()-1 && chainParents[i + 1] == i)
-						lastMVP = mvp[i + 1];
-					if (chainParents[i] > -1)
-						nextMVP = mvp[chainParents[i]];
 					pickedShape = i;
+					if (shapes[i]->GetShader() == 1) {
+						if (i < shapes.size() - 1 && shapes[i + 1]->GetShader() == 1 & chainParents[i + 1] == i)
+							lastMVP = mvp[i + 1];
+						else
+							lastMVP = mat4(0);
+						if (chainParents[i] > -1 && shapes[chainParents[i]]->GetShader() == 1)
+							nextMVP = mvp[chainParents[i]];
+						else
+							nextMVP = mat4(0);
+						UpdateLinear(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());
+					}
+					else
+						Update(mvp[i], norms[i], shapes[i]->GetShader());
 
-					UpdateLinear(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());
-					shapes[i]->Draw(shaders,textures,false);					
+					shapes[i]->Draw(shaders, textures, false);
 				}
 				else 
 				{

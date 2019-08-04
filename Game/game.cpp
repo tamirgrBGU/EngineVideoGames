@@ -47,22 +47,22 @@ int snakeLevel;
 int snakeNodesShapesStart = -1;
 int snakeNodesShapesEnd = -1;
 float snakeFullLength = 0;
-float jumpy = 0.4f, jumpx = 0.38f;
+float jumpy = 0.5f, jumpx = 0.47f;
 float lastYext = 0;
 static const int bezierRes = 10, cirSubdiv = 4;
-void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs) {
+void Game::getSegs(float& lastX, float mult, float sign, float jumpX, float jumpY, int segs) {
 	std::vector<glm::mat4> segments;
 	float lastY = 0;
 	mat4 seg0 = mat4(0);
 	float segPart = 1 / float(segs);
 	for (int i = 0; i < segs; i++) {
-		seg0[0] = vec4(*lastX, lastY, 0, 1);
-		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
-		seg0[1] = vec4(*lastX, lastY, 0, 1);
-		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
-		seg0[2] = vec4(*lastX, lastY, 0, 1);
-		*lastX = *lastX + jumpX;	lastY = lastY + jumpY*mult;
-		seg0[3] = vec4(*lastX, lastY, 0, 1);
+		seg0[0] = vec4(lastX, lastY, 0, 1);
+		lastX = lastX + jumpX;	lastY = lastY + jumpY*mult;
+		seg0[1] = vec4(lastX, lastY, 0, 1);
+		lastX = lastX + jumpX;	lastY = lastY + jumpY*mult;
+		seg0[2] = vec4(lastX, lastY, 0, 1);
+		lastX = lastX + jumpX;	lastY = lastY + jumpY*mult;
+		seg0[3] = vec4(lastX, lastY, 0, 1);
 		mult += sign * segPart;
 		segments.push_back(seg0);
 	}
@@ -80,11 +80,11 @@ void Game::orderSegPart(float segLen) {
 	pickedShape++;
 }
 
-void Game::getTailSegs(float *lastX, float jumpX, float jumpY, int segs) {
+void Game::getTailSegs(float& lastX, float jumpX, float jumpY, int segs) {
 	getSegs(lastX, 0, 1, jumpX, jumpY, segs);
 }
 
-void Game::getBodySegs(float *lastX, float jumpX, float jumpY, int segs, int amount) {
+void Game::getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amount) {
 	getSegs(lastX, 1, 0, jumpX, jumpY, segs);
 	Shape *bodySeg = shapes.back();
 	for (int i = 0; i < amount - 1; i++) {
@@ -94,8 +94,24 @@ void Game::getBodySegs(float *lastX, float jumpX, float jumpY, int segs, int amo
 	}
 }
 
-void Game::getHeadSegs(float *lastX, float jumpX, float jumpY, int segs) {
+void Game::getHeadSegs(float& lastX, float jumpX, float jumpY, int segs) {
+	int pa = shapes.size();
+	int xCopy = lastX;
 	getSegs(lastX, 1 - 1 / float(segs), -1, jumpX, jumpY, segs);
+	IndexedModel im = Bezier2D::genBall(5,5,8);
+	snakeNodesShapesEnd = shapes.size() - 1;
+	IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
+
+	addShape(im, pa, TRIANGLES, 3, 4);//using the basic shader
+	shapes.back()->myTranslate(vec3(-xCopy * 0.66f, lastYext * 0.33f, 0), 0);
+	shapes.back()->myScale(vec3(2.f));
+	shapes.back()->myRotate(90.f, xAx, xAxis1);
+	shapes.back()->myRotate(90.f, xAx, zAxis1);
+	shapes.push_back(new Shape(*shapes.back(), TRIANGLES));	chainParents.push_back(pa);
+	shapes.back()->myTranslate(vec3(xCopy * 0.66f, lastYext * 0.33f, 0), 0);
+	shapes.back()->myScale(vec3(2.f));
+	shapes.back()->myRotate(90.f, xAx, xAxis1);
+	shapes.back()->myRotate(-90.f, xAx, zAxis1);
 }
 
 vec3 myDir(int direction) {
@@ -117,18 +133,16 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	snakeNodesShapesStart = shapes.size();
 	pickedShape = snakeNodesShapesStart;//chaining!
 
-	getTailSegs(&x, jumpx * rounding, 2.f*jumpy, ends);
-	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);
+	getTailSegs(x, jumpx * rounding, 2.f*jumpy, ends);
+	getBodySegs(x, 0, jumpy, 4, snakeLength -2);
 	//round head generated here
-	getHeadSegs(&x, -jumpx * rounding, 2.5f*jumpy, ends);
-
-	snakeNodesShapesEnd = shapes.size() - 1;
+	getHeadSegs(x, -jumpx * rounding, 2.5f*jumpy, ends);	
 	
 	//big obj head
 	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, themes->getTex(4), 4);
 	//orderGenObj(vec3(0, 0, 0), 0.02f * allscale, (direction + 2)%4);
 
-	for (unsigned int i = snakeNodesShapesStart + 1; i < shapes.size(); i++) {
+	for (int i = snakeNodesShapesStart + 1; i < snakeNodesShapesEnd+1; i++) {
 		setParent(i, i-1);
 	}
 	
@@ -143,7 +157,6 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(snakeFullLength, 0, 0));
 	shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(xLoc + allscale * .5f, yLoc + allscale * .5f, zLoc + 5.f));
 	shapes[snakeNodesShapesStart]->myRotate(180.f + 90.f * direction, zAx, zAxis1);
-	//printf("%d %f\n", direction, 180.f + 90.f * direction);
 }
 
 char	  **filePath;
@@ -170,7 +183,7 @@ void Game::changeTheme(int nextTheme) {
 inline void Game::orderGenObj(vec3 startLoc, float scale, int direction) {
 	shapes.back()->myTranslate(startLoc, 0);
 	if (scale != -1)
-		shapeTransformation(shapes.size() - 1, Scale, vec3(scale, scale, scale));
+		shapes.back()->myScale(vec3(scale));
 	shapes.back()->myRotate(90.f * direction, zAx, zAxis1);
 }
 
@@ -247,8 +260,7 @@ void Game::specialObjHandle(objLocation &obj) {
 	case Snake:
 		genSnake(x, y, z, dir);
 		snakeLevel = obj.level;
-		IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
-		//printf("added SnakeHead\n");
+		printf("added Snake\n");
 		break;
 	case Cave:
 		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
@@ -355,11 +367,11 @@ void Game::orderCamera() {
 }
 
 void Game::setupCurrentLevel() {
-	printf("parsing files");
+	printf("parsing file\n");
 	struct objMap map = lGen->getLevel(currentLvl);
 	fruitCounter = 0;
 	fruitsVec.clear();
-	printf("level:%d walls:%d stairs:%d\n", currentLvl, map.walls->size(), map.stairs->size());
+	printf("loading level:%d walls:%d stairs:%d\n", currentLvl, map.walls->size(), map.stairs->size());
 
 	if (map.levelGround != nullptr) {
 		for (modelWrapper &obj : *map.levelGround) {
@@ -402,6 +414,7 @@ void Game::setupEnvironment() {
 	orderCamera();
 	configSound();
 	pickedShape = -1;
+	printf("Game ready\n");
 }
 
 void Game::Init()
@@ -429,8 +442,8 @@ void finUpdate(Shader *s, const int shaderIndx, const int pickedShape) {
 void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx) {
 	Shader *s = shaders[shaderIndx];
 	s->Bind();
-	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("lastMVP", lastMVP);
+	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("nextMVP", nextMVP);
 	s->SetUniformMat4f("Normal", Normal);
 	finUpdate(s, shaderIndx, pickedShape);
@@ -529,7 +542,7 @@ void Game::Motion()
 	pickedShape = savePicked;
 }
 
-float anglePL = 5.f;
+float anglePL = 9.f;
 void Game::changeCameraMode() {
 	Deactivate();
 	switchCamMode();

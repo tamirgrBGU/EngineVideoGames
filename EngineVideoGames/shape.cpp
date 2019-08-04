@@ -14,7 +14,6 @@ Shape::Shape(const Shape& shape,unsigned int mode)
 	toRender = true;
 	texID = shape.texID;
 	shaderID = shape.shaderID;
-
 }
 
 Shape::Shape(const std::string& fileName, unsigned int mode, int textureID, int shadeID){

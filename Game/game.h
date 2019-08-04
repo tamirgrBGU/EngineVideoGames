@@ -26,10 +26,10 @@ static void printMat(const glm::mat4 mat4)
 static const vec3 xAx(1, 0, 0);		static const vec3 yAx(0, 1, 0);		static const vec3 zAx(0, 0, 1);
 class Game : public Scene
 {
-	const int snakeLength = 30, segs = 5, ends = 10;
+	const int snakeLength = 25, segs = 5, ends = 10;
 	int projMode = -1;
 	bool rotRecently = false;
-	const float slowSpeed = 1.f;
+	const float slowSpeed = 2.f;
 	const float speed = 3.f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
@@ -96,10 +96,10 @@ private:
 	inline void orderGenObj(vec3 startLoc, float scale, int direction);
 	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
 
-	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
-	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
-	void getTailSegs(float *lastX, float jumpX, float jumpY, int segs);
-	void getBodySegs(float *lastX, float jumpX, float jumpY, int segs, int amount);
+	void getSegs(float& lastX, float mult, float sign, float jumpX, float jumpY, int segs);
+	void getHeadSegs(float& lastX, float jumpX, float jumpY, int segs);
+	void getTailSegs(float& lastX, float jumpX, float jumpY, int segs);
+	void getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amount);
 	void orderSegPart(float segLen);
 
 	void addCubes();
