@@ -2,18 +2,16 @@
 
 
 
-Menu::Menu(Display *display, Scene *scn, int type, bool *sounds)
+Menu::Menu(Display *display, Scene *scn, int type)
 {
 	this->display = display;
 	this->scn = scn;
 	this->created = false;
 	this->move = false;
-	this-> f = 0.0f;
 	this->type = type;
-	this->sounds = sounds;
-	show_window = true;
-	extra_options = false;
-	clear_color = ImVec4(0.45f, 0.55f, 0.60f, 0.00f);
+	this->show_window = true;
+	this->extra_options = false;
+	this->text_color = ImVec4(0.45f, 0.55f, 0.60f, 0.00f);
 }
 
 void Menu::create()
@@ -97,7 +95,7 @@ void Menu::DrawMenu()
 			ImGui::Checkbox("Demo Window", &show_window);      // Edit bools storing our window open/close state
 																	//ImGui::Checkbox("Another Window", &show_another_window);
 
-																	//ImGui::SliderFloat("velocity", &this->f, -5.0f, 5.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+			//ImGui::SliderFloat("velocity", &this->f, -5.0f, 5.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 			if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)               
 				ImGui::Text("picked shape is:");
 			//scn->tmp_test_mode = !scn->tmp_test_mode;

@@ -15,8 +15,8 @@ public:
 	bool created;
 	float f;
 	int type;
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-	Menu(Display *display, Scene *scn, int type, bool *sounds);
+	ImVec4 text_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	Menu(Display *display, Scene *scn, int type);
 	void create();
 	void DrawMenu();
 	void destroy();
