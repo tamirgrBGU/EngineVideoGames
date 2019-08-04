@@ -438,7 +438,7 @@ void finUpdate(Shader *s, const int shaderIndx, const int pickedShape) {
 	if (shaderIndx == 0)
 		s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
 	else
-		s->SetUniform4f("lightColor", 0.1f, 0.8f, 0.7f, 1.0f);
+		s->SetUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
 	s->Unbind();
 }
 
