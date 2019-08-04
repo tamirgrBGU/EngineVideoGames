@@ -46,9 +46,7 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/sky-back.jpg");//16
 	scn->AddTexture("../res/textures/sky-bottom.jpg");//17
 	scn->AddTexture("../res/objs/snake_female.jpg");//18
-
-	scn->Init();
-
+	
 	display.setScene(scn);
 
 	Menu* menu = new Menu(&display, scn, 0); //start menu
@@ -66,6 +64,8 @@ int main(int argc,char *argv[])
 	{
 		menu2->create();
 	}
+	
+	scn->Init();
 
 	while(!display.closeWindow() && !display.quit_game)
 	{

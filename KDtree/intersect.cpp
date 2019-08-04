@@ -26,6 +26,8 @@ glm::mat4 *currentTransOther;
 *  Return the tree root node
 */
 std::vector<IndexedModel> coloredBoxesOutput;
+int maxDepA;
+int maxDepB;
 int maxDep;
 std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *transOther, intersect &other) {
 	std::vector<glm::vec3> boundboxvec1 = bound_vec_to_boundbox(boundbox);
@@ -42,10 +44,15 @@ std::vector<IndexedModel> intersect::isIntersect(glm::mat4 *transMe, glm::mat4 *
 
 	std::vector<std::vector<glm::vec3>> intersect_boxes;
 	coloredBoxesOutput.clear();
-	maxDep = kd.max_depth < other.kd.max_depth ? kd.max_depth : other.kd.max_depth;
-	if (0 >= maxDep - 1) {
-		IndexedModel a;
-		coloredBoxesOutput.push_back(a);
+	maxDepA = kd.max_depth;
+	maxDepB = other.kd.max_depth;
+	maxDep = max(maxDepA, maxDepB);
+	if (maxDepA > maxDepB) {
+		maxDepA = other.kd.max_depth;
+		maxDepB = kd.max_depth;
+		currentTransMe = transOther;
+		currentTransOther = transMe;
+		rec_is_intersect(other.kd.getRoot(), kd.getRoot(), 0, &intersect_boxes);
 	}
 	else
 		rec_is_intersect(kd.getRoot(), other.kd.getRoot(), 0, &intersect_boxes);
@@ -236,21 +243,31 @@ int intersect::intersectWithOther(Node * nextother, int axis, std::vector<float>
 void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 	int depth, std::vector<std::vector<glm::vec3>> * output, std::vector<glm::vec3> &boxvec, std::vector<glm::vec3> &boxvec2)
 {
-	bool intersect_with = 0;// 1;
+	bool intersect_with = 0;
 	if (next) {
 		if (next->boundbox[axis * 2] == next->boundbox[axis * 2 + 1])
 			intersect_with = 1;//we do not want to keep recursion on a plane	
 		else {
 			int res1 = intersectWithOther(other->left, axis, next->boundbox);
-			if (res1 == 0)
-				rec_is_intersect(next, other->left, depth + 1, output);
+			if (res1 == 0) {
+				if(depth >= maxDepB)
+					rec_is_intersect(next, other, depth + 1, output);
+				else
+					rec_is_intersect(next, other->left, depth + 1, output);
+			}
 			int res2 = intersectWithOther(other->right, axis, next->boundbox);
-			if (res2 == 0)
-				rec_is_intersect(next, other->right, depth + 1, output);
+			if (res2 == 0) {
+				if (depth >= maxDepB)
+					rec_is_intersect(next, other, depth + 1, output);
+				else
+					rec_is_intersect(next, other->right, depth + 1, output);
+			}
 			intersect_with = (res1 & res2) > 0;
 		}
 	}
-	if (intersect_with && ((signed)depth >= maxDep-2)) {//none of the children are intersecting - add perants
+
+	//none of the children are intersecting - so we will try to add perants
+	if (intersect_with && ((signed)depth >= maxDep-2)) {
 		insert_box(output, boxvec, currentTransMe,	  glm::vec3(0.2, 0.2, 1));
 		insert_box(output, boxvec2, currentTransOther, glm::vec3(1, 0.2, 0.2));
 	}
@@ -259,17 +276,20 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 //in iteration level the boxes are intersecting we will assure it happen in the children too
 void intersect::rec_is_intersect(Node *current, Node *other,
 			int depth, std::vector<std::vector<glm::vec3>> *output) {
-	if (output->size() > 0)
+	if (depth > maxDep | output->size() > 0)
 		return;//optimize
 
 	int axis = depth % 3;
 	std::vector<glm::vec3> boxvec = bound_vec_to_boundbox(current->boundbox);
 	std::vector<glm::vec3> boxvec2 = bound_vec_to_boundbox( other->boundbox);
-	std::vector<float> boundingboxcopy   = current->boundbox;
-	std::vector<float> boundingboxcopyother =  other->boundbox;
 	
-	nodesIntersectValitate(current->left, axis, other, depth, output, boxvec, boxvec2);
-	nodesIntersectValitate(current->right, axis, other, depth, output, boxvec, boxvec2);
+	if (depth >= maxDepA) {
+		nodesIntersectValitate(current, axis, other, depth, output, boxvec, boxvec2);
+	}
+	else {
+		nodesIntersectValitate(current->right, axis, other, depth, output, boxvec, boxvec2);
+		nodesIntersectValitate(current->left, axis, other, depth, output, boxvec, boxvec2);
+	}
 }
 
 IndexedModel intersect::boxVertexesToIndexModel (std::vector<glm::vec3> &intesect_box, glm::vec3 color){	

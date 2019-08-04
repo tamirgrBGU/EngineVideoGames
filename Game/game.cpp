@@ -92,6 +92,7 @@ void Game::getBodySegs(float& lastX, const float jumpX, const float jumpY, const
 
 void Game::genTongue(int pa) {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//getSegs(0.02f, float mult, const float sign, const float jumpX, const float jumpY, const int segs);
 }
 
 void Game::genEyes(float width, int pa) {
@@ -529,9 +530,12 @@ void Game::setupCurrentLevel() {
 	}
 	else
 		printf("level did not been loaded!");
+
+	isLoading = false;
 }
 
 void Game::setupEnvironment() {
+	isLoading = true;
 	setupCurrentLevel();
 	//after adding snake we should order the camera
 	setUpCamera();

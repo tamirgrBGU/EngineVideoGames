@@ -29,10 +29,10 @@ class Game : public Scene
 	const int snakeLength = 30, segs = 5, ends = 10;
 	int projMode = -1;
 	bool rotRecently = false;
-	const float slowSpeed = 2.f;
-	const float speed = 3.f;
+	const float slowSpeed = 1.5f;
+	const float speed = 2.f;
 	float superSpeedTicks = 0;
-	const float superSpeed = 5.f;
+	const float superSpeed = 2.5f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
@@ -79,6 +79,7 @@ public:
 	}
 
 	bool wonGame = false;
+	bool isLoading = false;
 	int currentTheme = 0;
 	void loadNextLevel();
 
