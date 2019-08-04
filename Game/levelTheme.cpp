@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <random>
 
-float scale1[] = { 0.01f, 0.003f };
-float scale2[] = { 0.01f, 0.003f };
-float scale3[] = { 0.01f, 0.003f };
-float scale4[] = { 0.01f, 0.003f };
-float scale5[] = { 0.01f, 0.003f };
+float scale1[] = { 0.1f, 0.01f };
+float scale2[] = { 0.1f, 0.02f };
+float scale3[] = { 0.005f, 0.02f };
+float scale4[] = { 0.01f, 0.02f };
+float scale5[] = { 0.008f, 0.002f };
 float *scales[] = { scale1, scale2, scale3, scale4, scale5 };
 float ThemeHolder::getScale(int type) {
 	return scales[current][type];

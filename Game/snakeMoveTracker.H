@@ -20,6 +20,7 @@ public:
 	snakeMoveTracker(int size, float speed);
 	void add(glm::vec3 rotationAxis, float angle);
 	motionTracker getAngleAndAxis(int Node);
+	void flush();
 	float getSumOfAllAngles(int Node);
 	void printDS();//for debugging
 	~snakeMoveTracker(void);

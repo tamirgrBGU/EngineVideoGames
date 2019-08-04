@@ -52,6 +52,19 @@ void snakeMoveTracker::add(glm::vec3 rotationAxis, float angleTurn) {
 	add(nodesLen, genNode(baseTicks, rotationAxis, angleTurn));
 }
 
+void snakeMoveTracker::flush() {
+	for (int i = 0; i < (signed)firstVec.size(); i++) {
+		listNode<motionTracker> *node = firstVec[i];
+		listNode<motionTracker> *next;
+		firstVec[i] = nullptr;
+		while (node) {
+			next = node->next;
+			delete node;
+			node = next;
+		}
+	}
+}
+
 void snakeMoveTracker::printDS() {
 	for (int i = 0; i < (signed)firstVec.size(); i++) {
 		listNode<motionTracker> *node = firstVec[i];

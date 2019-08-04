@@ -95,11 +95,11 @@ void Game::getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amo
 }
 
 void Game::getHeadSegs(float& lastX, float jumpX, float jumpY, int segs) {
-	int pa = shapes.size();
+	snakeNodesShapesEnd = shapes.size();
+	int pa = snakeNodesShapesEnd;
 	float xCopy = lastX;
 	getSegs(lastX, 1 - 1 / float(segs), -1, jumpX, jumpY, segs);
 	IndexedModel im = Bezier2D::genBall(5,5,8);
-	snakeNodesShapesEnd = shapes.size() - 1;
 	IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
 
 	addShape(im, pa, TRIANGLES, 0, 4);//using the basic shader
@@ -155,7 +155,7 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, themes->getTex(4), 4);
 	//orderGenObj(vec3(0, 0, 0), 0.02f * allscale, (direction + 2)%4);
 
-	for (int i = snakeNodesShapesStart + 1; i < snakeNodesShapesEnd+1; i++) {
+	for (int i = snakeNodesShapesStart + 1; i <= snakeNodesShapesEnd; i++) {
 		setParent(i, i-1);
 	}
 	
@@ -382,39 +382,44 @@ void Game::orderCamera() {
 
 void Game::resetSnake() {
 	struct objMap map = lGen->getLevel(currentLvl);
-	
-	for (objLocation &obj : *map.specialObj) {
+
+	sMT->flush();
+	for (int pShape = snakeNodesShapesStart; pShape <= snakeNodesShapesEnd; pShape++) {
+		shapes[pShape]->resetEuler();
+		shapes[pShape]->doRotate(mat4(1));
+	}
+
+	bool notfound = 1;	int i = 0;
+	while (notfound) {
+		struct objLocation obj = (*map.specialObj)[i++];
 		switch (obj.type) {
 			case Snake:
 				shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 0);
 				shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 1);
 				putSnakeInPlace(obj.x, obj.y, obj.z, obj.direction);
+				notfound = 0;
 				break;
 		}
 	}
+
+	Deactivate();
+	updateSnakePosition();
+	setCameraTopView();
 }
 
 void Game::resetCurrentLevel(){
-	struct objMap map = lGen->getLevel(currentLvl);
 
 	fruitCounter = fruitsVec.size();
 	for (int i = 0; i < (signed)fruitsVec.size(); i++) {
 		vec4 obj = fruitsVec[i]->makeTransScale()[3];
 		fruitsVec[i]->Unhide();
-		if (!IT->exist((int) obj.z / zscale, fruitsVec[i]))
-			IT->addObj(obj.x, obj.y, (int) obj.z / zscale, shapes.back(), FruitF, computedKDtrees[FruitF]);
+		int level = (int) (obj.z / zscale);
+		if (!IT->exist(level, fruitsVec[i]))
+			IT->addObj(obj.x, obj.y, level, shapes.back(), FruitF, computedKDtrees[FruitF]);
 		
 	}
 
-	for (objLocation &obj : *map.specialObj) {
-		switch (obj.type) {
-		case Snake:
-			shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 0);
-			shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 1);
-			putSnakeInPlace(obj.x, obj.y, obj.z, obj.direction);
-			break;
-		}
-	}	
+	resetSnake();
 }
 
 void Game::loadNextLevel() {
@@ -470,11 +475,12 @@ void Game::setupCurrentLevel() {
 	}
 	else
 		printf("level did not been loaded!");
+	//after adding snake we should order the camera
+	orderCamera();
 }
 
 void Game::setupEnvironment() {
 	setupCurrentLevel();
-	orderCamera();
 	configSound();
 	pickedShape = -1;
 	printf("Game ready\n");
@@ -589,8 +595,10 @@ void Game::Motion()
 	if (isActive)
 	{	
 		vec3 temp;
-		if(superSpeedTicks > 0)
+		if (superSpeedTicks > 0) {
 			temp = superSpeed*tailDirection;
+			superSpeedTicks--;
+		}
 		else if (rotRecently) {
 			rotRecently = false;
 			temp = slowSpeed*tailDirection;
@@ -638,6 +646,10 @@ void Game::playerInput(bool dir) {
 
 void Game::switchSoundEnable() {
 	soundEnable = !soundEnable;
+}
+
+bool Game::getSoundVar() {
+	return soundEnable;
 }
 
 int Game::getCurrentLevel() {

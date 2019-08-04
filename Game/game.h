@@ -71,6 +71,12 @@ public:
 	int getTotalLevelCount();
 	int getCurrentFruitCount();
 	int getTotalFruitCount();
+	bool getSoundVar();
+
+	void PlayTheme() {
+		PlaySoundGame(Theme);
+	}
+	int currentTheme = 0;
 private:
 	bool soundEnable = true;
 
@@ -99,7 +105,6 @@ private:
 	void changeTheme();
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	int currentTheme = 0;
 	
 	int fruitCounter;
 	std::vector<Shape *> fruitsVec;
