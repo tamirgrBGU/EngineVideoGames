@@ -46,14 +46,15 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/sky-back.jpg");//16
 	scn->AddTexture("../res/textures/sky-bottom.jpg");//17
 	scn->AddTexture("../res/objs/snake_female.jpg");//18
-
+	scn->AddTexture("../res/textures/win.png");//19
+	scn->AddTexture("../res/textures/loading.png");//20
 	scn->Init();
 
 	display.setScene(scn);
 
 	Menu* menu = new Menu(&display, scn, 0); //start menu
 	Menu* menu2 = new Menu(&display, scn, 1); //fruits count and options - his name is fruitCounter in game.h private
-
+	Menu* menu3 = new Menu(&display, scn, 2);
 
 	if (!menu->created)
 	{
@@ -65,7 +66,12 @@ int main(int argc,char *argv[])
 	if (!menu->created)
 	{
 		menu2->create();
+		menu3->create();
 	}
+	//if (!menu3->created)
+	//{
+	//	
+	//}
 
 	while(!display.closeWindow() && !display.quit_game)
 	{
@@ -76,6 +82,9 @@ int main(int argc,char *argv[])
 			menu ->DrawMenu();
 		else
 			menu2->DrawMenu();
+
+		if (scn->wonGame)
+			menu3->DrawMenu();
 
 		scn->Motion();
 		display.SwapBuffers();
