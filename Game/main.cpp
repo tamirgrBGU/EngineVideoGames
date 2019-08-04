@@ -29,20 +29,20 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/grass2.bmp");//2	// NOT USED
 	scn->AddTexture("../res/textures/grass3.bmp");//3	// NOT USED
 	
-	scn->AddTexture("../res/textures/logo.png");//9
-	scn->AddTexture("../res/textures/start.png");//10
-	scn->AddTexture("../res/textures/fruit1.png");//11
-	scn->AddTexture("../res/textures/fruit2.png");//11
-	scn->AddTexture("../res/textures/fruit3.png");//11
-	scn->AddTexture("../res/textures/fruit4.png");//11
-
+	scn->AddTexture("../res/textures/logo.png");//4
+	scn->AddTexture("../res/textures/start.png");//5
+	scn->AddTexture("../res/textures/fruit1.png");//6
+	scn->AddTexture("../res/textures/fruit2.png");//7
+	scn->AddTexture("../res/textures/fruit3.png");//8
+	scn->AddTexture("../res/textures/fruit4.png");//9
+	scn->AddTexture("../res/textures/fruit5.png");//10
+	scn->AddTexture("../res/textures/credits.png");//11
 	scn->Init();
 
 	display.setScene(scn);
 
 	Menu* menu = new Menu(&display, scn, 0); //start menu
 	Menu* menu2 = new Menu(&display, scn, 1); //fruits count and options - his name is fruitCounter in game.h private
-
 
 
 	while(!display.closeWindow() && !display.quit_game)
@@ -54,7 +54,9 @@ int main(int argc,char *argv[])
 		if (!menu->created)
 		{
 			menu->create();
+			
 			init(display);
+			scn->PlayTheme();
 		}
 		if (menu->show_window)
 			menu->DrawMenu();

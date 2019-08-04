@@ -575,6 +575,10 @@ void Game::switchSoundEnable() {
 	soundEnable = !soundEnable;
 }
 
+bool Game::getSoundVar() {
+	return soundEnable;
+}
+
 int Game::getCurrentLevel() {
 	return currentLvl;
 }

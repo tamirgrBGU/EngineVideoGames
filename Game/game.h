@@ -69,10 +69,13 @@ public:
 	int getTotalLevelCount();
 	int getCurrentFruitCount();
 	int getTotalFruitCount();
+	bool getSoundVar();
+	void PlayTheme();
+	const int currentTheme = 4;
 private:
 	bool soundEnable = true;
 
-	void PlayTheme();
+	
 	void PlayPoint();
 	void PlayWin();
 	void PlayExplosion();
@@ -87,7 +90,6 @@ private:
 
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	const int currentTheme = 0;
 	const int currentLvl = 0;
 	const int maxLvl = 5;
 	leveGenerator *lGen;
