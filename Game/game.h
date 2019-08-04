@@ -71,7 +71,7 @@ public:
 	int getTotalFruitCount();
 	bool getSoundVar();
 	void PlayTheme();
-	const int currentTheme = 4;
+	const int currentTheme = 3;
 private:
 	bool soundEnable = true;
 

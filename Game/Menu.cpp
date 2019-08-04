@@ -63,6 +63,7 @@ void Menu::DrawMenu()
 			if (ImGui::Button(this->extra_options?"Resume":"Options")) {
 				printf("clicked on options\n");
 				this->extra_options = !this->extra_options;
+				this->scn->PauseUnpause();
 			}
 			if (this->extra_options) {
 				this->sound = this->scn->getSoundVar();
@@ -77,11 +78,11 @@ void Menu::DrawMenu()
 				
 				ImGui::Begin("pause", &show_window, ImVec2((float)1200, (float)800), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);	
 				ImGui::SetCursorPos(ImVec2(500,300));
-				ImGui::SetWindowFontScale(3.5f);
+				ImGui::SetWindowFontScale(5.0f);
 				ImGui::TextColored(ImVec4(0.28f, 0.79f, 0.52f, 1.0f), "Paused");
 				ImGui::End();
 			}
-			ImGui::SetWindowFontScale(2.5f);
+			ImGui::SetWindowFontScale(3.5f);
 			ImGui::Image((GLuint*)(this->scn->currentTheme+7), ImVec2(50, 50));
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(0.28f, 0.79f, 0.52f,1.0f),"%d / %d", this->scn->getTotalFruitCount(), this->scn->getCurrentFruitCount());
