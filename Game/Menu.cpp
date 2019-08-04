@@ -67,7 +67,7 @@ void Menu::DrawMenu()
 				this->extra_options ? this->scn->Activate() : this->scn->Deactivate();
 				this->extra_options = !this->extra_options;
 			}
-			if (this->extra_options) {
+			if (this->extra_options || !this->scn->IsActive()) {
 				this->sound = this->scn->getSoundVar();
 				if (ImGui::Checkbox("Mute sounds", &this->sound)) {
 					this->scn->switchSoundEnable();
