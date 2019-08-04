@@ -28,7 +28,7 @@ public:
 		//printf("theme %d \n", current);
 		return themes[current];
 	}
-	int getScale(int type);
+	float getScale(int type);
 	void swapThemes(int next);
 private:
 	struct theme *genTheme(char *name);

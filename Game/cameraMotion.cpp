@@ -100,7 +100,7 @@ void rotCam() {
 	float angle = abs(dirAngle);
 	mat4 rotator(1);
 
-	printf("%f\n", dirAngle);
+	//printf("%f\n", dirAngle);
 	if (angle > bigAngleFrame) {
 		myCam->myRotate(dirAngle*bigTolerance, zAx, 4);
 		rotator = glm::rotate(dirAngle*bigTolerance, zAx);

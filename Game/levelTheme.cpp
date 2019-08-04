@@ -11,7 +11,7 @@ float scale3[] = { 0.01f, 0.003f };
 float scale4[] = { 0.01f, 0.003f };
 float scale5[] = { 0.01f, 0.003f };
 float *scales[] = { scale1, scale2, scale3, scale4, scale5 };
-int ThemeHolder::getScale(int type) {
+float ThemeHolder::getScale(int type) {
 	return scales[current][type];
 }
 

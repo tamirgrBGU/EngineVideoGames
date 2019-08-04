@@ -102,7 +102,7 @@ void Game::getHeadSegs(float& lastX, float jumpX, float jumpY, int segs) {
 	snakeNodesShapesEnd = shapes.size() - 1;
 	IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
 
-	addShape(im, pa, TRIANGLES, 3, 4);//using the basic shader
+	addShape(im, pa, TRIANGLES, 0, 4);//using the basic shader
 	shapes.back()->myTranslate(vec3(-xCopy * 0.66f, lastYext * 0.33f, 0), 0);
 	shapes.back()->myScale(vec3(2.f));
 	shapes.back()->myRotate(90.f, xAx, xAxis1);
@@ -263,7 +263,7 @@ void Game::specialObjHandle(objLocation &obj) {
 		printf("added Snake\n");
 		break;
 	case Cave:
-		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 100), obj.level, 0.1f * allscale, dir);
+		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 60), obj.level, 0.21f * allscale, dir);
 		break;
 	case Obstecle:
 		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z), obj.level, themes->getScale(0) * allscale, dir);
