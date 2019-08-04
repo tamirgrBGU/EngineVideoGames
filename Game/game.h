@@ -37,7 +37,6 @@ public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
 	glm::mat4 headTransMAT;
-	bool cameramode = false;
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	~Game(void);
 	void Init();
@@ -130,7 +129,7 @@ private:
 	int snakeLevel;
 	int snakeNodesShapesStart = -1;
 	int snakeNodesShapesEnd = -1;
-	float snakeFullLength = 0;
+	float snakeFullLength;
 
 	void setSnakeNodesAngles();
 	void updateSnakePosition();

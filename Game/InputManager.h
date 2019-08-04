@@ -43,9 +43,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			case GLFW_KEY_D:
 				scn->changeCameraMode();
 			break;
-			case GLFW_KEY_C:
-				scn->cameramode = !scn->cameramode;
-			break;
 			case GLFW_KEY_RIGHT://TODO head intersect with nodes disable rotation
 				scn->playerInput(true);
 			break;

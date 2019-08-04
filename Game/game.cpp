@@ -43,10 +43,10 @@ void Game::updateDrawMode(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
-float jumpy = 0.4f, jumpx = 0.38f;
-float lastYext = 0;
+const float jumpy = 0.4f, jumpx = 0.38f;
+float lastYext;
 static const int bezierRes = 10, cirSubdiv = 4;
-void Game::getSegs(float& lastX, float mult, float sign, float jumpX, float jumpY, int segs) {
+void Game::getSegs(float& lastX, float mult, const float sign, const float jumpX, const float jumpY, const int segs) {
 	std::vector<glm::mat4> segments;
 	float lastY = 0;
 	mat4 seg0 = mat4(0);
@@ -69,18 +69,18 @@ void Game::getSegs(float& lastX, float mult, float sign, float jumpX, float jump
 	orderSegPart(lastY);
 }
 
-void Game::orderSegPart(float segLen) {
+void Game::orderSegPart(const float segLen) {
 	shapeTransformation(yGlobalTranslate, lastYext);
 	snakeFullLength += segLen;
 	lastYext = segLen;
 	pickedShape++;
 }
 
-void Game::getTailSegs(float& lastX, float jumpX, float jumpY, int segs) {
+void Game::getTailSegs(float& lastX, const float jumpX, const float jumpY, const int segs) {
 	getSegs(lastX, 0, 1, jumpX, jumpY, segs);
 }
 
-void Game::getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amount) {
+void Game::getBodySegs(float& lastX, const float jumpX, const float jumpY, const int segs, const int amount) {
 	getSegs(lastX, 1, 0, jumpX, jumpY, segs);
 	Shape *bodySeg = shapes.back();
 	for (int i = 0; i < amount - 1; i++) {
@@ -90,7 +90,7 @@ void Game::getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amo
 	}
 }
 
-void Game::getHeadSegs(float& lastX, float jumpX, float jumpY, int segs) {
+void Game::getHeadSegs(float& lastX, const float jumpX, const float jumpY, const int segs) {
 	snakeNodesShapesEnd = shapes.size();
 	int pa = snakeNodesShapesEnd;
 	float xCopy = lastX;
@@ -137,6 +137,7 @@ void Game::putSnakeInPlace(float xLoc, float yLoc, float zLoc, int direction){
 /*The vertebral column of a snake consists of anywhere between 200 and 400 (or more) vertebrae.*/
 void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	std::vector<Bezier2D> b1vec;
+	lastYext = 0; snakeFullLength = 0;
 	float x = 0; float rounding = float(segs) / ends;
 
 	snakeNodesShapesStart = shapes.size();
@@ -430,6 +431,7 @@ void Game::loadNextLevel() {
 		for (int i = 0; i < (signed) shapes.size(); i++) {
 			delete shapes[i];
 		}
+		chainParents.clear();
 		shapes.clear();
 		currentTheme++;
 		changeTheme();
@@ -437,7 +439,8 @@ void Game::loadNextLevel() {
 		IT->flush();
 		setupCurrentLevel();
 		orderCameraTop();
-		Deactivate();
+		printVec(shapes[snakeNodesShapesStart]->makeTransScale()[3]);
+ 		Deactivate();
 	}
 }
 //2 3 -> 6 7
