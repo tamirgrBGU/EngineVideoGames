@@ -9,7 +9,7 @@ intersect::intersect(std::vector<glm::vec3> &shape) {
 
 //copy constructor
 intersect::intersect(Node *Node) {
-	kd = Kdtree(Node);
+	kd.setRoot(Node);
 	boundbox = kd.getRoot()->boundbox;
 	boundboxvec = bound_vec_to_boundbox(boundbox);
 }

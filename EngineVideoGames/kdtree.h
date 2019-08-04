@@ -56,16 +56,15 @@ class Kdtree
 
 	//default deconstructor
 	~Kdtree();
-
-	Node *getRoot() {
-		return root;
-	}
-	void kiil();
+	
+	static void kill(Node *head);
 
 	/* 
 	*  Return the tree root node
 	*/
-	Node* getRoot() const { return root; };
+	Node* getRoot() const { return Kdtree::root; };
+	void setRoot(Node * newRoot) { Kdtree::root = newRoot; };
+
 	/*
 	* support function for printTree
 	*/

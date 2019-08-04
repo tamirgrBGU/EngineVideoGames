@@ -124,7 +124,7 @@ void *IntersectTracker::addObj(float x, float y, int level, Shape *myShape, int 
 	intersect *model = new intersect(shape);
 	node->value.model = model;
 	addNode(node);
-	return (void *) node->value.model->getKdNode();
+	return (void *) model->getKdNode();
 }
 
 intersect *snakeHead;
@@ -179,7 +179,7 @@ void IntersectTracker::isIntersectSnakeHead(glm::mat4 tranSnake, float x, float 
 		return;
 	std::vector<listNode<levelIntersect> *> closeObjects = collect(findNode(levels[level], x - radiusLenToCheckIntersects), x, y);
 	int dontstop = 0;
-	for (unsigned int i = 0; !dontstop & i < closeObjects.size(); i++) {
+	for (unsigned int i = 0; !dontstop & (i < closeObjects.size()); i++) {
 		Shape *myShape = closeObjects[i]->value.myShape;
 		int type = closeObjects[i]->value.type;
 		glm::mat4 myshapetrans = myShape->makeTransScale();

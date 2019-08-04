@@ -22,24 +22,23 @@ Node::~Node(){}
 
 Kdtree::Kdtree(){}
 Kdtree::Kdtree(Node *outsider) { Kdtree::root = outsider; }
-Kdtree::~Kdtree(){/*kiil()*/}
+Kdtree::~Kdtree(){/*if(root) kiil(root)*/}
 
-void kill(Node* head) {
+void killHelper(Node* head) {
 	if (head) {
-		kill(head->left);
-		kill(head->right);
+		killHelper(head->left);
+		killHelper(head->right);
 
 		delete head;
 	}
 }
 
-void Kdtree::kiil() {
-	Node* head = root;
+void Kdtree::kill(Node* head) {
 
-	kill(head->left);
-	kill(head->right);
+	killHelper(head->left);
+	killHelper(head->right);
 
-	delete root;
+	delete head;
 }
 /*
 *
@@ -200,7 +199,7 @@ inline void prepareLists(std::list<Kdtree::vecType>& plist, std::list<Kdtree::ve
 
 void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 {
-	Node* head = new Node(3);
+	root = new Node(3);
 	max_depth = (unsigned int)log2((plist.size() >> 4));
 
 	printf("size %d max depth %d", plist.size(), max_depth);
@@ -209,8 +208,7 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 	prepareLists(plist, xlist, ylist, zlist);
 
 	std::list<Kdtree::vecType> lists[3] = { xlist, ylist, zlist };
-	Kdtree::_makeTree(head, lists, 0);
-	Kdtree::root = head;
+	Kdtree::_makeTree(root, lists, 0);
 }
 
 void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType> plist[], unsigned int depth )
