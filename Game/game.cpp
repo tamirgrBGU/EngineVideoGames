@@ -121,10 +121,12 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	getBodySegs(&x, 0, jumpy, 4, snakeLength -2);
 	//round head generated here
 	getHeadSegs(&x, -jumpx * rounding, 2.5f*jumpy, ends);
-	//big obj head
-	//genObj(4, 0, vec3(0,25,0), 0.001f * allscale, direction+1);
 
 	snakeNodesShapesEnd = shapes.size() - 1;
+	
+	//big obj head
+	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, themes->getTex(4), 4);
+	//orderGenObj(vec3(0, 0, 0), 0.02f * allscale, (direction + 2)%4);
 
 	for (unsigned int i = snakeNodesShapesStart + 1; i < shapes.size(); i++) {
 		setParent(i, i-1);
@@ -165,6 +167,13 @@ void Game::changeTheme(int nextTheme) {
 	updateThemeArrays();
 }
 
+inline void Game::orderGenObj(vec3 startLoc, float scale, int direction) {
+	shapes.back()->myTranslate(startLoc, 0);
+	if (scale != -1)
+		shapeTransformation(shapes.size() - 1, Scale, vec3(scale, scale, scale));
+	shapes.back()->myRotate(90.f * direction, zAx, zAxis1);
+}
+
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
 		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 4);//using the basic shader
@@ -174,10 +183,7 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 		chainParents.push_back(-1);
 		shapes.push_back(new Shape(*uploadedFiles[ptrIndx], TRIANGLES));
 	}
-	shapes.back()->myTranslate(startLoc, 0);
-	if (scale != -1)
-		shapeTransformation(shapes.size() - 1, Scale, vec3(scale, scale, scale));
-	shapes.back()->myRotate(90.f * direction, zAx, zAxis1);
+	orderGenObj(startLoc, scale, direction);
 }
 
 void Game::onIntersectCave(Shape *s) {
@@ -481,7 +487,7 @@ void Game::Debug() {
 }
 
 const int maxFmotion = 10;
-int counter = -maxFmotion;
+float counter = -maxFmotion;
 float dir = 1;
 float angleFmotion = 10.f;
 void Game::fruitMotion() {

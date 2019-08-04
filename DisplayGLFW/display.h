@@ -18,7 +18,7 @@ public:
 	void addKeyCallBack(void(*func)(GLFWwindow *,int,int,int,int));
 	void addMouseCallBacks(void (* mousebuttonfun)(GLFWwindow*,int,int,int),void(* scrollfun)(GLFWwindow*,double,double),void (* cursorposfun)(GLFWwindow*,double,double));
 	void addResizeCallBack(void (*windowsizefun)(GLFWwindow*,int,int));
-	
+	bool quit_game;
 	void setScene(void *userPointer);
 	GLFWwindow* getWindow();
 	void mouseProccessing(int button);

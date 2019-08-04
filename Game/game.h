@@ -80,7 +80,7 @@ private:
 
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	const int firstTheme = 4;
+	const int firstTheme = 2;
 	const int currentLvl = 7;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
@@ -93,6 +93,7 @@ private:
 	std::vector<Shape *> fruitsVec;
 	void fruitMotion();
 
+	inline void orderGenObj(vec3 startLoc, float scale, int direction);
 	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
 
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
