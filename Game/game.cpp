@@ -162,15 +162,15 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	putSnakeInPlace(xLoc, yLoc, zLoc, direction);
 }
 
-char	  **filePath;
-Shape	  **uploadedFiles;
-void	  **computedKDtrees;
+char		 **filePath;
+IndexedModel **uploadedFiles;
+void		 **computedKDtrees;
 inline void Game::updateThemeArrays()
 {
 	theme *tempTheme = themes->getCurrentTheme();
 	filePath	    = tempTheme->filepath;
-	uploadedFiles   = (Shape **) tempTheme->uploadedObj;
-	computedKDtrees = (void  **) tempTheme->computedKDtrees;
+	uploadedFiles   = (IndexedModel **) tempTheme->uploadedObj;
+	computedKDtrees = (void  **)		tempTheme->computedKDtrees;
 }
 
 void Game::loadThemes() {
@@ -193,26 +193,30 @@ inline void Game::orderGenObj(vec3 startLoc, float scale, int direction) {
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
 		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 4);//using the basic shader
-		uploadedFiles[ptrIndx] = shapes.back();
+		uploadedFiles[ptrIndx] = new IndexedModel(MeshConstructor::getlastIndexedModel());
 	}
 	else {
 		chainParents.push_back(-1);
-		shapes.push_back(new Shape(*uploadedFiles[ptrIndx], TRIANGLES));
+		shapes.push_back(new Shape(*uploadedFiles[ptrIndx], TRIANGLES, tex, 4));
 	}
 	orderGenObj(startLoc, scale, direction);
 }
 
-void Game::onIntersectCave(Shape *s) {
+bool Game::onIntersectCave(Shape *s) {
 	printf("reach to seafty END Level\n");
 	if (fruitCounter == 0) {
-		Deactivate();
 		PlaySoundGame(Win);
 		loadNextLevel();
+		orderCamera();
+		Deactivate();
+		pickedShape = -1;
+		return 1;
 	}
-	else {
-		resetSnake();
-		PlaySoundGame(Hiss);
-	}
+	resetSnake();
+	PlaySoundGame(Hiss);
+	Deactivate();
+	pickedShape = -1;	
+	return 0;
 }
 
 void Game::onIntersectFruit(Shape *s) {
@@ -220,7 +224,7 @@ void Game::onIntersectFruit(Shape *s) {
 	s->Hide();
 	IT->remove(s);
 	PlaySoundGame(FruitSound);
-	superSpeedTicks = 10;
+	superSpeedTicks = 30;
 	fruitCounter--;
 }
 
@@ -229,6 +233,7 @@ void Game::onIntersectObstecle(Shape *s) {
 	PlaySoundGame(ObstecleSound);
 	resetCurrentLevel();
 	Deactivate();
+	pickedShape = -1;
 }
 
 float climbAngle = glm::atan(zscale / allscale);
@@ -237,6 +242,7 @@ void Game::onIntersectWalls(Shape *s) {
 	PlaySoundGame(ObstecleSound);
 	resetCurrentLevel();
 	Deactivate();
+	pickedShape = -1;
 }
 
 void Game::onIntersectFallWall(Shape *s){
@@ -290,7 +296,8 @@ void Game::specialObjHandle(objLocation &obj) {
 	}
 }
 
-void Game::onIntersectSnakeHead(int type, Shape *myShape) {
+//return true if map objects had changed
+bool Game::onIntersectSnakeHead(int type, Shape *myShape) {
 	switch (type) {
 		case WallF:
 			Game::onIntersectWalls(myShape);
@@ -299,7 +306,7 @@ void Game::onIntersectSnakeHead(int type, Shape *myShape) {
 			Game::onIntersectFallWall(myShape);
 			break;
 		case CaveF:
-			Game::onIntersectCave(myShape);
+			return Game::onIntersectCave(myShape);
 			break;
 		case ObstecleF:
 			Game::onIntersectObstecle(myShape);
@@ -314,6 +321,7 @@ void Game::onIntersectSnakeHead(int type, Shape *myShape) {
 			printf("unknown special obj <%d>\n", type);
 			break;
 	}
+	return 0;
 };
 
 void Game::addCubes() {
@@ -373,11 +381,15 @@ void Game::updateSnakePosition()
 	headTransMAT = root;
 }
 
-void Game::orderCamera() {
+inline void Game::orderCamera() {
 	updateSnakePosition();
+	setCameraTopView();
+}
+
+void Game::setUpCamera() {
 	float zView = -1.5f*snakeFullLength;
 	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
-	setCameraTopView();
+	orderCamera();
 }
 
 void Game::resetSnake() {
@@ -402,21 +414,21 @@ void Game::resetSnake() {
 		}
 	}
 
-	Deactivate();
-	updateSnakePosition();
-	setCameraTopView();
+	orderCamera();
 }
 
 void Game::resetCurrentLevel(){
 
 	fruitCounter = fruitsVec.size();
 	for (int i = 0; i < (signed)fruitsVec.size(); i++) {
-		vec4 obj = fruitsVec[i]->makeTransScale()[3];
-		fruitsVec[i]->Unhide();
-		int level = (int) (obj.z / zscale);
-		if (!IT->exist(level, fruitsVec[i]))
-			IT->addObj(obj.x, obj.y, level, shapes.back(), FruitF, computedKDtrees[FruitF]);
-		
+		if (!fruitsVec[i]->Is2Render()) {
+			fruitsVec[i]->Unhide();
+			vec4 obj = fruitsVec[i]->makeTransScale()[3];
+			int level = (int)(obj.z / zscale);
+			if (!IT->exist(level, fruitsVec[i])) {
+				IT->addObj(obj.x, obj.y, level, fruitsVec[i], FruitF, computedKDtrees[FruitF]);
+			}
+		}
 	}
 
 	resetSnake();
@@ -475,12 +487,12 @@ void Game::setupCurrentLevel() {
 	}
 	else
 		printf("level did not been loaded!");
-	//after adding snake we should order the camera
-	orderCamera();
 }
 
 void Game::setupEnvironment() {
 	setupCurrentLevel();
+	//after adding snake we should order the camera
+	setUpCamera();
 	configSound();
 	pickedShape = -1;
 	printf("Game ready\n");
@@ -584,8 +596,10 @@ void Game::fruitMotion() {
 		motionJumps = -motionJumps;
 	}
 	for (int i = 0; i < (signed) fruitsVec.size(); i++) {
-		fruitsVec[i]->myTranslate(motionJumps, 1);
-		fruitsVec[i]->myRotate(angleFmotion, zAx, zAxis1);
+		if (fruitsVec[i]->Is2Render()) {
+			fruitsVec[i]->myTranslate(motionJumps, 1);
+			fruitsVec[i]->myRotate(angleFmotion, zAx, zAxis1);
+		}
 	}
 }
 
@@ -607,8 +621,7 @@ void Game::Motion()
 			temp = speed*tailDirection;
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
-		setSnakeNodesAngles();
-		updateSnakePosition();
+		orderCamera();
 
 		fruitMotion();
 

@@ -63,7 +63,7 @@ public:
 		updateDrawMode(projMode);
 	};
 	
-	void onIntersectSnakeHead(int type, Shape *myShape);
+	bool onIntersectSnakeHead(int type, Shape *myShape);
 
 	//to use outside (in main integration with imgui)
 	void switchSoundEnable();
@@ -84,7 +84,7 @@ private:
 	void PlaySoundGame(int type);
 
 	snakeMoveTracker *sMT;
-	void onIntersectCave	(Shape *s);
+	bool onIntersectCave	(Shape *s);
 	void onIntersectObstecle(Shape *s);
 	void onIntersectFruit	(Shape *s);
 	void onIntersectWalls	(Shape *s);
@@ -130,5 +130,6 @@ private:
 	void addCubes();
 	void configSound();
 	void orderCamera();
+	void setUpCamera();
 };
 

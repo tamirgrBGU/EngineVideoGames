@@ -21,7 +21,7 @@ public:
 
 	Shape(const IndexedModel& model, unsigned int mode, int textureID, int shaderID);
 
-	Shape(const Shape& shape,unsigned int mode);
+	Shape(const Shape& shape, unsigned int mode);
 
 	Shape(const std::string& fileName,unsigned int mode, int textureID, int shaderID);
 	

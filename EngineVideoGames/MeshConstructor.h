@@ -6,8 +6,7 @@
 #include "bezier1D.h"
 #include "kdtree.h"
 
-
-static std::vector<glm::vec3> lastInitMeshPositions;
+static IndexedModel lastInitIndexedModel;
 class MeshConstructor
 {
 
@@ -26,6 +25,7 @@ class MeshConstructor
 	
 public:
 	static std::vector<glm::vec3>& getlastInitMeshPositions();
+	static IndexedModel& getlastIndexedModel();
 
 	//TO DO: add collision detection function which get other MeshConstructor and Mat4 of related transformasions. The function may return a pointer to the relevant Bounding Box when collide
 	enum SimpleShapes

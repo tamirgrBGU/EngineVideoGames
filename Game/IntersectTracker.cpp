@@ -178,16 +178,17 @@ void IntersectTracker::isIntersectSnakeHead(glm::mat4 tranSnake, float x, float 
 	if ((signed) levelObjSize.size() <= level || levelObjSize[level] == 0)
 		return;
 	std::vector<listNode<levelIntersect> *> closeObjects = collect(findNode(levels[level], x - radiusLenToCheckIntersects), x, y);
-	for (unsigned int i = 0; i < closeObjects.size(); i++) {
+	int dontstop = 0;
+	for (unsigned int i = 0; !dontstop & i < closeObjects.size(); i++) {
 		Shape *myShape = closeObjects[i]->value.myShape;
 		int type = closeObjects[i]->value.type;
 		glm::mat4 myshapetrans = myShape->makeTransScale();
 		std::vector<IndexedModel> sol = snakeHead->isIntersect(&tranSnake, &myshapetrans, *closeObjects[i]->value.model);
 		if (sol.size() > 0) {
-			printf("%d\n", i);
+			printf("sol %d\n", i);
 			chacheShape = closeObjects[i];
 			chacheLvl = level;
-			mygame->onIntersectSnakeHead(type, myShape);
+			dontstop = mygame->onIntersectSnakeHead(type, myShape);
 		}
 	}
 }

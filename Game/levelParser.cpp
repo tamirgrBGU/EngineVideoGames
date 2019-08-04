@@ -354,7 +354,7 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 
 
 static const int minObjToRand = 4;
-static const int maxObjToRand = 8 - minObjToRand;
+static const int maxObjToRand = 20 - minObjToRand;
 static const int minFruitToRand = 3;
 static const int maxFruitToRand = 5 - minFruitToRand;
 
@@ -362,12 +362,46 @@ static const int maxFruitToRand = 5 - minFruitToRand;
 void randFill(std::vector<struct objConnected>& vec, std::vector<struct objLocation>* specialObj, int RandOBJs, int type) {
 	while (RandOBJs > 0)
 	{
-		struct objConnected objC = vec[std::rand() % vec.size()];
-		struct objLocation *obj  = &objC.me;
+		struct objConnected *objC = &vec[std::rand() % vec.size()];
+		struct objLocation *obj  = &(objC->me);
 		if (obj->type == -1) {
-			obj->type = type;
-			specialObj->push_back(*obj);
-			RandOBJs--;
+			bool neighbors =
+				(!objC->up || (objC->up->me.type < 0))   &
+				/*(!objC->up || (!objC->up->left || (objC->up->left->me.type < 0)))   &
+				(!objC->up || (!objC->up->right || (objC->up->right->me.type < 0)))  &*/
+				(!objC->down || (objC->down->me.type < 0)) &
+				/*(!objC->down || (!objC->down->left || (objC->down->left->me.type < 0)))   &
+				(!objC->down || (!objC->down->right || (objC->down->right->me.type < 0)))  &*/
+				(!objC->left || (objC->left->me.type < 0)) &
+				/*(!objC->left || (!objC->left->up || (objC->left->up->me.type < 0)))   &
+				(!objC->left || (!objC->left->down || (objC->left->down->me.type < 0)))  &*/
+				(!objC->right || (objC->right->me.type < 0));
+				/*(!objC->right || (!objC->right->up || (objC->right->up->me.type < 0)))   &
+				(!objC->right || (!objC->right->down || (objC->right->down->me.type < 0)));*/
+			//printf("%d", neighbors?1:0);
+			if (neighbors) {
+				printf("%f %f\n", obj->x, obj->y);
+				obj->type = type;
+				specialObj->push_back(*obj);
+				RandOBJs--;
+			}
+		}
+	}
+}
+
+void randObj(std::vector<struct objConnected>& vec, std::vector<struct objLocation>* specialObj) {
+	int RandOBJs = minObjToRand + std::rand() % maxObjToRand;
+	int fruits = minFruitToRand + std::rand() % maxFruitToRand;
+	int trees = RandOBJs - fruits;
+	printf("rand %d trees and %d fruits\n", trees, fruits);
+	randFill(vec, specialObj, 5, 3);
+	randFill(vec, specialObj, 5, 4);
+
+	for (unsigned int i = 0; i < vec.size(); i++) {
+		struct objConnected objC = vec[i];
+		struct objLocation *obj = &objC.me;
+		if (obj->type == -2) {
+			obj->type = -1;
 		}
 	}
 }
@@ -422,19 +456,7 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 		}
 	}
 
-	int RandOBJs = minObjToRand + std::rand() % maxObjToRand;
-	int fruits = minFruitToRand + std::rand() % maxFruitToRand;
-	int trees = RandOBJs - fruits;
-	randFill(vec, specialObj, trees,  3);
-	randFill(vec, specialObj, fruits, 4);
-
-	for (unsigned int i = 0; i < vec.size(); i++) {
-		struct objConnected objC = vec[i];
-		struct objLocation *obj = &objC.me; 
-		if (obj->type == -2) {
-			obj->type = -1;
-		}
-	}
+	randObj(vec, specialObj);
 }
 
 std::vector<struct objConnected> toConnectedVec(int width, std::vector<struct objLocation> &vec) {
