@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <random>
 
-static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.jpg" };
+static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.jpg", "snake.jpg" };
 static const int TexImgSize = sizeof(TexImg) / sizeof(char*);
 static const char *sharedObjNames[] = { "../res/objs/cave.obj" };
 static const int sharedSize = sizeof(sharedObjNames) / sizeof(char*);
@@ -62,12 +62,12 @@ void ThemeHolder::loadTex()
 	if (0 < (signed)themes[current]->texNo.size())
 		return;
 	int texId = scn->textures.size();
-	for (int i = 0; i < (signed)themes.size(); i++)
-		for (int j = 0; j < TexImgSize; j++) {
-			sprintf_s(buf, maxWidth, path, themes[current]->themeName, TexImg[j]);
-			scn->AddTexture(buf);
-			themes[current]->texNo.push_back(texId++);
-		}	
+	//for (int i = 0; i < (signed)themes.size(); i++)
+	for (int j = 0; j < TexImgSize; j++) {
+		sprintf_s(buf, maxWidth, path, themes[current]->themeName, TexImg[j]);
+		scn->AddTexture(buf);
+		themes[current]->texNo.push_back(texId++);
+	}	
 }
 
 ThemeHolder::ThemeHolder(Scene *scn, int size, int firstTheme) {

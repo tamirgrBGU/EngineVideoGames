@@ -27,13 +27,7 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/grass.bmp");//0
 	scn->AddTexture("../res/textures/grass2.bmp");//1
 	scn->AddTexture("../res/textures/grass3.bmp");//2
-	//scn->AddTexture("../res/textures/snake.jpg");
-	scn->AddTexture("../res/textures/snake1.png");//3
-	scn->AddTexture("../res/textures/snakeEye.bmp");//4
-	scn->AddTexture("../res/textures/snake2.jpg");//5
-	scn->AddTexture("../res/textures/snake3.jpg");//6
-	scn->AddTexture("../res/textures/snake4.jpg");//7
-	scn->AddTexture("../res/textures/snake5.jpg");//8
+	scn->AddTexture("../res/textures/snakeEye.bmp");//3
 	
 	scn->AddTexture("../res/textures/logo.png");//9
 	scn->AddTexture("../res/textures/start.png");//10

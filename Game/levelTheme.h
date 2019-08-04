@@ -20,6 +20,7 @@ class ThemeHolder
 public:
 	ThemeHolder(Scene *scn, int size, int firstTheme);
 	~ThemeHolder();
+	//the number is by TexImg array in levelTheme.cpp
 	int getTex(int type) {
 		return themes[current]->texNo[type];
 	};

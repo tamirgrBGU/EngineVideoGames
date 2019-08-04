@@ -69,7 +69,7 @@ void Game::getSegs(float *lastX, float mult, float sign, float jumpX, float jump
 	Bezier1D body(segments);
 	vec3 axisFrom = *(body.GetControlPoint(0, 0).GetPos());
 	Bezier2D b(body, cirSubdiv, yAx, vec3(0, axisFrom.y, 0)); 
-	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, 8, 1);
+	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, themes->getTex(4), 1);
 	orderSegPart(lastY);
 }
 
