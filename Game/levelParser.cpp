@@ -93,7 +93,7 @@ int parseFileLine(char* buf, int linenum, std::vector<struct objLocation> *Objs)
 	del = nextDelimeterCSV(buf, i, ',');
 	while (del > -1) {
 		struct objLocation obj;
-		//EMPTY GROUND RANDOM OBJECT SHOULD NOT SPAWN UPON
+		//EMPTY GROUND - UNREACHABLE GROUND FOR SNAKE - RANDOM OBJECT SHOULD NOT SPAWN UPON
 		if (buf[i] == '!') {
 			obj.type = -2;
 			i++;
@@ -353,8 +353,24 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 }
 
 
-static const int maxObjToChooseFrom = 2;
-static const int probToGet = 8 * maxObjToChooseFrom;
+static const int minObjToRand = 4;
+static const int maxObjToRand = 8 - minObjToRand;
+static const int minFruitToRand = 3;
+static const int maxFruitToRand = 5 - minFruitToRand;
+
+// rand() return a number between ​0​ and RAND_MAX;
+void randFill(std::vector<struct objConnected>& vec, std::vector<struct objLocation>* specialObj, int RandOBJs, int type) {
+	while (RandOBJs > 0)
+	{
+		struct objConnected objC = vec[std::rand() % vec.size()];
+		struct objLocation *obj  = &objC.me;
+		if (obj->type == -1) {
+			obj->type = type;
+			specialObj->push_back(*obj);
+			RandOBJs--;
+		}
+	}
+}
 
 //-2 is non spawnable ground
 //-1 is bare ground
@@ -402,21 +418,21 @@ void initGroundModel(std::vector<modelWrapper>* levelGround,
 			mw.model = create_ground_square(0, allscale, allscale, 0, 0);
 			levelGround->push_back(mw);
 			if (obj->type > 0)
-				specialObj->push_back(*obj);
-			else
-			{
-				if (obj->type == -2) {
-					obj->type = -1;
-				}
-				else {
-					unsigned int x = std::rand(); // rand() return a number between ​0​ and RAND_MAX;
-					x = x % probToGet;
-					if (x < maxObjToChooseFrom) {
-						obj->type = 3 + x;
-						specialObj->push_back(*obj);
-					}
-				}
-			}
+				specialObj->push_back(*obj);			
+		}
+	}
+
+	int RandOBJs = minObjToRand + std::rand() % maxObjToRand;
+	int fruits = minFruitToRand + std::rand() % maxFruitToRand;
+	int trees = RandOBJs - fruits;
+	randFill(vec, specialObj, trees,  3);
+	randFill(vec, specialObj, fruits, 4);
+
+	for (unsigned int i = 0; i < vec.size(); i++) {
+		struct objConnected objC = vec[i];
+		struct objLocation *obj = &objC.me; 
+		if (obj->type == -2) {
+			obj->type = -1;
 		}
 	}
 }
