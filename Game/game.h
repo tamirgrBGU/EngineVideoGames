@@ -78,6 +78,7 @@ public:
 		PlaySoundGame(Theme);
 	}
 
+	bool wonGame = false;
 	int currentTheme = 0;
 	void loadNextLevel();
 

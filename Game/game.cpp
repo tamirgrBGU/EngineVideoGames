@@ -442,6 +442,8 @@ void Game::loadNextLevel() {
  		Deactivate();
 	}
 	else {
+		wonGame = true;
+		PlaySoundGame(Win);
 		Deactivate();
 	}
 }
