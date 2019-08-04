@@ -90,24 +90,34 @@ void Game::getBodySegs(float& lastX, const float jumpX, const float jumpY, const
 	}
 }
 
+void Game::genTongue(int pa) {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//getSegs(0.02f, float mult, const float sign, const float jumpX, const float jumpY, const int segs);
+}
+
+void Game::genEyes(float width, int pa) {
+	IndexedModel im = Bezier2D::genBall(5, 5, 8);
+	IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
+
+	addShape(im, pa, TRIANGLES, 0, 4);//using the basic shader
+	shapes.back()->myTranslate(vec3(-width * 0.66f, lastYext * 0.33f, 0), 0);
+	shapes.back()->myScale(vec3(2.f));
+	shapes.back()->myRotate(90.f, xAx, xAxis1);
+	shapes.back()->myRotate(90.f, xAx, zAxis1);
+	shapes.push_back(new Shape(*shapes.back(), TRIANGLES));	chainParents.push_back(pa);
+	shapes.back()->myTranslate(vec3(width * 0.66f, lastYext * 0.33f, 0), 0);
+	shapes.back()->myScale(vec3(2.f));
+	shapes.back()->myRotate(90.f, xAx, xAxis1);
+	shapes.back()->myRotate(-90.f, xAx, zAxis1);
+}
+
 void Game::getHeadSegs(float& lastX, const float jumpX, const float jumpY, const int segs) {
 	snakeNodesShapesEnd = shapes.size();
 	int pa = snakeNodesShapesEnd;
 	float xCopy = lastX;
 	getSegs(lastX, 1 - 1 / float(segs), -1, jumpX, jumpY, segs);
-	IndexedModel im = Bezier2D::genBall(5,5,8);
-	IT->addSnakeHead(MeshConstructor::getlastInitMeshPositions());
-
-	addShape(im, pa, TRIANGLES, 0, 4);//using the basic shader
-	shapes.back()->myTranslate(vec3(-xCopy * 0.66f, lastYext * 0.33f, 0), 0);
-	shapes.back()->myScale(vec3(2.f));
-	shapes.back()->myRotate(90.f, xAx, xAxis1);
-	shapes.back()->myRotate(90.f, xAx, zAxis1);
-	shapes.push_back(new Shape(*shapes.back(), TRIANGLES));	chainParents.push_back(pa);
-	shapes.back()->myTranslate(vec3(xCopy * 0.66f, lastYext * 0.33f, 0), 0);
-	shapes.back()->myScale(vec3(2.f));
-	shapes.back()->myRotate(90.f, xAx, xAxis1);
-	shapes.back()->myRotate(-90.f, xAx, zAxis1);
+	genEyes(xCopy, snakeNodesShapesEnd);
+	genTongue(snakeNodesShapesEnd);
 }
 
 vec3 myDir(int direction) {
@@ -520,9 +530,12 @@ void Game::setupCurrentLevel() {
 	}
 	else
 		printf("level did not been loaded!");
+
+	isLoading = false;
 }
 
 void Game::setupEnvironment() {
+	isLoading = true;
 	setupCurrentLevel();
 	//after adding snake we should order the camera
 	setUpCamera();
@@ -609,15 +622,15 @@ void Game::setSnakeNodesAngles()
 
 void Game::Debug() {
 	Deactivate();
-	//IT->printDSDebug();
+	IT->printDSDebug();
 	//sMT->printDS();
 }
 
 const int maxFmotion = 10;
-vec3 motionJumps = vec3(0.4f);
+vec3 motionJumps = vec3(0.5f);
 int counter = -maxFmotion;
 int dir = 1;
-float angleFmotion = 6.f;
+float angleFmotion = 8.f;
 void Game::fruitMotion() {
 	counter += dir;
 	if (counter == maxFmotion) {
@@ -634,6 +647,25 @@ void Game::fruitMotion() {
 			fruitsVec[i]->myRotate(angleFmotion, zAx, zAxis1);
 		}
 	}
+}
+
+const int waitForBlink = 40;
+const int waitForUnBlink = 4;
+const int waitForTongue = 15;
+int curWaitForBlink = 0;
+int curWaitForTongue = 0;
+void Game::snakeFaceMotion() {
+	if (curWaitForBlink == 0) {
+		curWaitForBlink = waitForBlink + waitForUnBlink;
+		shapes[snakeNodesShapesEnd + 1]->SetTexture(themes->getTex(4));
+		shapes[snakeNodesShapesEnd + 2]->SetTexture(themes->getTex(4));
+	}
+	else if (curWaitForBlink == waitForBlink) {
+		shapes[snakeNodesShapesEnd + 1]->SetTexture(0);
+		shapes[snakeNodesShapesEnd + 2]->SetTexture(0);
+	}
+	curWaitForBlink--;
+
 }
 
 void Game::Motion()
@@ -654,14 +686,16 @@ void Game::Motion()
 			temp = speed*tailDirection;
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
-		fruitMotion();
-
 		updateSnakePosition();
 		setSnakeNodesAngles();
 		updateCam();
 
 		IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
+
+	fruitMotion();
+	snakeFaceMotion();
+
 	pickedShape = savePicked;
 }
 

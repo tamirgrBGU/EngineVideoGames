@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/objs/snake_female.jpg");//18
 	scn->AddTexture("../res/textures/win.png");//19
 	scn->AddTexture("../res/textures/loading.png");//20
-	scn->Init();
+	
 
 	display.setScene(scn);
 
@@ -72,7 +72,7 @@ int main(int argc,char *argv[])
 	//{
 	//	
 	//}
-
+	scn->Init();
 	while(!display.closeWindow() && !display.quit_game)
 	{
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
