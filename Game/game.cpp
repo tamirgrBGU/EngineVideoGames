@@ -454,11 +454,11 @@ void Game::genSkyCubeHelper(vec3 a1, vec3 a2, vec3 a3, vec3 a4,
 	addShape(leveGenerator::create_square(a2, a3, a4, a1),
 		-1, TRIANGLES, 13, 6);//front
 	addShape(leveGenerator::create_square(a2, a6, a5, a1),
-		-1, TRIANGLES, 16, 6);//left
+		-1, TRIANGLES, 14, 6);//left
 	addShape(leveGenerator::create_square(a3, a7, a8, a4),
-		-1, TRIANGLES, 14, 6);//right
+		-1, TRIANGLES, 15, 6);//right
 	addShape(leveGenerator::create_square(a6, a7, a8, a5),
-		-1, TRIANGLES, 15, 6);//back
+		-1, TRIANGLES, 16, 6);//back
 }
 
 inline void Game::genSkyHelper(float xl, float xh, float yl, float yh, float zl, float zh) {
