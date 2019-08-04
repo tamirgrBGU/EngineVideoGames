@@ -12,6 +12,10 @@ leveGenerator::leveGenerator(int i) {
 	parseLevel(i);
 }
 
+int leveGenerator::size() {
+	return levelName->size();
+}
+
 int fileExists(TCHAR * file)
 {
 	WIN32_FIND_DATA FindFileData;

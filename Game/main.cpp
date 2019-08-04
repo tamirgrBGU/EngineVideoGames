@@ -25,10 +25,10 @@ int main(int argc,char *argv[])
 	scn->addShader("../res/shaders/basicShadertex");//4
 	scn->addShader("../res/shaders/weightsShader");//5
 
-	scn->AddTexture("../res/textures/grass.bmp");//0
-	scn->AddTexture("../res/textures/grass2.bmp");//1
-	scn->AddTexture("../res/textures/grass3.bmp");//2
-	scn->AddTexture("../res/textures/snakeEye.bmp");//3
+	scn->AddTexture("../res/textures/snakeEye.bmp");//0
+	scn->AddTexture("../res/textures/Tongue.png");//1
+	scn->AddTexture("../res/textures/grass2.bmp");//2	// NOT USED
+	scn->AddTexture("../res/textures/grass3.bmp");//3	// NOT USED
 	
 	scn->AddTexture("../res/textures/logo.png");//9
 	scn->AddTexture("../res/textures/start.png");//10

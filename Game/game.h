@@ -38,38 +38,45 @@ public:
 	bool cameramode = false;
 	Game(glm::vec3 position,float angle,float hwRelation,float near, float far);
 	~Game(void);
-	void setSnakeNodesAngles();
-	void updateSnakePosition();
-	void genSnake(float x, float y, float z, int direction);
-	void specialObjHandle(objLocation &obj);
-	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
 	void Init();
-	void playerInput(bool direction);
-	void changeDirPInput(bool dir);
+
 	void addShape(int type, int parent, unsigned int mode);
 	void addShape(IndexedModel model, int parent, unsigned int mode, int tex, int shader);
+
 	void updateDrawMode(unsigned int mode);
-	//	void Update( glm::mat4 MVP ,glm::mat4 *jointTransforms,const int length,const int shaderIndx);
 	void UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx);
 	void UpdateQuaternion(const glm::mat2x4 &lastMVP, const glm::mat2x4 &MVP, const glm::mat2x4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx);
 	void Update(const glm::mat4 &MVP, const glm::mat4 &Normal, const int shaderIndx);
+
 	void WhenRotate();
 	void WhenTranslate();
 	void Motion();
-	void changeCameraMode();
-	void PlayTheme();
-	void PlayPoint();
-	void PlayWin();
+
 	void Debug();
-	void PlayExplosion();
+	void playerInput(bool direction);
+	void changeDirPInput(bool dir);
+	void changeCameraMode();
 	void changeMode() {
 		projMode = (projMode + 1) % 6;
 		updateDrawMode(projMode);
 	};
-
+	
 	void onIntersectSnakeHead(int type, Shape *myShape);
 
+	//to use outside (in main integration with imgui)
+	void switchSoundEnable();
+	int getCurrentLevel();
+	int getTotalLevelCount();
+	int getCurrentFruitCount();
+	int getTotalFruitCount();
 private:
+	bool soundEnable = true;
+
+	void PlayTheme();
+	void PlayPoint();
+	void PlayWin();
+	void PlayExplosion();
+
 	snakeMoveTracker *sMT;
 	void onIntersectCave	(Shape *s);
 	void onIntersectObstecle(Shape *s);
@@ -80,8 +87,9 @@ private:
 
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	const int firstTheme = 2;
-	const int currentLvl = 7;
+	const int currentTheme = 0;
+	const int currentLvl = 0;
+	const int maxLvl = 5;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
 
@@ -101,6 +109,13 @@ private:
 	void getTailSegs(float& lastX, float jumpX, float jumpY, int segs);
 	void getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amount);
 	void orderSegPart(float segLen);
+
+	void setSnakeNodesAngles();
+	void updateSnakePosition();
+
+	void genSnake(float x, float y, float z, int direction);
+	void specialObjHandle(objLocation &obj);
+	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
 
 	void addCubes();
 	void configSound();

@@ -96,7 +96,7 @@ void Game::getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amo
 
 void Game::getHeadSegs(float& lastX, float jumpX, float jumpY, int segs) {
 	int pa = shapes.size();
-	int xCopy = lastX;
+	float xCopy = lastX;
 	getSegs(lastX, 1 - 1 / float(segs), -1, jumpX, jumpY, segs);
 	IndexedModel im = Bezier2D::genBall(5,5,8);
 	snakeNodesShapesEnd = shapes.size() - 1;
@@ -171,7 +171,7 @@ inline void Game::updateThemeArrays()
 }
 
 void Game::loadThemes() {
-	themes = new ThemeHolder(this, 3, firstTheme);
+	themes = new ThemeHolder(this, 3, currentTheme);
 	updateThemeArrays();
 }
 
@@ -263,14 +263,14 @@ void Game::specialObjHandle(objLocation &obj) {
 		printf("added Snake\n");
 		break;
 	case Cave:
-		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale / 2, y + allscale / 2, z - 22), obj.level, 0.05f * allscale, dir);
+		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 100), obj.level, 0.1f * allscale, dir);
 		break;
 	case Obstecle:
-		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.01f * allscale, dir);
+		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z), obj.level, themes->getScale(0) * allscale, dir);
 		break;
 	case Fruit:
 		fruitCounter++;
-		addShapeAndKD(FruitF, themes->getTex(3), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		addShapeAndKD(FruitF, themes->getTex(3), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z), obj.level, themes->getScale(1) * allscale, dir);
 		fruitsVec.push_back(shapes.back());
 		break;
 	default:
@@ -324,22 +324,26 @@ void Game::configSound() {
 
 void Game::PlayTheme()
 {
-	PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	if (soundEnable)
+		PlaySound("../res/sounds/theme.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 }
 
 void Game::PlayPoint()
 {
-	PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+	if (soundEnable)
+		PlaySound("../res/sounds/eat_apple.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
 }
 
 void Game::PlayWin()
 {
-	PlaySound("../res/sounds/Cheering.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+	if(soundEnable)
+		PlaySound("../res/sounds/Cheering.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
 }
 
 void Game::PlayExplosion()
 {
-	PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
+	if (soundEnable)
+		PlaySound("../res/sounds/explosion.wav", NULL, SND_ASYNC | SND_FILENAME | SND_NOWAIT | SND_RING);
 }
 
 void Game::updateSnakePosition()
@@ -565,4 +569,24 @@ void Game::changeDirPInput(bool dir){
 
 void Game::playerInput(bool dir) {
 	changeDirPInput(dir);
+}
+
+void Game::switchSoundEnable() {
+	soundEnable = !soundEnable;
+}
+
+int Game::getCurrentLevel() {
+	return currentLvl;
+}
+
+int Game::getTotalLevelCount() {
+	return lGen->size();
+}
+
+int Game::getCurrentFruitCount() {
+	return fruitsVec.size();
+}
+
+int Game::getTotalFruitCount() {
+	return fruitsVec.size() - fruitCounter;
 }

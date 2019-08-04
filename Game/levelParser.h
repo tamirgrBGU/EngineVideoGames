@@ -54,6 +54,7 @@ private:
 	void init(const char *);
 public:
 	struct objMap getLevel(int i);
+	int size();
 	leveGenerator(int i);
 	~leveGenerator(void);
 };

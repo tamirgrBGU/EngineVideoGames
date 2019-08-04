@@ -5,6 +5,16 @@
 #include <stdio.h>
 #include <random>
 
+float scale1[] = { 0.01f, 0.003f };
+float scale2[] = { 0.01f, 0.003f };
+float scale3[] = { 0.01f, 0.003f };
+float scale4[] = { 0.01f, 0.003f };
+float scale5[] = { 0.01f, 0.003f };
+float *scales[] = { scale1, scale2, scale3, scale4, scale5 };
+int ThemeHolder::getScale(int type) {
+	return scales[current][type];
+}
+
 static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.jpg", "snake.jpg" };
 static const int TexImgSize = sizeof(TexImg) / sizeof(char*);
 static const char *sharedObjNames[] = { "../res/objs/cave.obj" };
