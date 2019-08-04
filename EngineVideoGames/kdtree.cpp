@@ -235,7 +235,7 @@ void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType> plist[], unsigned
 		Node* left_node = new Node(N);
 		Node* right_node = new Node(N);
 
-		if (depth < max_depth & (plist[0].size()) > 3 & (plist[1].size() > 3) & (plist[2].size() > 3)) {
+		if ((depth < max_depth) & (plist[0].size()) > 3 & (plist[1].size() > 3) & (plist[2].size() > 3)) {
 			Kdtree::_makeTree(left_node, plistNEXT[0], depth + 1);
 			if (!plistNEXT[0][axis].empty()) head->left = left_node;
 

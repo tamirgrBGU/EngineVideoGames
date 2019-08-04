@@ -78,6 +78,7 @@ public:
 	void PlayTheme() {
 		PlaySoundGame(Theme);
 	}
+
 	int currentTheme = 0;
 
 private:

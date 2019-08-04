@@ -44,12 +44,14 @@ void Menu::DrawMenu()
 			
 			ImGui::Begin("logoWindow", &show_window, ImVec2((float)1200, (float)800), -1.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 			ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - 615)*0.5f, (ImGui::GetWindowSize().y - 352)* 0.2f));
-			ImGui::Image((GLuint*)5, ImVec2(615, 352));
+			ImGui::Image((GLuint*) 5, ImVec2(615, 352));
 			ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - 800)*0.5f, (ImGui::GetWindowSize().y - 89)* 0.6f));
-			ImGui::Image((GLuint*)12, ImVec2(800, 89));
+			ImGui::Image((GLuint*) 12, ImVec2(800, 89));
 			ImGui::SetCursorPos(ImVec2((ImGui::GetWindowSize().x - 200)*0.5f, (ImGui::GetWindowSize().y - 63)* 0.8f));
-			if (ImGui::ImageButton((GLuint*)6, ImVec2(200, 63)))
+			if (ImGui::ImageButton((GLuint*)6, ImVec2(200, 63))) {
+				scn->playWelcome();
 				this->show_window = false;
+			}
 			ImGui::End();
 
 			ImGui::Render();

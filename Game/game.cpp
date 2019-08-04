@@ -277,7 +277,7 @@ void Game::specialObjHandle(objLocation &obj) {
 		break;
 	case Cave:
 		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 60.f), obj.level, 0.2f * allscale, dir);
-		genObj(1, 1, vec3(x + allscale * 1.f, y, z-5.f), 0.07f * allscale, (dir+2)%4);
+		genObj(1, 18, vec3(x + allscale * 1.f, y, z-5.f), 0.06f * allscale, (dir+2)%4);
 		break;
 	case Obstecle:
 		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z), obj.level, themes->getScale(0) * allscale, dir);

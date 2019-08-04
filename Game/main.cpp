@@ -40,12 +40,12 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/credits.png");//11
 	scn->AddTexture("../res/textures/sky-up.jpg");//12
 	
-	scn->AddTexture("../res/textures/sky-front.jpg");//14
-	scn->AddTexture("../res/textures/sky-left.jpg");//13
-	scn->AddTexture("../res/textures/sky-right.jpg");//14
-	scn->AddTexture("../res/textures/sky-back.jpg");//15
-	scn->AddTexture("../res/textures/sky-bottom.jpg");//16
-	scn->AddTexture("../res/objs/snake_female.png");//17
+	scn->AddTexture("../res/textures/sky-front.jpg");//13
+	scn->AddTexture("../res/textures/sky-left.jpg");//14
+	scn->AddTexture("../res/textures/sky-right.jpg");//15
+	scn->AddTexture("../res/textures/sky-back.jpg");//16
+	scn->AddTexture("../res/textures/sky-bottom.jpg");//17
+	scn->AddTexture("../res/objs/snake_female.jpg");//18
 
 	scn->Init();
 

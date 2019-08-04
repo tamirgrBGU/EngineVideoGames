@@ -20,7 +20,7 @@ void IndexedModel::CalcNormals()
     
     for(unsigned int i = 0; i < positions.size(); i++)
 	{
-		if (normals[i].x == 0 & normals[i].y == 0 & normals[i].z == 0)
+		if ((normals[i].x == 0) & (normals[i].y == 0) & (normals[i].z == 0))
 			normals[i] = vec3(1, 0, 0);//handle bad files..
 		else
 			normals[i] = glm::normalize(normals[i]);
