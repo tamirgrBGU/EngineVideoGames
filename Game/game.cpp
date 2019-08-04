@@ -207,7 +207,7 @@ bool Game::onIntersectCave(Shape *s) {
 	if (fruitCounter == 0) {
 		PlaySoundGame(Win);
 		loadNextLevel();
-		orderCamera();
+		orderCameraTop();
 		Deactivate();
 		pickedShape = -1;
 		return 1;
@@ -381,7 +381,7 @@ void Game::updateSnakePosition()
 	headTransMAT = root;
 }
 
-inline void Game::orderCamera() {
+inline void Game::orderCameraTop() {
 	updateSnakePosition();
 	setCameraTopView();
 }
@@ -389,7 +389,7 @@ inline void Game::orderCamera() {
 void Game::setUpCamera() {
 	float zView = -1.5f*snakeFullLength;
 	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
-	orderCamera();
+	orderCameraTop();
 }
 
 void Game::resetSnake() {
@@ -414,7 +414,7 @@ void Game::resetSnake() {
 		}
 	}
 
-	orderCamera();
+	orderCameraTop();
 }
 
 void Game::resetCurrentLevel(){
@@ -621,10 +621,10 @@ void Game::Motion()
 			temp = speed*tailDirection;
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
-		orderCamera();
-
 		fruitMotion();
 
+		updateSnakePosition();
+		setSnakeNodesAngles();
 		updateCam();
 
 		IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);

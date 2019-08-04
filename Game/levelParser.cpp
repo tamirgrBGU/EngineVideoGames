@@ -354,7 +354,8 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 
 
 static const int minObjToRand = 4;
-static const int maxObjToRand = 20 - minObjToRand;
+static const int maxObjToRand = 10 - minObjToRand;
+static const int minTreesToRand = 3;
 static const int minFruitToRand = 3;
 static const int maxFruitToRand = 5 - minFruitToRand;
 
@@ -380,7 +381,7 @@ void randFill(std::vector<struct objConnected>& vec, std::vector<struct objLocat
 				(!objC->right || (!objC->right->down || (objC->right->down->me.type < 0)));*/
 			//printf("%d", neighbors?1:0);
 			if (neighbors) {
-				printf("%f %f\n", obj->x, obj->y);
+				//printf("%f %f\n", obj->x, obj->y);
 				obj->type = type;
 				specialObj->push_back(*obj);
 				RandOBJs--;
@@ -392,10 +393,10 @@ void randFill(std::vector<struct objConnected>& vec, std::vector<struct objLocat
 void randObj(std::vector<struct objConnected>& vec, std::vector<struct objLocation>* specialObj) {
 	int RandOBJs = minObjToRand + std::rand() % maxObjToRand;
 	int fruits = minFruitToRand + std::rand() % maxFruitToRand;
-	int trees = RandOBJs - fruits;
+	int trees  = minTreesToRand + RandOBJs - fruits;
 	printf("rand %d trees and %d fruits\n", trees, fruits);
-	randFill(vec, specialObj, 5, 3);
-	randFill(vec, specialObj, 5, 4);
+	randFill(vec, specialObj, fruits, 3);
+	randFill(vec, specialObj, trees, 4);
 
 	for (unsigned int i = 0; i < vec.size(); i++) {
 		struct objConnected objC = vec[i];

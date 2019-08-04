@@ -129,7 +129,7 @@ private:
 
 	void addCubes();
 	void configSound();
-	void orderCamera();
+	void orderCameraTop();
 	void setUpCamera();
 };
 
