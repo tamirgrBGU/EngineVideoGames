@@ -174,7 +174,7 @@ inline void Game::updateThemeArrays()
 }
 
 void Game::loadThemes() {
-	themes = new ThemeHolder(this, 3, currentTheme);
+	themes = new ThemeHolder(this, 4, currentTheme);
 	updateThemeArrays();
 }
 
@@ -254,7 +254,7 @@ void Game::onIntersectStairs(Shape *s) {
 }
 
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
-enum IntersectFuncTypes { CaveF, ObstecleF, FruitF, StairF, WallF, FallWallF };
+enum IntersectFuncTypes { CaveF, SnakeGirl, ObstecleF, FruitF, StairF, WallF, FallWallF };
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
 	genObj(myIndex, tex, pos, scale, dir);
 	if (computedKDtrees[myIndex])
@@ -280,7 +280,8 @@ void Game::specialObjHandle(objLocation &obj) {
 		printf("added Snake\n");
 		break;
 	case Cave:
-		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 60), obj.level, 0.21f * allscale, dir);
+		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 60.f), obj.level, 0.2f * allscale, dir);
+		genObj(1, 1, vec3(x + allscale * 1.f, y, z-5.f), 0.07f * allscale, (dir+2)%4);
 		break;
 	case Obstecle:
 		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z), obj.level, themes->getScale(0) * allscale, dir);
@@ -689,6 +690,8 @@ void Game::playerInput(bool dir) {
 }
 
 void Game::switchSoundEnable() {
+	if (soundEnable)
+		PlaySoundGame(Hiss);
 	soundEnable = !soundEnable;
 }
 

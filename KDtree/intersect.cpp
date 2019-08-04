@@ -250,7 +250,7 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 			intersect_with = (res1 & res2) > 0;
 		}
 	}
-	if (intersect_with && ((signed)depth >= maxDep-1)) {//none of the children are intersecting - add perants
+	if (intersect_with && ((signed)depth >= maxDep-2)) {//none of the children are intersecting - add perants
 		insert_box(output, boxvec, currentTransMe,	  glm::vec3(0.2, 0.2, 1));
 		insert_box(output, boxvec2, currentTransOther, glm::vec3(1, 0.2, 0.2));
 	}
@@ -259,6 +259,9 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 //in iteration level the boxes are intersecting we will assure it happen in the children too
 void intersect::rec_is_intersect(Node *current, Node *other,
 			int depth, std::vector<std::vector<glm::vec3>> *output) {
+	if (output->size() > 0)
+		return;//optimize
+
 	int axis = depth % 3;
 	std::vector<glm::vec3> boxvec = bound_vec_to_boundbox(current->boundbox);
 	std::vector<glm::vec3> boxvec2 = bound_vec_to_boundbox( other->boundbox);

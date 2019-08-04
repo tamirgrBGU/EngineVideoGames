@@ -17,7 +17,7 @@ float ThemeHolder::getScale(int type) {
 
 static const char *TexImg[] = { "floor.jpg", "wall.jpg", "tree.png", "fruit.jpg", "snake.jpg" };
 static const int TexImgSize = sizeof(TexImg) / sizeof(char*);
-static const char *sharedObjNames[] = { "../res/objs/cave.obj" };
+static const char *sharedObjNames[] = { "../res/objs/cave.obj", "../res/objs/snake_female.obj" };
 static const int sharedSize = sizeof(sharedObjNames) / sizeof(char*);
 static const char *objNames[] = { "tree.obj", "fruit.obj" };
 static const char *path = "../res/objs-ordered/levels/%s/%s";
@@ -100,12 +100,22 @@ void ThemeHolder::swapThemes(int next) {
 }
 
 ThemeHolder::~ThemeHolder(){
+
+	for (int i = 0; i < sharedSize; i++) {
+		if (themes[0]->computedKDtrees[i] != nullptr) {
+			Kdtree::kill((Node *)themes[0]->computedKDtrees[i]);
+			delete ((IndexedModel *)themes[0]->uploadedObj[i]);
+		}
+	}
 	for (int i = 0; i < (signed) themes.size(); i++) {
 		delete themes[i]->themeName;
-		for (int j = 0; j < size; j++)
-			delete themes[i]->filepath[j];		
-		delete themes[i]->uploadedObj;
-		delete themes[i]->computedKDtrees;
+		for (int j = 0; j < size; j++) {
+			delete themes[i]->filepath[j];
+			if ((themes[i]->computedKDtrees[j] != nullptr) & (j >= sharedSize)) {
+				Kdtree::kill((Node *)themes[i]->computedKDtrees[j]);
+				delete ((IndexedModel *)themes[i]->uploadedObj[j]);
+			}
+		}
 		delete themes[i];
 	}
 	themes.clear();

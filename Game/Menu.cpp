@@ -57,13 +57,13 @@ void Menu::DrawMenu()
 			break;
 		case 1:
 			ImGui::Begin("score", &show_window, ImVec2((float)200, (float)800), 0.0f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove );
-			ImGui::SetWindowSize("score", ImVec2((float)300, (float)500));
+			ImGui::SetWindowSize("score", ImVec2((float)350, (float)500));
 			style.WindowBorderSize = 0.0f;
 			
 			if (ImGui::Button(this->extra_options?"Resume":"Options")) {
 				printf("clicked on options\n");
+				this->extra_options ? this->scn->Activate() : this->scn->Deactivate();
 				this->extra_options = !this->extra_options;
-				this->scn->PauseUnpause();
 			}
 			if (this->extra_options) {
 				this->sound = this->scn->getSoundVar();

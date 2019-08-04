@@ -200,7 +200,7 @@ inline void prepareLists(std::list<Kdtree::vecType>& plist, std::list<Kdtree::ve
 void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 {
 	root = new Node(3);
-	max_depth = (unsigned int)log2((plist.size() >> 4));
+	max_depth = (unsigned int)log2((plist.size() >> 3));
 
 	printf("size %d max depth %d", plist.size(), max_depth);
 
@@ -214,7 +214,7 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType> plist[], unsigned int depth )
 {	
 	int axis = depth % N;
-	if( 2 < plist[axis].size())
+	if( !plist[0].empty() & !plist[1].empty() & !plist[2].empty())
 	{
 		std::list<Kdtree::vecType> plistNEXT[2][3];
 		std::list<Kdtree::vecType> l1, l2, l3, l4, l5, l6;
@@ -235,7 +235,7 @@ void Kdtree::_makeTree( Node* head, std::list<Kdtree::vecType> plist[], unsigned
 		Node* left_node = new Node(N);
 		Node* right_node = new Node(N);
 
-		if (depth < max_depth) {
+		if (depth < max_depth & (plist[0].size()) > 3 & (plist[1].size() > 3) & (plist[2].size() > 3)) {
 			Kdtree::_makeTree(left_node, plistNEXT[0], depth + 1);
 			if (!plistNEXT[0][axis].empty()) head->left = left_node;
 

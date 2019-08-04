@@ -20,7 +20,10 @@ void IndexedModel::CalcNormals()
     
     for(unsigned int i = 0; i < positions.size(); i++)
 	{
-        normals[i] = glm::normalize(normals[i]);
+		if (normals[i].x == 0 & normals[i].y == 0 & normals[i].z == 0)
+			normals[i] = vec3(1, 0, 0);//handle bad files..
+		else
+			normals[i] = glm::normalize(normals[i]);
 		colors[i] = (glm::vec3(1,1,1) + normals[i])/2.0f;
 	}
 }

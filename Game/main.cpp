@@ -44,7 +44,8 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/sky-left.jpg");//13
 	scn->AddTexture("../res/textures/sky-right.jpg");//14
 	scn->AddTexture("../res/textures/sky-back.jpg");//15
-	scn->AddTexture("../res/textures/sky-bottom.jpg");//1
+	scn->AddTexture("../res/textures/sky-bottom.jpg");//16
+	scn->AddTexture("../res/objs/snake_female.png");//17
 
 	scn->Init();
 
@@ -54,27 +55,28 @@ int main(int argc,char *argv[])
 	Menu* menu2 = new Menu(&display, scn, 1); //fruits count and options - his name is fruitCounter in game.h private
 
 
+	if (!menu->created)
+	{
+		menu->create();
+
+		init(display);
+		scn->PlayTheme();
+	}
+
+	if (!menu->created)
+	{
+		menu2->create();
+		//init(display);
+	}
+
 	while(!display.closeWindow() && !display.quit_game)
 	{
 		display.Clear(1.0f, 1.0f, 1.0f, 1.0f);
 		scn->Draw(1,0,true);
 		scn->Motion();
-
-		if (!menu->created)
-		{
-			menu->create();
-			
-			init(display);
-			scn->PlayTheme();
-		}
 		if (menu->show_window)
 			menu->DrawMenu();
 
-		if (!menu->created)
-		{
-			menu2->create();
-			//init(display);
-		}
 		if (!menu->show_window)
 			menu2->DrawMenu();
 
