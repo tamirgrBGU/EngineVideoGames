@@ -32,7 +32,7 @@ class Game : public Scene
 	const float slowSpeed = 2.f;
 	const float speed = 3.f;
 	float superSpeedTicks = 0;
-	const float superSpeed = 4.f;
+	const float superSpeed = 5.f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
@@ -117,16 +117,19 @@ private:
 	int fruitCounter;
 	std::vector<Shape *> fruitsVec;
 	void fruitMotion();
+	void snakeFaceMotion();
 
 	inline void orderGenObj(vec3 startLoc, float scale, int direction);
 	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
 
 	void getSegs(float& lastX, float mult, float sign, float jumpX, float jumpY, int segs);
-	void getHeadSegs(float& lastX, float jumpX, float jumpY, int segs);
+	void orderSegPart(float segLen);
 	void getTailSegs(float& lastX, float jumpX, float jumpY, int segs);
 	void getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amount);
-	void orderSegPart(float segLen);
-	
+	void getHeadSegs(float& lastX, float jumpX, float jumpY, int segs);
+	void genTongue(int pa);
+	void genEyes(float width, int pa);
+
 	int snakeLevel;
 	int snakeNodesShapesStart = -1;
 	int snakeNodesShapesEnd = -1;

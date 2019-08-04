@@ -13,6 +13,7 @@ case GLFW_KEY_F1:			in case it is too hard for you to complete the level press t
 case GLFW_KEY_D:			will change the camera mode
 
 rules-
+loading levels take at most 20 seconds, be patient.
 the menu buttons need a long click to get your input.
 the snake is hunting food for his lover snake
 you should get all the available food in the map and touch the cave wall to proceed to next level.
@@ -28,7 +29,7 @@ coolFeatures-
 5. maps are saved as csv
 6. food and obstacles are random generated
 7. skybox
-8. snake animations
+8. snake animations - close eyes and toungh motion
 9. menu and in game options
 
 known bugs-
