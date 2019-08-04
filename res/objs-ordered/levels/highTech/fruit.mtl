@@ -1,8 +1,5 @@
 # Exported from 3D Builder
 
-newmtl Default_0
-Kd 0.737255 0.737255 0.737255
-
 newmtl Mat_0
 Kd 1.000000 1.000000 1.000000
 map_Kd fruit.jpg

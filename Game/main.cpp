@@ -7,7 +7,7 @@ int main(int argc,char *argv[])
 {
 	const int DISPLAY_WIDTH = 1200;
 	const int DISPLAY_HEIGHT = 800;
-	const float zFar = 10000.0f;
+	const float zFar = 100000.0f;
 	const float zNear = 1.0f;
 	const float CAM_ANGLE = 60.0f;
 	const float relation = (float)DISPLAY_WIDTH/(float)DISPLAY_HEIGHT;
@@ -23,7 +23,8 @@ int main(int argc,char *argv[])
 	scn->addShader("../res/shaders/basicShader");//3
 	scn->addShader("../res/shaders/basicShadertex");//4
 	scn->addShader("../res/shaders/weightsShader");//5
-
+	scn->addShader("../res/shaders/basicShadertexNoShadow");//5
+	
 	scn->AddTexture("../res/textures/snakeEye.bmp");//0
 	scn->AddTexture("../res/textures/Tongue.png");//1
 	scn->AddTexture("../res/textures/grass2.bmp");//2	// NOT USED
@@ -37,6 +38,13 @@ int main(int argc,char *argv[])
 	scn->AddTexture("../res/textures/fruit4.png");//9
 	scn->AddTexture("../res/textures/fruit5.png");//10
 	scn->AddTexture("../res/textures/credits.png");//11
+	scn->AddTexture("../res/textures/sky-up.jpg");//12
+	scn->AddTexture("../res/textures/sky-front.jpg");//13
+	scn->AddTexture("../res/textures/sky-right.jpg");//14
+	scn->AddTexture("../res/textures/sky-back.jpg");//15
+	scn->AddTexture("../res/textures/sky-left.jpg");//16
+	scn->AddTexture("../res/textures/sky-bottom.jpg");//17
+
 	scn->Init();
 
 	display.setScene(scn);
