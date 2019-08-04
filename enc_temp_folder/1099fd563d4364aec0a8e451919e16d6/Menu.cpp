@@ -8,10 +8,12 @@ Menu::Menu(Display *display, Scene *scn, int type)
 	this->scn = scn;
 	this->created = false;
 	this->move = false;
+	this-> f = 0.0f;
 	this->type = type;
-	this->show_window = true;
-	this->extra_options = false;
-	this->text_color = ImVec4(0.45f, 0.55f, 0.60f, 0.00f);
+	this->sounds = sounds;
+	show_window = true;
+	extra_options = false;
+	text_color = ImVec4(0.45f, 0.55f, 0.60f, 0.00f);
 }
 
 void Menu::create()

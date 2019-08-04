@@ -80,7 +80,7 @@ private:
 
 	ThemeHolder *themes;
 	void updateThemeArrays();
-	const int firstTheme = 2;
+	const int firstTheme = 4;
 	const int currentLvl = 7;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
