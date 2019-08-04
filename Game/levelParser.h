@@ -53,6 +53,7 @@ private:
 	int currentLevel;
 	void init(const char *);
 public:
+	static IndexedModel create_square(vec3 a, vec3 b, vec3 c, vec3 d);
 	struct objMap getLevel(int i);
 	int size();
 	leveGenerator(int i);

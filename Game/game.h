@@ -95,6 +95,10 @@ private:
 	const int maxGameLvl = 5;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
+	void genSky(float widthOfMap);
+	inline void genSkyCubeHelper(vec3 a1, vec3 a2, vec3 a3, vec3 a4,
+		vec3 a5, vec3 a6, vec3 a7, vec3 a8);
+	inline void genSkyHelper(float xl, float xh, float yl, float yh, float zl, float zh);
 
 	void resetCurrentLevel();
 	void resetSnake();

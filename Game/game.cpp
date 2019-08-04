@@ -445,10 +445,38 @@ void Game::loadNextLevel() {
 		setupCurrentLevel();
 	}
 }
+//2 3 -> 6 7
+//1 4 -> 5 8
+void Game::genSkyCubeHelper(vec3 a1, vec3 a2, vec3 a3, vec3 a4,
+						vec3 a5, vec3 a6, vec3 a7, vec3 a8) {
+	addShape(leveGenerator::create_square(a2, a3, a6, a7),
+		-1, TRIANGLES, 1, 4);//top
+	addShape(leveGenerator::create_square(a2, a3, a1, a4),
+		-1, TRIANGLES, 1, 4);//front
+	addShape(leveGenerator::create_square(a2, a6, a1, a5),
+		-1, TRIANGLES, 1, 4);//left
+	addShape(leveGenerator::create_square(a3, a7, a4, a8),
+		-1, TRIANGLES, 1, 4);//right
+	addShape(leveGenerator::create_square(a6, a7, a5, a8),
+		-1, TRIANGLES, 1, 4);//back
+}
 
+inline void Game::genSkyHelper(float xl, float xh, float yl, float yh, float zl, float zh) {
+	genSkyCubeHelper(vec3(xl, yh, zl), vec3(xl, yh, zh),
+					 vec3(xh, yh, zh), vec3(xh, yh, zl),
+					 vec3(xl, yl, zl), vec3(xl, yl, zh),
+					 vec3(xh, yl, zh), vec3(xh, yl, zl));
+}
+
+void Game::genSky(float widthOfMap) {
+	genSkyHelper(-widthOfMap, 2 * widthOfMap, -widthOfMap, 2 * widthOfMap, -zscale, 4 * zscale);
+}
 void Game::setupCurrentLevel() {
 	printf("parsing file\n");
+
 	struct objMap map = lGen->getLevel(currentLvl);
+	genSky(glm::sqrt(float(map.levelGround->size()))*allscale);
+
 	fruitCounter = 0;
 	fruitsVec.clear();
 	printf("loading level:%d walls:%d stairs:%d\n", currentLvl, map.walls->size(), map.stairs->size());

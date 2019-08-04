@@ -130,7 +130,7 @@ square
 a	b
 c	d
 */
-IndexedModel create_square(vec3 a, vec3 b, vec3 c, vec3 d) {
+IndexedModel leveGenerator::create_square(vec3 a, vec3 b, vec3 c, vec3 d) {
 	IndexedModel square;
 	square.positions.push_back(a);	square.positions.push_back(b);
 	square.positions.push_back(c);	square.positions.push_back(d);
@@ -187,24 +187,24 @@ IndexedModel create_UHtriangle(float xa, float ya, float za, float xc, float zc)
 }
 
 IndexedModel create_wall_square(float xa, float ya, float za, float xc, float yc, float zc) {
-	return create_square(vec3(xa, ya, za), vec3(xc, ya, za), vec3(xc, yc, zc), vec3(xa, yc, zc));
+	return leveGenerator::create_square(vec3(xa, ya, za), vec3(xc, ya, za), vec3(xc, yc, zc), vec3(xa, yc, zc));
 }
 
 IndexedModel create_Hstairs_square(float xa, float ya, float za, float xc, float yc, float zc) {
-	return create_square(vec3(xa, ya, za), vec3(xa, yc, za), vec3(xc, yc, zc), vec3(xc, ya, zc));
+	return leveGenerator::create_square(vec3(xa, ya, za), vec3(xa, yc, za), vec3(xc, yc, zc), vec3(xc, ya, zc));
 }
 
 IndexedModel create_Hwall_square(float xa, float ya, float za, float xc, float zc) {
-	return create_square(vec3(xa, ya, za), vec3(xc, ya, za), vec3(xc, ya, zc), vec3(xa, ya, zc));
+	return leveGenerator::create_square(vec3(xa, ya, za), vec3(xc, ya, za), vec3(xc, ya, zc), vec3(xa, ya, zc));
 }
 
 IndexedModel create_Vwall_square(float xa, float ya, float za, float yc, float zc) {
-	return create_square(vec3(xa, ya, za), vec3(xa, yc, za), vec3(xa, yc, zc), vec3(xa, ya, zc));
+	return leveGenerator::create_square(vec3(xa, ya, za), vec3(xa, yc, za), vec3(xa, yc, zc), vec3(xa, ya, zc));
 }
 
 
 IndexedModel create_ground_square(float xa, float ya, float xc, float yc, float z) {
-	return create_square(vec3(xa, ya, z), vec3(xc, ya, z), vec3(xc, yc, z), vec3(xa, yc, z));
+	return leveGenerator::create_square(vec3(xa, ya, z), vec3(xc, ya, z), vec3(xc, yc, z), vec3(xa, yc, z));
 }
 
 inline void genMW(modelWrapper& mw, struct objLocation obj) {
@@ -354,7 +354,7 @@ void setStairs(const struct objConnected objC, std::vector<modelWrapper>* walls,
 
 
 static const int minObjToRand = 4;
-static const int maxObjToRand = 10 - minObjToRand;
+static const int maxObjToRand = 8 - minObjToRand;
 static const int minTreesToRand = 3;
 static const int minFruitToRand = 3;
 static const int maxFruitToRand = 5 - minFruitToRand;
@@ -395,8 +395,8 @@ void randObj(std::vector<struct objConnected>& vec, std::vector<struct objLocati
 	int fruits = minFruitToRand + std::rand() % maxFruitToRand;
 	int trees  = minTreesToRand + RandOBJs - fruits;
 	printf("rand %d trees and %d fruits\n", trees, fruits);
-	randFill(vec, specialObj, fruits, 3);
-	randFill(vec, specialObj, trees, 4);
+	randFill(vec, specialObj, trees, 3);
+	randFill(vec, specialObj, fruits, 4);
 
 	for (unsigned int i = 0; i < vec.size(); i++) {
 		struct objConnected objC = vec[i];
