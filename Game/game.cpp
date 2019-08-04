@@ -86,7 +86,7 @@ void Game::getTailSegs(float *lastX, float jumpX, float jumpY, int segs) {
 
 void Game::getBodySegs(float *lastX, float jumpX, float jumpY, int segs, int amount) {
 	getSegs(lastX, 1, 0, jumpX, jumpY, segs);
-	Shape *bodySeg = shapes[shapes.size() - 1];
+	Shape *bodySeg = shapes.back();
 	for (int i = 0; i < amount - 1; i++) {
 		chainParents.push_back(-1);
 		shapes.push_back(new Shape(*bodySeg, TRIANGLES));
@@ -168,16 +168,16 @@ void Game::changeTheme(int nextTheme) {
 void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction) {
 	if (uploadedFiles[ptrIndx] == nullptr) {
 		addShapeFromFile(filePath[ptrIndx], -1, TRIANGLES, tex, 4);//using the basic shader
-		uploadedFiles[ptrIndx] = shapes[shapes.size() - 1];
+		uploadedFiles[ptrIndx] = shapes.back();
 	}
 	else {
 		chainParents.push_back(-1);
 		shapes.push_back(new Shape(*uploadedFiles[ptrIndx], TRIANGLES));
 	}
-	shapes[shapes.size() - 1]->myTranslate(startLoc, 0);
+	shapes.back()->myTranslate(startLoc, 0);
 	if (scale != -1)
 		shapeTransformation(shapes.size() - 1, Scale, vec3(scale, scale, scale));
-	shapes[shapes.size() - 1]->myRotate(90.f * direction, zAx, zAxis1);
+	shapes.back()->myRotate(90.f * direction, zAx, zAxis1);
 }
 
 void Game::onIntersectCave(Shape *s) {
@@ -222,9 +222,9 @@ enum IntersectFuncTypes { CaveF, ObstecleF, FruitF, StairF, WallF, FallWallF };
 inline void Game::addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir) {
 	genObj(myIndex, tex, pos, scale, dir);
 	if (computedKDtrees[myIndex])
-		IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, computedKDtrees[myIndex]);
+		IT->addObj(x, y, level, shapes.back(), myIndex, computedKDtrees[myIndex]);
 	else
-		computedKDtrees[myIndex] = IT->addObj(x, y, level, shapes[shapes.size() - 1], myIndex, MeshConstructor::getlastInitMeshPositions());
+		computedKDtrees[myIndex] = IT->addObj(x, y, level, shapes.back(), myIndex, MeshConstructor::getlastInitMeshPositions());
 }
 
 /*
@@ -253,6 +253,7 @@ void Game::specialObjHandle(objLocation &obj) {
 	case Fruit:
 		fruitCounter++;
 		addShapeAndKD(FruitF, themes->getTex(3), x, y, vec3(x + allscale / 2, y + allscale / 2, z), obj.level, 0.003f * allscale, dir);
+		fruitsVec.push_back(shapes.back());
 		break;
 	default:
 		printf("unknown special obj <%d>\n", obj.type);
@@ -351,35 +352,36 @@ void Game::setupCurrentLevel() {
 	printf("parsing files");
 	struct objMap map = lGen->getLevel(currentLvl);
 	fruitCounter = 0;
+	fruitsVec.clear();
 	printf("level:%d walls:%d stairs:%d\n", currentLvl, map.walls->size(), map.stairs->size());
 
 	if (map.levelGround != nullptr) {
 		for (modelWrapper &obj : *map.levelGround) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
-			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			shapes.back()->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 		}
 		for (modelWrapper &obj : *map.walls) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(1), 4);
-			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
-			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+			shapes.back()->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			IT->addObj(obj.x, obj.y, obj.level, shapes.back(),
 				WallF, MeshConstructor::getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.stairs) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
-			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			shapes.back()->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
 		}
 		for (modelWrapper &obj : *map.stairsWalls) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
-			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
-			shapes[shapes.size() - 1]->Hide();
-			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+			shapes.back()->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			shapes.back()->Hide();
+			IT->addObj(obj.x, obj.y, obj.level, shapes.back(),
 				StairF, MeshConstructor::getlastInitMeshPositions());
 		}
 		for (modelWrapper &obj : *map.fallWalls) {
 			addShape(obj.model, -1, TRIANGLES, themes->getTex(0), 4);
-			shapes[shapes.size() - 1]->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
-			shapes[shapes.size() - 1]->Hide();
-			IT->addObj(obj.x, obj.y, obj.level, shapes[shapes.size() - 1],
+			shapes.back()->myTranslate(vec3(obj.x, obj.y, obj.z), 0);
+			shapes.back()->Hide();
+			IT->addObj(obj.x, obj.y, obj.level, shapes.back(),
 				FallWallF, MeshConstructor::getlastInitMeshPositions());
 		}
 		for (objLocation &obj : *map.specialObj)
@@ -478,16 +480,41 @@ void Game::Debug() {
 	//sMT->printDS();
 }
 
+const int maxFmotion = 10;
+int counter = -maxFmotion;
+float dir = 1;
+float angleFmotion = 10.f;
+void Game::fruitMotion() {
+	counter += dir;
+	if (counter == maxFmotion)
+		dir = -1;
+	else if (counter == -maxFmotion)
+		dir = 1;
+	vec3 tempTR = dir*zAx;
+	for (int i = 0; i < (signed) fruitsVec.size(); i++) {
+		fruitsVec[i]->myTranslate(tempTR, 1);
+		fruitsVec[i]->myRotate(angleFmotion, zAx, zAxis1);
+	}
+}
+
 void Game::Motion()
 {
 	int savePicked = pickedShape;
 	if (isActive)
-	{
-		vec3 temp(tailDirection.x * speed, tailDirection.y * speed, tailDirection.z * speed);
+	{	
+		vec3 temp;
+		if (rotRecently) {
+			rotRecently = false;
+			temp = vec3(tailDirection.x * slowSpeed, tailDirection.y * slowSpeed, tailDirection.z * slowSpeed);
+		}
+		else
+			temp = vec3(tailDirection.x * speed, tailDirection.y * speed, tailDirection.z * speed);
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, temp);
 		
 		setSnakeNodesAngles();
 		updateSnakePosition();
+
+		fruitMotion();
 
 		updateCam();
 
@@ -508,6 +535,7 @@ mat4 rotNPl = glm::rotate(-anglePL, zAx);
 void Game::changeDirPInput(bool dir){
 	Deactivate();
 
+	rotRecently = true;
 	int sign = (dir ? -1 : 1);
 	arrowKeyPL += sign;
 	sMT->add(zAx, sign*anglePL);

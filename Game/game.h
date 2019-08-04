@@ -28,6 +28,8 @@ class Game : public Scene
 {
 	const int snakeLength = 30, segs = 5, ends = 10;
 	int projMode = -1;
+	bool rotRecently = false;
+	const float slowSpeed = 1.f;
 	const float speed = 3.f;
 public:
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
@@ -69,7 +71,6 @@ public:
 
 private:
 	snakeMoveTracker *sMT;
-	int fruitCounter;
 	void onIntersectCave	(Shape *s);
 	void onIntersectObstecle(Shape *s);
 	void onIntersectFruit	(Shape *s);
@@ -87,7 +88,13 @@ private:
 	void loadThemes();
 	void setupCurrentLevel();
 	void changeTheme(int nextTheme);
+
+	int fruitCounter;
+	std::vector<Shape *> fruitsVec;
+	void fruitMotion();
+
 	inline void addShapeAndKD(int myIndex, int tex, float x, float y, vec3 pos, int level, float scale, int dir);
+
 	void getSegs(float *lastX, float mult, float sign, float jumpX, float jumpY, int segs);
 	void getHeadSegs(float *lastX, float jumpX, float jumpY, int segs);
 	void getTailSegs(float *lastX, float jumpX, float jumpY, int segs);

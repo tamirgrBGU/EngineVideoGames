@@ -34,7 +34,7 @@ int main(int argc,char *argv[])
 	display.setScene(scn);
 
 	Menu* menu = new Menu(&display, scn, 0); //start menu
-	Menu* menu2 = new Menu(&display, scn, 1); //fruits count
+	Menu* menu2 = new Menu(&display, scn, 1); //fruits count - his name is fruitCounter
 	Menu* menu3 = new Menu(&display, scn, 2); //option menu
 
 
