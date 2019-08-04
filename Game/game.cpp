@@ -504,18 +504,22 @@ void Game::Debug() {
 }
 
 const int maxFmotion = 10;
-float counter = -maxFmotion;
-float dir = 1;
-float angleFmotion = 10.f;
+vec3 motionJumps = vec3(0.4f);
+int counter = -maxFmotion;
+int dir = 1;
+float angleFmotion = 6.f;
 void Game::fruitMotion() {
 	counter += dir;
-	if (counter == maxFmotion)
+	if (counter == maxFmotion) {
 		dir = -1;
-	else if (counter == -maxFmotion)
+		motionJumps = -motionJumps;
+	}
+	else if (counter == -maxFmotion) {
 		dir = 1;
-	vec3 tempTR = dir*zAx;
+		motionJumps = -motionJumps;
+	}
 	for (int i = 0; i < (signed) fruitsVec.size(); i++) {
-		fruitsVec[i]->myTranslate(tempTR, 1);
+		fruitsVec[i]->myTranslate(motionJumps, 1);
 		fruitsVec[i]->myRotate(angleFmotion, zAx, zAxis1);
 	}
 }
