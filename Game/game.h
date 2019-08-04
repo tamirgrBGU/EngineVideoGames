@@ -80,6 +80,7 @@ public:
 	}
 
 	int currentTheme = 0;
+	void loadNextLevel();
 
 private:
 	bool soundEnable = true;
@@ -106,7 +107,6 @@ private:
 
 	void resetCurrentLevel();
 	void resetSnake();
-	void loadNextLevel();
 
 	void loadThemes();
 	void setupCurrentLevel();
@@ -126,6 +126,11 @@ private:
 	void getTailSegs(float& lastX, float jumpX, float jumpY, int segs);
 	void getBodySegs(float& lastX, float jumpX, float jumpY, int segs, int amount);
 	void orderSegPart(float segLen);
+	
+	int snakeLevel;
+	int snakeNodesShapesStart = -1;
+	int snakeNodesShapesEnd = -1;
+	float snakeFullLength = 0;
 
 	void setSnakeNodesAngles();
 	void updateSnakePosition();

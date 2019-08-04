@@ -4,7 +4,30 @@
 IntersectTracker::IntersectTracker(Game *game) {
 	mygame = game;
 }
-IntersectTracker::~IntersectTracker() {}
+
+void IntersectTracker::flush() {
+
+	for (unsigned int lvl = 0; lvl < levels.size(); lvl++) {
+		listNode<levelIntersect> *head = levels[lvl];
+		listNode<levelIntersect> *next;
+		while (head) {
+			next = head->next;
+			delete head->value.model;
+			delete head;
+			head = next;
+		}
+	}
+	if (snakeHead) {
+		delete snakeHead;
+		snakeHead = nullptr;
+	}
+	levelObjSize.clear();
+	levels.clear();
+}
+
+IntersectTracker::~IntersectTracker() {
+	flush();
+}
 
 //return the node that is little then X but next is greater or null
 listNode<levelIntersect> *IntersectTracker::findNode(listNode<levelIntersect> *head, float x) {
@@ -127,7 +150,6 @@ void *IntersectTracker::addObj(float x, float y, int level, Shape *myShape, int 
 	return (void *) model->getKdNode();
 }
 
-intersect *snakeHead;
 void IntersectTracker::addSnakeHead(std::vector<glm::vec3> &shape) {
 	snakeHead = new intersect(shape);
 }

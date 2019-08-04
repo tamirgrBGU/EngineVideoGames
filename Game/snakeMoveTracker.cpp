@@ -56,12 +56,12 @@ void snakeMoveTracker::flush() {
 	for (int i = 0; i < (signed)firstVec.size(); i++) {
 		listNode<motionTracker> *node = firstVec[i];
 		listNode<motionTracker> *next;
-		firstVec[i] = nullptr;
 		while (node) {
 			next = node->next;
 			delete node;
 			node = next;
 		}
+		firstVec[i] = nullptr;
 	}
 }
 
@@ -117,16 +117,8 @@ motionTracker snakeMoveTracker::getAngleAndAxis(int Node) {
 }
 
 snakeMoveTracker::~snakeMoveTracker(void) {
-	for (int i = 0; i < (signed)firstVec.size(); i++) {
-		listNode<motionTracker> *next;
-		listNode<motionTracker> *node = firstVec[i];
-		while (node) {
-			next = node->next;
-			delete node;
-			node = next;
-		}
-	}
-	firstVec.clear();	firstVec.~vector();
+	flush();
+	firstVec.clear();
 }
 
 // todo check ds

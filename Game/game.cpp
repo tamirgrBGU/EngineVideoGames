@@ -43,10 +43,6 @@ void Game::updateDrawMode(unsigned int mode){
 		shapes[i]->mode= mode;
 }
 
-int snakeLevel;
-int snakeNodesShapesStart = -1;
-int snakeNodesShapesEnd = -1;
-float snakeFullLength = 0;
 float jumpy = 0.4f, jumpx = 0.38f;
 float lastYext = 0;
 static const int bezierRes = 10, cirSubdiv = 4;
@@ -149,7 +145,7 @@ void Game::genSnake(float xLoc, float yLoc, float zLoc, int direction) {
 	getTailSegs(x, jumpx * rounding, 2.f*jumpy, ends);
 	getBodySegs(x, 0, jumpy, 4, snakeLength -2);
 	//round head generated here
-	getHeadSegs(x, -jumpx * rounding, 2.5f*jumpy, ends);	
+	getHeadSegs(x, -jumpx * rounding, 2.5f*jumpy, ends);
 	
 	//big obj head
 	//addShapeFromFile("../res/objs/snake_head.obj", -1, TRIANGLES, themes->getTex(4), 4);
@@ -207,8 +203,6 @@ bool Game::onIntersectCave(Shape *s) {
 	if (fruitCounter == 0) {
 		PlaySoundGame(Win);
 		loadNextLevel();
-		orderCameraTop();
-		Deactivate();
 		return 1;
 	}
 	resetSnake();
@@ -430,7 +424,7 @@ void Game::resetCurrentLevel(){
 
 	resetSnake();
 }
-int;
+
 void Game::loadNextLevel() {
 	if (++currentLvl < maxGameLvl) {
 		for (int i = 0; i < (signed) shapes.size(); i++) {
@@ -439,7 +433,11 @@ void Game::loadNextLevel() {
 		shapes.clear();
 		currentTheme++;
 		changeTheme();
+		sMT->flush();
+		IT->flush();
 		setupCurrentLevel();
+		orderCameraTop();
+		Deactivate();
 	}
 }
 //2 3 -> 6 7

@@ -34,7 +34,9 @@ public:
 	void isIntersectSnakeHead(glm::mat4 tranSnake, float x, float y, int level);
 	void remove(Shape *s);
 	void printDSDebug();
+	void flush();
 private:
+	intersect *snakeHead;
 	inline void appendNode(listNode<levelIntersect> *toAdd);
 	void printLevel(int lvl);
 	void IntersectTracker::printLevelR(int lvl);

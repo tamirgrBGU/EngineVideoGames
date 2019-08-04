@@ -24,7 +24,6 @@ vec3 x(1, 0, 0);
 vec3 y(0, 1, 0);
 vec3 z(0, 0, 1);
 bool stateActive = false;
-bool numpadMoveMode = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	Game *scn = (Game*)glfwGetWindowUserPointer(window);
@@ -32,68 +31,41 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		switch (key)
 		{
-		case GLFW_KEY_ESCAPE:
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			case GLFW_KEY_ESCAPE:
+				glfwSetWindowShouldClose(window, GLFW_TRUE);
 			break;
-		case GLFW_KEY_P:
-			scn->changeMode();
+			case GLFW_KEY_P:
+				scn->changeMode();
 			break;
-		case GLFW_KEY_O:
-			scn->HideShape(0);
-			if (scn->IsActive())
-				scn->Deactivate();
-			else
-				scn->Activate();
+			case GLFW_KEY_F1:
+				scn->loadNextLevel();
 			break;
-		case GLFW_KEY_D:
-			scn->changeCameraMode();
+			case GLFW_KEY_D:
+				scn->changeCameraMode();
 			break;
-		case GLFW_KEY_C:
-			scn->cameramode = !scn->cameramode;
+			case GLFW_KEY_C:
+				scn->cameramode = !scn->cameramode;
 			break;
-		case GLFW_KEY_RIGHT://TODO head intersect with nodes disable rotation
-			scn->playerInput(true);
+			case GLFW_KEY_RIGHT://TODO head intersect with nodes disable rotation
+				scn->playerInput(true);
 			break;
-		case GLFW_KEY_LEFT:
-			scn->playerInput(false);
+			case GLFW_KEY_LEFT:
+				scn->playerInput(false);
 			break;
-		case GLFW_KEY_KP_8:
-			numpadMoveMode ?
-			scn->myRotate(1.f, vec3(1, 0, 0), 1) :
-			scn->myTranslate(vec3(0, -1, 0), 0);
+			case GLFW_KEY_KP_SUBTRACT:
+				scn->shapeTransformation(scn->zCameraTranslate, -50.f);
 			break;
-		case GLFW_KEY_KP_6:
-			numpadMoveMode ?
-			scn->myRotate(1.f, vec3(0, 0, 1), 1) :
-			scn->myTranslate(vec3(-1, 0, 0), 0);
+			case GLFW_KEY_KP_ADD:
+				scn->shapeTransformation(scn->zCameraTranslate, 50.f);
 			break;
-		case GLFW_KEY_KP_4:
-			numpadMoveMode ?
-			scn->myRotate(-1.f, vec3(0, 0, 1), 1) :
-			scn->myTranslate(vec3(1, 0, 0), 0);
+			case GLFW_KEY_SPACE:
+				scn->PauseUnpause();
 			break;
-		case GLFW_KEY_KP_2:
-			numpadMoveMode?
-			scn->myRotate(-1.f, vec3(1, 0, 0), 1):
-			scn->myTranslate(vec3(0, 1, 0), 0);
+			case GLFW_KEY_GRAVE_ACCENT:
+				scn->Debug();
 			break;
-		case GLFW_KEY_KP_0:
-			numpadMoveMode = !numpadMoveMode;
-			break;
-		case GLFW_KEY_KP_SUBTRACT:
-			scn->shapeTransformation(scn->zCameraTranslate, -10.f);
-			break;
-		case GLFW_KEY_KP_ADD:
-			scn->shapeTransformation(scn->zCameraTranslate, 10.f);
-			break;
-		case GLFW_KEY_SPACE:
-			scn->PauseUnpause();
-			break;
-		case GLFW_KEY_GRAVE_ACCENT:
-			scn->Debug();
-			break;
-		default:
-			printf("undefined key %d\n", key);
+			default:
+				printf("undefined key %d\n", key);
 			break;
 		}
 	}
