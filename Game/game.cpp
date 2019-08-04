@@ -70,6 +70,10 @@ void Game::getSegs(float& lastX, float mult, const float sign, const float jumpX
 }
 
 void Game::orderSegPart(const float segLen) {
+	if (pickedShape == -1) {
+		lastYext = segLen;
+		return;
+	}
 	shapeTransformation(yGlobalTranslate, lastYext);
 	snakeFullLength += segLen;
 	lastYext = segLen;
@@ -91,8 +95,26 @@ void Game::getBodySegs(float& lastX, const float jumpX, const float jumpY, const
 }
 
 void Game::genTongue(int pa) {
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//getSegs(0.02f, float mult, const float sign, const float jumpX, const float jumpY, const int segs);
+	float x = .2f;
+	getSegs(x, 1, 0, 0.f, .2f, ends);
+	shapes.back()->SetTexture(1);
+	chainParents.back() = -1;
+	chainParents.back() = pa;
+	getSegs(x, 0, 1, 0.f, 0.2f, ends);
+	pickedShape = shapes.size() - 1;
+	shapeTransformation(yGlobalTranslate, lastYext);
+	shapes.back()->SetTexture(1);
+	shapes.back()->SetShader(4);
+	shapes.back()->myScale(vec3(2.f));
+	shapes.back()->myRotate(-60.f, xAx, zAxis1);
+	chainParents.back() = shapes.size() -2;
+	pickedShape = -1;
+	getSegs(x, 0, 1, 0.f, 0.2f, ends);
+	shapes.back()->SetTexture(1);
+	shapes.back()->SetShader(4);
+	shapes.back()->myScale(vec3(2.f));
+	shapes.back()->myRotate(60.f, xAx, zAxis1);
+	chainParents.back() = shapes.size() - 3;
 }
 
 void Game::genEyes(float width, int pa) {
@@ -116,6 +138,7 @@ void Game::getHeadSegs(float& lastX, const float jumpX, const float jumpY, const
 	int pa = snakeNodesShapesEnd;
 	float xCopy = lastX;
 	getSegs(lastX, 1 - 1 / float(segs), -1, jumpX, jumpY, segs);
+	pickedShape = -1;
 	genEyes(xCopy, snakeNodesShapesEnd);
 	genTongue(snakeNodesShapesEnd);
 }
@@ -212,6 +235,7 @@ void Game::genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int directio
 bool Game::onIntersectCave(Shape *s) {
 	printf("reach to seafty END Level\n");
 	if (fruitCounter == 0) {
+		isLoading = true;
 		PlaySoundGame(Win);
 		loadNextLevel();
 		return 1;

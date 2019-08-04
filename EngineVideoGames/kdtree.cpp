@@ -192,7 +192,11 @@ inline void prepareLists(std::list<Kdtree::vecType>& plist, std::list<Kdtree::ve
 
 	completeToBox(xlist, ylist, zlist);
 
-	printf("\b\b\b, sorted\n");
+	if (plist.size() > 1000)
+		printf("\b\b\b, sorted\n");
+	else
+		printf("\b\b\b");
+
 	//printf("%f %f %f %f %f %f\n", xlist.front().x, xlist.back().x, ylist.front().y, ylist.back().y, zlist.front().z, zlist.back().z);
 }
 
@@ -202,7 +206,8 @@ void Kdtree::makeTree(std::list<Kdtree::vecType>& plist)
 	root = new Node(3);
 	max_depth = (unsigned int)log2((plist.size() >> 2));
 
-	printf("size %d max depth %d", plist.size(), max_depth);
+	if(plist.size() > 1000)
+		printf("size %d max depth %d", plist.size(), max_depth);
 
 	std::list<Kdtree::vecType> xlist, ylist, zlist;
 	prepareLists(plist, xlist, ylist, zlist);

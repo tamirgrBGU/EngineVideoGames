@@ -5,7 +5,7 @@ keybindings-
 case GLFW_KEY_ESCAPE: 		will close the game
 case GLFW_KEY_RIGHT: 		rotate snake right
 case GLFW_KEY_LEFT: 		rotate snake left
-case GLFW_KEY_SPACE:		pause&unpause motion
+case GLFW_KEY_SPACE:		pause&unpause game
 case GLFW_KEY_KP_SUBTRACT: 	zoomout
 case GLFW_KEY_KP_ADD:		zoomin
 case GLFW_KEY_P: 	  		will change the drawing mode

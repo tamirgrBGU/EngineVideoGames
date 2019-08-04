@@ -149,7 +149,8 @@ void updateCam() {
 vec3 orderCamSnakeEyeMode() {
 	vec3 camLoc = myCam->headCurLocation;
 	camLoc.z += heightDown;
-
+	camLoc.x += myCam->headDirection.x*0.6f;
+	camLoc.y += myCam->headDirection.y*0.6f;
 	//printVec(myCam->headCurLocation);
 	//printVec(myCam->headDirection);
 
