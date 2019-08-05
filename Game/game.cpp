@@ -46,7 +46,7 @@ void Game::updateDrawMode(unsigned int mode){
 const float jumpy = 0.4f, jumpx = 0.38f;
 float lastYext;
 float lastY;
-static const int bezierRes = 14, cirSubdiv = 4;
+static const int bezierRes = 12, cirSubdiv = 4;
 inline void Game::getSegsHelper(std::vector<glm::mat4>& segments, float& lastX, float mult, const float sign, const float jumpX, const float jumpY, const int segs) {
 	lastY = 0;
 	mat4 seg0 = mat4(0);
