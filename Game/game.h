@@ -97,7 +97,7 @@ private:
 	void onIntersectFallWall(Shape *s);
 	void onIntersectStairs	(Shape *s);
 
-	int currentLvl = 0;
+	int currentLvl = 5;
 	const int maxGameLvl = 5;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
@@ -153,9 +153,11 @@ private:
 
 	int fruitMotionCounter;
 	int fruitMotionDir;
+	vec3 motionJumps;
 	void setFruitMotion() {
 		fruitMotionCounter = 1;
 		fruitMotionDir = -1;
+		motionJumps = -vec3(0.8f);
 	}
 };
 

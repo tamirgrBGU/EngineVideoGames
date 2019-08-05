@@ -531,6 +531,8 @@ using namespace glm;
 	
 	void Scene::mouseProccessing(int button)
 	{
+		if (!enableMouse)
+			return;
 		if ((signed)shapes.size() <= pickedShape || pickedShape < -1) {
 			printf("mouseProccessing out of index <%d>\n", pickedShape);
 			pickedShape = -1;

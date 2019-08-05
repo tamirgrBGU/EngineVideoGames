@@ -659,7 +659,6 @@ void Game::Debug() {
 }
 
 const int maxFmotion = 20;
-vec3 motionJumps = -vec3(0.8f);
 float angleFmotion = 8.f;
 void Game::fruitMotion() {
 	fruitMotionCounter += fruitMotionDir;

@@ -74,6 +74,7 @@ public:
 	inline void Activate() {isActive = true;}
 	inline void Deactivate() {isActive = false;}
 	inline void PauseUnpause() { isActive = !isActive; }//will change motion
+	inline void switchMouseEnable() { enableMouse = !enableMouse; }//will change motion
 	void HideShape(int shpIndx);
 	//inline void SetMousePosition(double xpos, double ypos){xold =xpos; yold=ypos;}
 	void updatePosition(float xpos, float ypos);
@@ -113,6 +114,7 @@ protected:
 	int direction;
 	static const int scaleFactor =2;
 	bool isActive;
+	bool enableMouse = false;
 	void ScaleAllDirections(int factor);
 };
 

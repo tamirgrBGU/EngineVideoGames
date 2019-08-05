@@ -40,6 +40,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			case GLFW_KEY_F1:
 				scn->loadNextLevel();
 			break;
+			case GLFW_KEY_F2:
+				scn->switchMouseEnable();
+			break;
 			case GLFW_KEY_D:
 				scn->changeCameraMode();
 			break;
