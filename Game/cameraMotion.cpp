@@ -26,7 +26,7 @@ static const float bigAngleFrame = 1.5f * angleFrame;
 
 static const float frame = 12.f;
 static const float bigframe = 2*frame;
-static const float tolerance = 0.07f;
+static const float tolerance = 0.1f;
 static const float bigTolerance = tolerance*3;
 
 bool snakeviewmode = false;
@@ -36,7 +36,14 @@ Game *myCam = nullptr;
 MovableGLM *tail = nullptr;
 
 inline glm::vec3 getMid() {
-	return snakeviewmode ? myCam->headCurLocation : myCam->midCurLocation;
+	vec3 out;
+	if (snakeviewmode){
+		vec3 temp(myCam->headDirection.x*10.f, myCam->headDirection.y*10.f, 0);
+		out = myCam->headCurLocation + temp;
+	}
+	else 
+		out = myCam->midCurLocation;
+	return out;
 }
 
 
@@ -149,8 +156,6 @@ void updateCam() {
 vec3 orderCamSnakeEyeMode() {
 	vec3 camLoc = myCam->headCurLocation;
 	camLoc.z += heightDown;
-	camLoc.x += myCam->headDirection.x*0.6f;
-	camLoc.y += myCam->headDirection.y*0.6f;
 	//printVec(myCam->headCurLocation);
 	//printVec(myCam->headDirection);
 
