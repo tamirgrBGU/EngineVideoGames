@@ -108,6 +108,39 @@ IndexedModel Bezier2D::GetSurface(int resT, int resS) {
 	return model;
 }
 
+const float YAxIntersection = 1.0f;
+const float minPointY = 0.15f;
+const float minPointX = 0.5f;
+const float myBaseEdge = 0.2f;
+const float cP = (YAxIntersection - myBaseEdge - minPointY)*0.5f;
+const float aP = (cP - minPointY) / (minPointX*minPointX);
+const float bP = -2 * minPointX * aP;
+//we gonna divide the rest between next and current
+/*glm::vec3 Bezier2D::calcWeight(int segmentT, int segmentS, float t, float s)
+{
+	if (segmentT == 0) {
+		//float x = aP*t*t + bP*t + cP;
+		return glm::vec3(0, 1 - 0.1f, 0.1f);
+	}
+	if (segmentT == b.segNo() - 1) {
+		float x = aP*t*t + bP*t + cP;
+		return glm::vec3(x, 1 - x, 0);
+	}
+	float f1 = 0, f3 = 0;
+	float x = aP*t*t + bP*t + cP;
+	float f2 = cP - x;
+	if (t > 0.5) {
+		f3 = x;
+		f1 = 0.05f;
+	}
+	else {
+		f3 = 0.05f;
+		f1 = x;
+	}
+	return glm::vec3(f1, f2, f3);
+}*/
+
+//we gonna divide the rest between next and current
 glm::vec3 Bezier2D::calcWeight(int segmentT, int segmentS, float t, float s)
 {
 	float f1 = 0, f3 = 0;
