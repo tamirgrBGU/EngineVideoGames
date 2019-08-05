@@ -45,10 +45,10 @@ void Game::updateDrawMode(unsigned int mode){
 
 const float jumpy = 0.4f, jumpx = 0.38f;
 float lastYext;
-static const int bezierRes = 10, cirSubdiv = 4;
-void Game::getSegs(float& lastX, float mult, const float sign, const float jumpX, const float jumpY, const int segs) {
-	std::vector<glm::mat4> segments;
-	float lastY = 0;
+float lastY;
+static const int bezierRes = 14, cirSubdiv = 4;
+inline void Game::getSegsHelper(std::vector<glm::mat4>& segments, float& lastX, float mult, const float sign, const float jumpX, const float jumpY, const int segs) {
+	lastY = 0;
 	mat4 seg0 = mat4(0);
 	float segPart = 1 / float(segs);
 	for (int i = 0; i < segs; i++) {
@@ -61,10 +61,15 @@ void Game::getSegs(float& lastX, float mult, const float sign, const float jumpX
 		seg0[3] = vec4(lastX, lastY, 0, 1);
 		mult += sign * segPart;
 		segments.push_back(seg0);
-	}
+	};
+}
+
+void Game::getSegs(float& lastX, float mult, const float sign, const float jumpX, const float jumpY, const int segs) {
+	std::vector<glm::mat4> segments;
+	getSegsHelper(segments, lastX, mult, sign, jumpX, jumpY, segs);
 	Bezier1D body(segments);
 	vec3 axisFrom = *(body.GetControlPoint(0, 0).GetPos());
-	Bezier2D b(body, cirSubdiv, yAx, vec3(0, axisFrom.y, 0)); 
+	Bezier2D b(body, cirSubdiv, yAx, vec3(0, axisFrom.y, 0));
 	addShape(b.GetSurface(bezierRes, bezierRes), -1, TRIANGLES, themes->getTex(4), 1);
 	orderSegPart(lastY);
 }
