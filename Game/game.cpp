@@ -314,7 +314,7 @@ void Game::specialObjHandle(objLocation &obj) {
 		break;
 	case Cave:
 		addShapeAndKD(CaveF, themes->getTex(1), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z - 60.f), obj.level, 0.2f * allscale, dir);
-		genObj(1, 18, vec3(x + allscale * 1.f, y, z-5.f), 0.06f * allscale, (dir+2)%4);
+		genObj(1, 18, vec3(x + allscale * 1.f, y, z + 1.f), 0.06f * allscale, (dir+2)%4);
 		break;
 	case Obstecle:
 		addShapeAndKD(ObstecleF, themes->getTex(2), x, y, vec3(x + allscale * 0.5f, y + allscale * 0.5f, z), obj.level, themes->getScale(0) * allscale, dir);
@@ -590,10 +590,7 @@ void finUpdate(Shader *s, const int shaderIndx, const int pickedShape) {
 	int g = ((pickedShape + 1) & 0x0000FF00) >> 8;
 	int b = ((pickedShape + 1) & 0x00FF0000) >> 16;
 	s->SetUniform4f("lightDirection", 0.0f, 0.0f, -1.0f, 0.0f);
-	if (shaderIndx == 0)
-		s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
-	else
-		s->SetUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+	s->SetUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
 	s->Unbind();
 }
 
@@ -620,12 +617,19 @@ void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4
 	finUpdate(s, shaderIndx, pickedShape);
 }
 
-void Game::Update(const glm::mat4 &MVP,const glm::mat4 &Normal,const int shaderIndx)
+void Game::Update(const glm::vec4 &camdir, glm::mat4 &MVP,const glm::mat4 &Normal,const int shaderIndx)
 {
 	Shader *s = shaders[shaderIndx];
 	s->Bind();
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
+	//printVec(headCurLocation);
+	//printVec(camdir);
+	if(snakeviewmode)
+		s->SetUniform4f("Campos", headCurLocation.x, headCurLocation.y, headCurLocation.z + 120.f, 1.f);
+	else
+		s->SetUniform4f("Campos", headCurLocation.x, headCurLocation.y, headCurLocation.z, 1.f);
+	s->SetUniform4f("Camdir", camdir.x, camdir.y, camdir.z, 0.f);
 	finUpdate(s, shaderIndx, pickedShape);
 }
 

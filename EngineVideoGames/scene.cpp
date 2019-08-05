@@ -137,7 +137,7 @@ using namespace glm;
 		}
 
 		glm::mat4 lastMVP, nextMVP;
-
+		
 		for (unsigned int i=0; i<shapes.size();i++)
 		{
 			if(shapes[i]->Is2Render())
@@ -156,14 +156,15 @@ using namespace glm;
 							nextMVP = mat4(0);
 						UpdateLinear(lastMVP, mvp[i], nextMVP, norms[i], shapes[i]->GetShader());
 					}
-					else
-						Update(mvp[i], norms[i], shapes[i]->GetShader());
+					else {
+						Update(vec4(0, 0, 1, 0)*MVP, mvp[i], norms[i], shapes[i]->GetShader());
+					}
 
 					shapes[i]->Draw(shaders, textures, false);
 				}
 				else 
 				{
-					Update(mvp[i], norms[i],0);
+					Update(vec4(0, 0, 1, 0)*MVP, mvp[i], norms[i], shapes[i]->GetShader());
 					shapes[i]->Draw(shaders,textures,true);
 					
 				}

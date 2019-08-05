@@ -29,7 +29,6 @@ static const float bigframe = 2*frame;
 static const float tolerance = 0.1f;
 static const float bigTolerance = tolerance*3;
 
-bool snakeviewmode = false;
 bool animateMovement = false;
 
 Game *myCam = nullptr;
@@ -37,7 +36,7 @@ MovableGLM *tail = nullptr;
 
 inline glm::vec3 getMid() {
 	vec3 out;
-	if (snakeviewmode){
+	if (myCam->snakeviewmode){
 		vec3 temp(myCam->headDirection.x*10.f, myCam->headDirection.y*10.f, 0);
 		out = myCam->headCurLocation + temp;
 	}
@@ -60,12 +59,12 @@ void initCameraMotion(Game *obj, MovableGLM *tailp, float z) {
 }
 
 void setCameraTopView() {
-	snakeviewmode = true;
+	myCam->snakeviewmode = true;
 	switchCamMode();
 }
 
 void setCameraBottomView() {
-	snakeviewmode = false;
+	myCam->snakeviewmode = false;
 	switchCamMode();
 }
 
@@ -140,7 +139,7 @@ void animate() {
 }
 
 void updateCam() {
-	if (snakeviewmode)
+	if (myCam->snakeviewmode)
 		rotCam();
 	
 	if (animateMovement)
@@ -171,7 +170,7 @@ vec3 orderCamSnakeEyeMode() {
 }
 
 inline void getCamCorrection(vec3& camLoc) {
-	if (snakeviewmode) {
+	if (myCam->snakeviewmode) {
 		camLoc = orderCamSnakeEyeMode();
 	}
 	else {
@@ -183,7 +182,7 @@ inline void getCamCorrection(vec3& camLoc) {
 }
 
 void switchCamMode() {
-	snakeviewmode = !snakeviewmode;
+	myCam->snakeviewmode = !myCam->snakeviewmode;
 	vec3 camLoc;
 	snakeMid = getMid();
 	getCamCorrection(camLoc);
