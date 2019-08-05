@@ -276,7 +276,7 @@ void intersect::nodesIntersectValitate(Node * next, int axis, Node * other,
 //in iteration level the boxes are intersecting we will assure it happen in the children too
 void intersect::rec_is_intersect(Node *current, Node *other,
 			int depth, std::vector<std::vector<glm::vec3>> *output) {
-	if (depth > maxDep | output->size() > 0)
+	if ((depth > maxDep) | (output->size() > 0))
 		return;//optimize
 
 	int axis = depth % 3;

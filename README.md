@@ -34,3 +34,4 @@ coolFeatures-
 
 known bugs-
 1. sometimes when you come in 90 degrees to a surface the intersection detection is not working
+2. some random numbers can be too big to place in the map you may need to restart the whole game

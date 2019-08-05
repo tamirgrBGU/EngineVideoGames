@@ -100,7 +100,7 @@ using namespace glm;
 		*MVP1 = MVP * *Normal1;
 		*Normal1 = Normal * *Normal1;
 
-		*MVP1 = *MVP1 * shapes[i]->makeTransScale(mat4(1));
+		*MVP1 = *MVP1 * shapes[i]->makeTransScale();
 		*Normal1 = *Normal1 * shapes[i]->makeTrans();
 	}
 
@@ -127,7 +127,7 @@ using namespace glm;
 		glm::mat4 Normal = makeTrans();
 		glm::mat4 MVP = cameras[0]->GetViewProjection() * Normal;
 
-		int p = pickedShape;
+		int savedP = pickedShape;
 		mat4 Normal1, MVP1;
 		std::vector<glm::mat4> mvp, norms;
 		for (unsigned int i = 0; i<shapes.size(); i++){
@@ -136,15 +136,15 @@ using namespace glm;
 			norms.push_back(Normal1);
 		}
 
-		glm::mat4 lastMVP(0), nextMVP(0);
+		glm::mat4 lastMVP, nextMVP;
 
 		for (unsigned int i=0; i<shapes.size();i++)
 		{
 			if(shapes[i]->Is2Render())
 			{
+				pickedShape = i;
 				if (shaderIndx > 0)
 				{
-					pickedShape = i;
 					if (shapes[i]->GetShader() == 1) {
 						if (i < shapes.size() - 1 && (shapes[i + 1]->GetShader() == 1) & (chainParents[i + 1] == i))
 							lastMVP = mvp[i + 1];
@@ -163,14 +163,13 @@ using namespace glm;
 				}
 				else 
 				{
-					pickedShape = i;
 					Update(mvp[i], norms[i],0);
 					shapes[i]->Draw(shaders,textures,true);
 					
 				}
 			}
 		}
-		pickedShape = p;
+		pickedShape = savedP;
 	}
 
 	 void Scene::shapeRotation(vec3 v, float ang,int indx)
