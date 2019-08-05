@@ -164,9 +164,8 @@ using namespace glm;
 				}
 				else 
 				{
-					Update(vec4(0, 0, 1, 0)*MVP, mvp[i], norms[i], shapes[i]->GetShader());
-					shapes[i]->Draw(shaders,textures,true);
-					
+					Update(vec4(0, 0, 1, 0)*MVP, mvp[i], norms[i], 0);
+					shapes[i]->Draw(shaders, textures, true);					
 				}
 			}
 		}

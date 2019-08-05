@@ -46,7 +46,6 @@ public:
 
 	virtual void Update(const glm::vec4 &camdir, glm::mat4 &MVP, const glm::mat4 &Normal, const int shaderIndx) = 0;
 	virtual void UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx) = 0;
-	virtual void UpdateQuaternion(const glm::mat2x4 &lastMVP, const glm::mat2x4 &MVP, const glm::mat2x4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx) = 0;
 	virtual void WhenTranslate(){};
 	virtual void WhenRotate(){};
 	virtual void Motion(){};

@@ -85,7 +85,7 @@ void Menu::DrawMenu()
 				ImGui::End();
 			}
 			ImGui::SetWindowFontScale(3.5f);
-			ImGui::Image((GLuint*)(this->scn->currentTheme+7), ImVec2(50, 50));
+			ImGui::Image((GLuint*)(this->scn->getCurrentTheme()+7), ImVec2(50, 50));
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(0.28f, 0.79f, 0.52f,1.0f),"%d / %d", this->scn->getTotalFruitCount(), this->scn->getCurrentFruitCount());
 

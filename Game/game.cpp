@@ -270,7 +270,6 @@ void Game::onIntersectObstecle(Shape *s) {
 	Deactivate();
 }
 
-float climbAngle = glm::atan(zscale / allscale);
 void Game::onIntersectWalls(Shape *s) {
 	printf("wall  \n");
 	PlaySoundGame(ObstecleSound);
@@ -278,12 +277,54 @@ void Game::onIntersectWalls(Shape *s) {
 	Deactivate();
 }
 
-void Game::onIntersectFallWall(Shape *s){
-	printf("fall wall\n");
+float climbAngle = glm::atan(zscale / allscale);
+/*
+true - is up
+false- is down
+*/
+void Game::turnSnakeHeadUpDown(bool dir, float angle) {
+	Deactivate();
+
+	int sign = (dir ? -1 : 1);
+	vec3 turnOnMe = glm::cross(zAx, headDirection);
+	sMT->add(turnOnMe, sign*angle);
+	shapes[snakeNodesShapesEnd]->myRotate(sign*angle, turnOnMe, 4);
+
+	Activate();
 }
 
+int fallWallCoolDown = 0;
+void Game::onIntersectFallWall(Shape *s) {
+	printf("fall wall\n");
+	if (fallWallCoolDown > 0) return;
+	fallWallCoolDown = 1;
+	turnSnakeHeadUpDown(false, 90.f);
+}
+
+bool onStair = false;
+int stairIntersCoolDown = 0;
+Shape *stairWall;
 void Game::onIntersectStairs(Shape *s) {
+	if (stairIntersCoolDown > 0) {
+		stairIntersCoolDown++;
+		return;
+	}
 	printf("stairs\n");
+	stairIntersCoolDown = 2;
+	if (s == stairWall) {//enter stair
+		if (onStair) {//exit stair
+			turnSnakeHeadUpDown(false, climbAngle);
+		}
+		else{
+			onStair = true;
+			stairWall = s;
+			turnSnakeHeadUpDown(true, climbAngle);
+		}
+	}
+	else {//exit stair
+		onStair = false;
+		snakeLevel = (int) (s->makeTrans()[3][2] / zscale);
+	}	
 }
 
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
@@ -422,7 +463,7 @@ inline void Game::orderCameraTop() {
 
 void Game::setUpCamera() {
 	float zView = -1.5f*snakeFullLength;
-	initCameraMotion(this, shapes[snakeNodesShapesStart], abs(zView));
+	initCameraMotion(this, abs(zView));
 	orderCameraTop();
 }
 
@@ -468,26 +509,29 @@ void Game::resetCurrentLevel(){
 	resetSnake();
 }
 
+void Game::prepareLevel() {
+	for (int i = 0; i < (signed)shapes.size(); i++) {
+		delete shapes[i];
+	}
+	chainParents.clear();
+	shapes.clear();
+	sMT->flush();
+	IT->flush();
+	setupCurrentLevel();
+	orderCameraTop();
+}
+
 void Game::loadNextLevel() {
 	if (++currentLvl < maxGameLvl) {
-		for (int i = 0; i < (signed) shapes.size(); i++) {
-			delete shapes[i];
-		}
-		chainParents.clear();
-		shapes.clear();
 		currentTheme++;
 		changeTheme();
-		sMT->flush();
-		IT->flush();
-		setupCurrentLevel();
-		orderCameraTop();
- 		Deactivate();
+		prepareLevel();
 	}
 	else {
 		wonGame = true;
 		PlaySoundGame(Win);
-		Deactivate();
 	}
+	Deactivate();
 }
 //2 3 -> 6 7
 //1 4 -> 5 8
@@ -512,10 +556,11 @@ inline void Game::genSkyHelper(float xl, float xh, float yl, float yh, float zl,
 					 vec3(xh, yl, zh), vec3(xh, yl, zl));
 }
 
+const float epsilonSkyGen = -20.f;
 const int amplify = 4;
 void Game::genSky(float widthOfMap) {
-	float low  = -amplify * widthOfMap;
-	float high = (1 + amplify) * widthOfMap;
+	float low  = -amplify * widthOfMap - epsilonSkyGen;
+	float high = (1 + amplify) * widthOfMap + epsilonSkyGen;
 	genSkyHelper(low, high, low, high, low, high);
 }
 void Game::setupCurrentLevel() {
@@ -580,7 +625,6 @@ void Game::Init()
 {
 	loadThemes();
 	setupEnvironment();
-
 	//addCubes();
 	ReadPixel();
 }
@@ -590,7 +634,10 @@ void finUpdate(Shader *s, const int shaderIndx, const int pickedShape) {
 	int g = ((pickedShape + 1) & 0x0000FF00) >> 8;
 	int b = ((pickedShape + 1) & 0x00FF0000) >> 16;
 	s->SetUniform4f("lightDirection", 0.0f, 0.0f, -1.0f, 0.0f);
-	s->SetUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
+	if (shaderIndx == 0)
+		s->SetUniform4f("lightColor", r / 255.0f, g / 255.0f, b / 255.0f, 1.0f);
+	else
+		s->SetUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
 	s->Unbind();
 }
 
@@ -605,30 +652,13 @@ void Game::UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const gl
 	finUpdate(s, shaderIndx, pickedShape);
 }
 
-void Game::UpdateQuaternion(const glm::mat2x4 &lastQuaternion, const glm::mat2x4 &Quaternion, const glm::mat2x4 &nextQuaternion, const glm::mat4 &Normal, const int shaderIndx) {
-	//printf("<%f %f %f %f>", Quaternion[0].x, Quaternion[0].y, Quaternion[0].z, Quaternion[0].w);
-	//printf(" <%f %f %f %f>\n", Quaternion[1].x, Quaternion[1].y, Quaternion[1].z, Quaternion[1].w);
-	Shader *s = shaders[shaderIndx];
-	s->Bind();
-	s->SetUniformMat2x4f("Quaternion", Quaternion);
-	s->SetUniformMat2x4f("lastQuaternion", lastQuaternion);
-	s->SetUniformMat2x4f("nextQuaternion", nextQuaternion);
-	s->SetUniformMat4f("Normal", Normal);
-	finUpdate(s, shaderIndx, pickedShape);
-}
-
 void Game::Update(const glm::vec4 &camdir, glm::mat4 &MVP,const glm::mat4 &Normal,const int shaderIndx)
 {
 	Shader *s = shaders[shaderIndx];
 	s->Bind();
 	s->SetUniformMat4f("MVP", MVP);
 	s->SetUniformMat4f("Normal", Normal);
-	//printVec(headCurLocation);
 	//printVec(camdir);
-	if(snakeviewmode)
-		s->SetUniform4f("Campos", headCurLocation.x, headCurLocation.y, headCurLocation.z + 120.f, 1.f);
-	else
-		s->SetUniform4f("Campos", headCurLocation.x, headCurLocation.y, headCurLocation.z, 1.f);
 	s->SetUniform4f("Camdir", camdir.x, camdir.y, camdir.z, 0.f);
 	finUpdate(s, shaderIndx, pickedShape);
 }
@@ -766,28 +796,17 @@ void Game::playerInput(bool dir) {
 	changeDirPInput(dir);
 }
 
+/*IMGUI HELPERS*/
 void Game::switchSoundEnable() {
 	if (soundEnable)
-		PlaySoundGame(Hiss);
+		PlaySoundGame(Hiss);//to stop the current sound in game
 	soundEnable = !soundEnable;
 }
 
-bool Game::getSoundVar() {
-	return soundEnable;
-}
-
-int Game::getCurrentLevel() {
-	return currentLvl;
-}
-
-int Game::getTotalLevelCount() {
-	return lGen->size();
-}
-
-int Game::getCurrentFruitCount() {
-	return fruitsVec.size();
-}
-
-int Game::getTotalFruitCount() {
-	return fruitsVec.size() - fruitCounter;
-}
+//getters for imgui
+bool Game::getSoundVar()		{	return soundEnable; }
+int Game::getCurrentTheme()		{	return currentTheme; }
+int Game::getCurrentLevel()		{	return currentLvl; }
+int Game::getTotalLevelCount()	{	return lGen->size(); }
+int Game::getCurrentFruitCount(){	return fruitsVec.size(); }
+int Game::getTotalFruitCount()	{	return fruitsVec.size() - fruitCounter;}

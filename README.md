@@ -14,6 +14,7 @@ case GLFW_KEY_F2:			to enable mouse dragging of the map(default is disabled)
 case GLFW_KEY_D:			will change the camera mode - can reset your camera in case you dragged it away
 
 rules-
+*the game will start paused, you can unpause with space, key D, arrow left and right.
 *loading levels take at most 20 seconds, be patient.
 *the menu buttons need a long click to get your input.
 *the snake is hunting food for his lover snake. when the snake find food, he become slightly faster.
