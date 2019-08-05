@@ -25,7 +25,7 @@ int main(int argc,char *argv[])
 	scn->addShader("../res/shaders/weightsShader");//5
 	scn->addShader("../res/shaders/basicShadertexNoShadow");//5
 	
-	scn->AddTexture("../res/textures/snakeEye.bmp");//0
+	scn->AddTexture("../res/textures/snakeEye.jpg");//0
 	scn->AddTexture("../res/textures/Tongue.png");//1
 	scn->AddTexture("../res/textures/grass2.bmp");//2	// NOT USED
 	scn->AddTexture("../res/textures/grass3.bmp");//3	// NOT USED

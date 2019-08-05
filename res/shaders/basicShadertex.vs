@@ -12,30 +12,25 @@ uniform mat4 MVP;
 uniform mat4 Normal;
 uniform vec4 lightColor;
 uniform vec4 lightDirection;
+uniform vec4 Camdir;
 
 out vec3 LightIntensity;
 out vec2 TexCoord;
 
 void main()
 {
-	vec4 eyePosition = vec4(0,0,0,1);
-	//vec3 specularContribution =vec3(0.7,0.7,0.7);
-	float shiness = 10.0f;
 	vec3 tnorm =  - vec3(normalize(Normal * vec4(normal,0)));
-	
 	vec3 lightVec = normalize(vec3(lightDirection));
-	vec3 reflectVec = reflect(-lightVec, tnorm);
-	vec3 viewVec = vec3(normalize(eyePosition - MVP*vec4(position,1)));
+	
+	float specularStrength = 0.5f;
+	vec3 viewDir = vec3(Camdir.x,Camdir.y,Camdir.z);
+	vec3 reflectDir = reflect(-lightVec, tnorm);  
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16);
+	vec3 specular = specularStrength * spec * vec3(lightColor);  
 	float diffuse = max(dot(lightVec, tnorm), 0.0);
-	float spec = 0;
-	if(diffuse > 0.0)
-	{
-		spec = max(dot(reflectVec, viewVec), 0.0);
-		spec = pow(spec, shiness);
-	}
-	//LightIntensity=color;
-	LightIntensity = clamp(vec3(lightColor)*vec3(0.3,0.3,0.3) + diffuse * vec3(lightColor) + spec * vec3(lightColor),0.0,1.0);
+
+	LightIntensity = clamp(vec3(lightColor)*vec3(0.5,0.5,0.5) + diffuse * vec3(lightColor)+ specular,0,1);
 	TexCoord = texCoords;
-	gl_Position = MVP*vec4(position,1.0); //you must have gl_Position
+	gl_Position = MVP*vec4(position,1.0);
 		
 }

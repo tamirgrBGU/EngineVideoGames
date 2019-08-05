@@ -34,6 +34,7 @@ class Game : public Scene
 	float superSpeedTicks = 0;
 	const float superSpeed = 2.5f;
 public:
+	bool snakeviewmode = false;
 	glm::vec3 tailDirection;	glm::vec3 headDirection;
 	glm::vec3 headCurLocation;	glm::vec3 midCurLocation;
 	glm::mat4 headTransMAT;
@@ -47,7 +48,7 @@ public:
 	void updateDrawMode(unsigned int mode);
 	void UpdateLinear(const glm::mat4 &lastMVP, const glm::mat4 &MVP, const glm::mat4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx);
 	void UpdateQuaternion(const glm::mat2x4 &lastMVP, const glm::mat2x4 &MVP, const glm::mat2x4 &nextMVP, const glm::mat4 &Normal, const int shaderIndx);
-	void Update(const glm::mat4 &MVP, const glm::mat4 &Normal, const int shaderIndx);
+	void Update(const glm::vec4 &camdir, glm::mat4 &MVP, const glm::mat4 &Normal, const int shaderIndx);
 
 	void WhenRotate();
 	void WhenTranslate();
