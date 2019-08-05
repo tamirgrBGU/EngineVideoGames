@@ -149,5 +149,12 @@ private:
 	void configSound();
 	void orderCameraTop();
 	void setUpCamera();
+
+	int fruitMotionCounter;
+	int fruitMotionDir;
+	void setFruitMotion() {
+		fruitMotionCounter = 1;
+		fruitMotionDir = -1;
+	}
 };
 

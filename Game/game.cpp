@@ -104,14 +104,14 @@ void Game::genTongue(int pa) {
 	float lY = lastYext;
 	//getSegs(x, 0, 1, 0.f, 0.2f, ends);
 	//getSegs(x, 0, 1, 0.1f * float(segs) / ends, 0.2f, segs);	x = .2f;
-	getSegs(x, 1 - 1 / float(segs), -1, -0.09f*float(segs) / ends, 0.7f, segs); x = .4f;
+	getSegs(x, 1 - 1 / float(segs), -1, -0.09f*float(segs) / ends, 0.5f, segs); x = .4f;
 	pickedShape = shapes.size() - 1;
 	shapeTransformation(yGlobalTranslate, lY);	pickedShape = -1;
 	shapes.back()->SetTexture(1);
 	shapes.back()->SetShader(4);
 	shapes.back()->myRotate(-60.f, zAx, zAxis1);
 	chainParents.back() = snakeTongue;
-	getSegs(x, 1 - 1 / float(segs), -1, -0.09f*float(segs) / ends, 0.7f, segs);
+	getSegs(x, 1 - 1 / float(segs), -1, -0.09f*float(segs) / ends, 0.5f, segs);
 	pickedShape = shapes.size() - 1;
 	shapeTransformation(yGlobalTranslate, lY);	pickedShape = -1;
 	shapes.back()->SetTexture(1);
@@ -557,7 +557,7 @@ void Game::setupCurrentLevel() {
 	}
 	else
 		printf("level did not been loaded!");
-
+	setFruitMotion();
 	isLoading = false;
 }
 
@@ -653,19 +653,17 @@ void Game::Debug() {
 	//sMT->printDS();
 }
 
-const int maxFmotion = 10;
-vec3 motionJumps = vec3(0.5f);
-int counter = -maxFmotion;
-int dir = 1;
+const int maxFmotion = 20;
+vec3 motionJumps = -vec3(0.8f);
 float angleFmotion = 8.f;
 void Game::fruitMotion() {
-	counter += dir;
-	if (counter == maxFmotion) {
-		dir = -1;
+	fruitMotionCounter += fruitMotionDir;
+	if (fruitMotionCounter == maxFmotion) {
+		fruitMotionDir = -1;
 		motionJumps = -motionJumps;
 	}
-	else if (counter == -maxFmotion) {
-		dir = 1;
+	else if (fruitMotionCounter == 0) {
+		fruitMotionDir = 1;
 		motionJumps = -motionJumps;
 	}
 	for (int i = 0; i < (signed) fruitsVec.size(); i++) {
