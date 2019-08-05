@@ -95,26 +95,29 @@ void Game::getBodySegs(float& lastX, const float jumpX, const float jumpY, const
 }
 
 void Game::genTongue(int pa) {
-	float x = .2f;
-	getSegs(x, 1, 0, 0.f, .2f, ends);
+	float x = .4f;
+	snakeTongue = shapes.size();
+	getSegs(x, 1, 0, 0.f, .3f, ends);
 	shapes.back()->SetTexture(1);
-	chainParents.back() = -1;
+	shapes.back()->SetShader(4);
 	chainParents.back() = pa;
-	getSegs(x, 0, 1, 0.f, 0.2f, ends);
+	float lY = lastYext;
+	//getSegs(x, 0, 1, 0.f, 0.2f, ends);
+	//getSegs(x, 0, 1, 0.1f * float(segs) / ends, 0.2f, segs);	x = .2f;
+	getSegs(x, 1 - 1 / float(segs), -1, -0.09f*float(segs) / ends, 0.7f, segs); x = .4f;
 	pickedShape = shapes.size() - 1;
-	shapeTransformation(yGlobalTranslate, lastYext);
+	shapeTransformation(yGlobalTranslate, lY);	pickedShape = -1;
 	shapes.back()->SetTexture(1);
 	shapes.back()->SetShader(4);
-	shapes.back()->myScale(vec3(2.f));
-	shapes.back()->myRotate(-60.f, xAx, zAxis1);
-	chainParents.back() = shapes.size() -2;
-	pickedShape = -1;
-	getSegs(x, 0, 1, 0.f, 0.2f, ends);
+	shapes.back()->myRotate(-60.f, zAx, zAxis1);
+	chainParents.back() = snakeTongue;
+	getSegs(x, 1 - 1 / float(segs), -1, -0.09f*float(segs) / ends, 0.7f, segs);
+	pickedShape = shapes.size() - 1;
+	shapeTransformation(yGlobalTranslate, lY);	pickedShape = -1;
 	shapes.back()->SetTexture(1);
 	shapes.back()->SetShader(4);
-	shapes.back()->myScale(vec3(2.f));
-	shapes.back()->myRotate(60.f, xAx, zAxis1);
-	chainParents.back() = shapes.size() - 3;
+	shapes.back()->myRotate(60.f, zAx, zAxis1);
+	chainParents.back() = snakeTongue;
 }
 
 void Game::genEyes(float width, int pa) {
@@ -675,7 +678,8 @@ void Game::fruitMotion() {
 
 const int waitForBlink = 40;
 const int waitForUnBlink = 4;
-const int waitForTongue = 15;
+const int waitForTongue = 35;
+const int waitForUnTongue = 5;
 int curWaitForBlink = 0;
 int curWaitForTongue = 0;
 void Game::snakeFaceMotion() {
@@ -688,6 +692,14 @@ void Game::snakeFaceMotion() {
 		shapes[snakeNodesShapesEnd + 1]->SetTexture(0);
 		shapes[snakeNodesShapesEnd + 2]->SetTexture(0);
 	}
+	if (curWaitForTongue == 0) {
+		curWaitForTongue = waitForTongue + waitForUnTongue;
+		shapes[snakeTongue]->myTranslate(vec3(0, 10, 0), 1);
+	}
+	else if (curWaitForTongue == waitForTongue) {
+		shapes[snakeTongue]->myTranslate(vec3(0, -10, 0), 1);
+	}
+	curWaitForTongue--;
 	curWaitForBlink--;
 
 }

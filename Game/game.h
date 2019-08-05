@@ -132,6 +132,7 @@ private:
 	void genEyes(float width, int pa);
 
 	int snakeLevel;
+	int snakeTongue = - 1;
 	int snakeNodesShapesStart = -1;
 	int snakeNodesShapesEnd = -1;
 	float snakeFullLength;
