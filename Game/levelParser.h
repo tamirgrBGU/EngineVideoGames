@@ -2,8 +2,9 @@
 #include "bezier1D.h"
 
 static const char * levelDirName = "levels";
-static const float allscale = 100;
-static const float zscale = allscale/3;
+static const float allscale = 100.f;
+static const float zscale = allscale / 3.f;
+static const float climbAngle = glm::degrees(glm::atan(zscale / allscale));
 
 struct objLocation {
 	float x;

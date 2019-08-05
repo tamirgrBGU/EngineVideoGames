@@ -11,6 +11,7 @@ case GLFW_KEY_KP_ADD:		zoomin
 case GLFW_KEY_P: 	  		will change the drawing mode
 case GLFW_KEY_F1:			in case it is too hard for you to complete the level press this button to past to the next level
 case GLFW_KEY_F2:			to enable mouse dragging of the map(default is disabled)
+case GLFW_KEY_F3:			to enable reset the snake if it got terribly wrong
 case GLFW_KEY_D:			will change the camera mode - can reset your camera in case you dragged it away
 
 rules-

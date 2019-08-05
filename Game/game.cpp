@@ -162,6 +162,18 @@ vec3 myDir(int direction) {
 	return -xAx;
 }
 
+int Game::findMyDir() {
+	bool whosBigger = abs(headDirection.x) > abs(headDirection.y);
+	if (whosBigger) {
+		if (headDirection.x > 0)
+			return 1;
+		return 3;
+	}
+	if (headDirection.y > 0)
+		return 2;
+	return 0;	
+}
+
 void Game::putSnakeInPlace(float xLoc, float yLoc, float zLoc, int direction){
 	if (direction == 0)
 		shapeTransformation(snakeNodesShapesStart, GlobalTranslate, vec3(0, snakeFullLength, 0));
@@ -277,20 +289,16 @@ void Game::onIntersectWalls(Shape *s) {
 	Deactivate();
 }
 
-float climbAngle = glm::atan(zscale / allscale);
 /*
 true - is up
 false- is down
 */
 void Game::turnSnakeHeadUpDown(bool dir, float angle) {
-	Deactivate();
-
-	int sign = (dir ? -1 : 1);
-	vec3 turnOnMe = glm::cross(zAx, headDirection);
-	sMT->add(turnOnMe, sign*angle);
-	shapes[snakeNodesShapesEnd]->myRotate(sign*angle, turnOnMe, 4);
-
-	Activate();
+	printf("turning head %d %f\n", dir, angle);
+	int sign = (dir ? 1 : -1);
+	//vec3 turnOnMe = glm::cross(zAx, headDirection);
+	sMT->add(xAx, sign*angle);
+	shapes[snakeNodesShapesEnd]->myRotate(sign*angle, xAx, 4);
 }
 
 int fallWallCoolDown = 0;
@@ -303,28 +311,47 @@ void Game::onIntersectFallWall(Shape *s) {
 
 bool onStair = false;
 int stairIntersCoolDown = 0;
-Shape *stairWall;
+Shape *stairWall = nullptr;
+
+void Game::gotToDestinationStair(Shape *s)
+{
+	onStair = false;
+	vec4 wallLoc = s->makeTrans()[3];
+	snakeLevel = (int)(wallLoc.z / zscale);
+	stairWall = nullptr;
+	sMT->flush();
+	for (int pShape = snakeNodesShapesStart; pShape <= snakeNodesShapesEnd; pShape++) {
+		shapes[pShape]->resetEuler();
+		shapes[pShape]->doRotate(mat4(1));
+	}
+	//shapes[snakeNodesShapesStart]->makeRot(headDirection);
+	shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 0);
+	shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 1);
+	printVec(wallLoc);
+	putSnakeInPlace(wallLoc.x, wallLoc.y, wallLoc.z, findMyDir());
+}
+
 void Game::onIntersectStairs(Shape *s) {
+	printf("stairs %d\n", stairIntersCoolDown);
 	if (stairIntersCoolDown > 0) {
 		stairIntersCoolDown++;
 		return;
 	}
 	printf("stairs\n");
-	stairIntersCoolDown = 2;
-	if (s == stairWall) {//enter stair
-		if (onStair) {//exit stair
-			turnSnakeHeadUpDown(false, climbAngle);
-		}
+	printf("%d %d %p %d\n", stairIntersCoolDown, onStair, stairWall, snakeLevel);
+	stairIntersCoolDown = 5;
+	if (s != stairWall) {//enter stair
+		if (onStair)//exit stair from next level
+			gotToDestinationStair(s);		
 		else{
 			onStair = true;
 			stairWall = s;
-			turnSnakeHeadUpDown(true, climbAngle);
+			turnSnakeHeadUpDown(true, climbAngle);//todo how we know which wall we are?
 		}
 	}
-	else {//exit stair
-		onStair = false;
-		snakeLevel = (int) (s->makeTrans()[3][2] / zscale);
-	}	
+	else//exit stair from where we entered
+		gotToDestinationStair(s);
+	printf("%d %d %p %d\n", stairIntersCoolDown, onStair, stairWall, snakeLevel);
 }
 
 enum MapObjTypes { NOTUSED, Snake, Cave, Obstecle, Fruit };
@@ -469,6 +496,10 @@ void Game::setUpCamera() {
 
 void Game::resetSnake() {
 	struct objMap map = lGen->getLevel(currentLvl);
+	
+	onStair = false;
+	stairIntersCoolDown = 0;
+	stairWall = nullptr;
 
 	sMT->flush();
 	for (int pShape = snakeNodesShapesStart; pShape <= snakeNodesShapesEnd; pShape++) {
@@ -484,6 +515,7 @@ void Game::resetSnake() {
 				shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 0);
 				shapes[snakeNodesShapesStart]->doTranslate(mat4(1), 1);
 				putSnakeInPlace(obj.x, obj.y, obj.z, obj.direction);
+				snakeLevel = (int) (obj.z / zscale);
 				notfound = 0;
 				break;
 		}
@@ -762,7 +794,14 @@ void Game::Motion()
 		setSnakeNodesAngles();
 		updateCam();
 
-		IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
+		stairIntersCoolDown--;
+		if (onStair) {
+			IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel - 1);
+			IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
+			IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel + 1);
+		}
+		else
+			IT->isIntersectSnakeHead(headTransMAT, headCurLocation.x, headCurLocation.y, snakeLevel);
 	}
 
 	fruitMotion();

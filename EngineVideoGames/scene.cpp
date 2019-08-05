@@ -458,6 +458,7 @@ using namespace glm;
 
 	float Scene::picking(int x,int y)
 	{
+		if (!enableMousePicking)	return 1.f;
 		//float depth;
 		glClearColor(0.0,0.0,0.0,0.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -531,8 +532,7 @@ using namespace glm;
 	
 	void Scene::mouseProccessing(int button)
 	{
-		if (!enableMouse)
-			return;
+		if (!enableMousePicking)	return;
 		if ((signed)shapes.size() <= pickedShape || pickedShape < -1) {
 			printf("mouseProccessing out of index <%d>\n", pickedShape);
 			pickedShape = -1;

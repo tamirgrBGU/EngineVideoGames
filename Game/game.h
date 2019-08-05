@@ -81,7 +81,9 @@ public:
 	bool wonGame = false;
 	bool isLoading = false;
 	void loadNextLevel();
+	void resetSnake();
 
+	void turnSnakeHeadUpDown(bool dir, float angle);//rotate head helper
 private:
 	bool soundEnable = true;
 
@@ -93,11 +95,14 @@ private:
 	void onIntersectObstecle(Shape *s);
 	void onIntersectFruit	(Shape *s);
 	void onIntersectWalls	(Shape *s);
-	void turnSnakeHeadUpDown(bool dir, float angle);//rotate head helper
+
+	//void turnSnakeHeadUpDown(bool dir, float angle);//rotate head helper
 	void onIntersectFallWall(Shape *s);
+
+	void gotToDestinationStair(Shape *s);
 	void onIntersectStairs	(Shape *s);
 
-	int currentLvl = 5;
+	int currentLvl = 0;//AMIT:: show him stairs -> int currentLvl = 5
 	const int maxGameLvl = 5;
 	leveGenerator *lGen;
 	void Game::setupEnvironment();
@@ -107,7 +112,6 @@ private:
 	inline void genSkyHelper(float xl, float xh, float yl, float yh, float zl, float zh);
 
 	void resetCurrentLevel();
-	void resetSnake();
 	void prepareLevel();
 
 	int currentTheme = 0;
@@ -144,6 +148,7 @@ private:
 	void updateSnakePosition();
 
 	void genSnake(float x, float y, float z, int direction);
+	int  findMyDir();
 	void putSnakeInPlace(float xLoc, float yLoc, float zLoc, int direction);
 	void specialObjHandle(objLocation &obj);
 	void genObj(int ptrIndx, int tex, vec3 startLoc, float scale, int direction);
