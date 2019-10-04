@@ -506,6 +506,7 @@ using namespace glm;
 			shapes[shpIndx]->Hide();
 		else 
 			shapes[shpIndx]->Unhide();
+
 	}
 
 	Scene::~Scene(void)

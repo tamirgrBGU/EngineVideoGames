@@ -36,7 +36,7 @@ void Display::addKeyCallBack(void(*keyCallback)(GLFWwindow *,int,int,int,int))
 	//glfwSetKeyCallback(m_window,[](GLFWwindow *window,int key,int scancode,int action,int mods){
 	//	func(glfwGetWindowUserPointer(window),key,scancode,action,mods);
 	//});
-		//key_callback);
+	//	key_callback);
 	
 	
 
@@ -79,9 +79,9 @@ Display::~Display()
 	//SDL_Quit();
 }
 
-void Display::Clear(float r, float g, float b, float a)
+void Display::Clear(float r, float g, float my_curve, float a)
 {
-	glClearColor(r, g, b, a);
+	glClearColor(r, g, my_curve, a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

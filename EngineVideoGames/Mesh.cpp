@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <limits>
 
 void IndexedModel::CalcNormals()
 {
@@ -250,3 +251,76 @@ IndexedModel OctahedronGenerator()
 	return model;
 }
 
+bool BoundingBox::checkCollision(BoundingBox other) {
+	return this->checkCollision(*this, other) && this->checkCollision(other, *this);
+}
+
+glm::mat4 getTransformation(glm::vec3 u, glm::vec3 v) {
+	glm::vec3 axis = glm::cross(u, v);
+	float angle = glm::acos(glm::dot(u, v));
+	return glm::rotate(angle, axis);
+}
+
+bool axsisCut(float b1min, float b1max, float b2min, float b2max) {
+	return (b1min <= b2max && b2max <= b1max) || (b1min <= b2min && b2min <= b1max) || (b1min >= b2min && b1max <= b2max);
+}
+
+bool BoundingBox::checkCollision(BoundingBox b1, BoundingBox b2) {
+	glm::mat3 to_b1 = glm::mat3();
+	to_b1[0] = glm::vec3(b1.xInit[0], b1.yInit[0], b1.zInit[0]);
+	to_b1[1] = glm::vec3(b1.xInit[1], b1.yInit[1], b1.zInit[1]);
+	to_b1[2] = glm::vec3(b1.xInit[2], b1.yInit[2], b1.zInit[2]);
+
+	glm::mat3 to_b2 = glm::mat3();
+	to_b2[0] = glm::vec3(b2.xInit[0], b2.yInit[0], b2.zInit[0]);
+	to_b2[1] = glm::vec3(b2.xInit[1], b2.yInit[1], b2.zInit[1]);
+	to_b2[2] = glm::vec3(b2.xInit[2], b2.yInit[2], b2.zInit[2]);
+
+	glm::mat3 from_b1 = glm::inverse(to_b1);
+
+	glm::mat3 b1_to_b2 = to_b2 * from_b1;
+
+	glm::vec3 b1xb2 = b1_to_b2 * b1.xInit;
+	glm::vec3 b1yb2 = b1_to_b2 * b1.yInit;
+	glm::vec3 b1zb2 = b1_to_b2 * b1.zInit;
+
+	float b1minx = std::numeric_limits<float>::max(), b1maxx = std::numeric_limits<float>::min()
+		, b1miny = std::numeric_limits<float>::max(), b1maxy = std::numeric_limits<float>::min()
+		, b1minz = std::numeric_limits<float>::max(), b1maxz = std::numeric_limits<float>::min();
+	float b2minx = std::numeric_limits<float>::max(), b2maxx = std::numeric_limits<float>::min()
+		, b2miny = std::numeric_limits<float>::max(), b2maxy = std::numeric_limits<float>::min()
+		, b2minz = std::numeric_limits<float>::max(), b2maxz = std::numeric_limits<float>::min();
+
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			for (int k = -1; k < 2; k++) {
+				glm::vec3 p = b1.center + ((float)i * b1xb2) * b1.size.x + ((float)j * b1yb2) * b1.size.y + ((float)k * b1zb2) * b1.size.z;
+				b1minx = std::fmin(p.x, b1minx);
+				b1maxx = std::fmax(p.x, b1maxx);
+				b1miny = std::fmin(p.y, b1miny);
+				b1maxy = std::fmax(p.y, b1maxy);
+				b1minz = std::fmin(p.z, b1minz);
+				b1maxz = std::fmax(p.z, b1maxz);
+			}
+		}
+	}
+
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			for (int k = -1; k < 2; k++) {
+				glm::vec3 p = b2.center + ((float)i * b2.xInit) * b2.size.x + ((float)j * b2.yInit) * b2.size.y + ((float)k * b2.zInit) * b2.size.z;
+				b2minx = std::fmin(p.x, b2minx);
+				b2maxx = std::fmax(p.x, b2maxx);
+				b2miny = std::fmin(p.y, b2miny);
+				b2maxy = std::fmax(p.y, b2maxy);
+				b2minz = std::fmin(p.z, b2minz);
+				b2maxz = std::fmax(p.z, b2maxz);
+			}
+		}
+		return axsisCut(b1minx, b1maxx, b2minx, b2maxx)
+			&& axsisCut(b1miny, b1maxy, b2miny, b2maxy)
+			&& axsisCut(b1minz, b1maxz, b2minz, b2maxz);
+	}
+
+
+}

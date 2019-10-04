@@ -5,13 +5,33 @@
 #include "Mesh.h"
 #include "bezier1D.h"
 #include "kdtree.h"
+#include "Mesh.h"
 
+class B_Node 
+{
+private:
+	BoundingBox bb;
+	int low;
+	int high;
+	B_Node* left;
+	B_Node* right;
+
+	BoundingBox getBoundingbox(int low, int high,std::vector<glm::vec3>* points[]);
+	BoundingBox getDefultBoundingbox(glm::vec3 point);
+public:
+	B_Node(int low, int high, std::vector<glm::vec3>* points[]);
+	B_Node(const B_Node &other);
+	bool isColiding(glm::mat4 myMat, B_Node &other,glm::mat4 otherMat);
+
+	~B_Node(void);
+};
 
 class MeshConstructor
 {
 	VertexArray vao;
 	IndexBuffer *ib;
 	//TO DO: add bounding box data base and build it in the constructor 
+	B_Node boundingTree;
 	std::vector<VertexBuffer*> vbs;
 	bool is2D;
 	int unsigned indicesNum;
